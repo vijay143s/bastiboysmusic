@@ -1,93 +1,157 @@
-import { User } from "../models/User.js";
 import TryCatch from "../utils/TryCatch.js";
 import bcrypt from "bcrypt";
 import generateToken from "../utils/generateToken.js";
+import {
+  createUser,
+  findUserByEmail,
+  getUserWithPlaylist,
+} from "../repositories/userRepository.js";
+import {
+  addSongToPlaylist,
+  isSongInPlaylist,
+  removeSongFromPlaylist,
+} from "../repositories/playlistRepository.js";
+import { findSongById } from "../repositories/songRepository.js";
+
+const sanitizeUser = (userDoc) => {
+  if (!userDoc) return null;
+  return {
+    id: userDoc.id,
+    _id: String(userDoc.id),
+    name: userDoc.name,
+    email: userDoc.email,
+    role: userDoc.role,
+    playlist: userDoc.playlist || [],
+    createdAt: userDoc.createdAt,
+    updatedAt: userDoc.updatedAt,
+  };
+};
+
+const sendAuthSuccess = (res, user, message, statusCode = 200) => {
+  generateToken(user.id, res);
+
+  return res.status(statusCode).json({
+    success: true,
+    message,
+    user: sanitizeUser(user),
+  });
+};
 
 export const registerUser = TryCatch(async (req, res) => {
   const { name, email, password } = req.body;
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedName = name.trim();
 
-  let user = await User.findOne({ email });
+  const existingUser = await findUserByEmail(normalizedEmail);
 
-  if (user)
-    return res.status(400).json({
-      message: "User Already Exists",
+  if (existingUser)
+    return res.status(409).json({
+      success: false,
+      message: "Email already registered",
     });
 
   const hashPassword = await bcrypt.hash(password, 10);
 
-  user = await User.create({
-    name,
-    email,
-    password: hashPassword,
+  const user = await createUser({
+    name: normalizedName,
+    email: normalizedEmail,
+    passwordHash: hashPassword,
   });
 
-  generateToken(user._id, res);
-
-  res.status(201).json({
-    user,
-    message: "User Registered",
-  });
+  return sendAuthSuccess(
+    res,
+    {
+      ...user,
+      playlist: [],
+    },
+    "User Registered",
+    201
+  );
 });
 
 export const loginUser = TryCatch(async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = email.trim().toLowerCase();
 
-  const user = await User.findOne({ email });
+  const user = await findUserByEmail(normalizedEmail);
 
   if (!user)
-    return res.status(400).json({
-      message: "No User Exist",
+    return res.status(401).json({
+      success: false,
+      message: "Invalid credentials",
     });
 
-  const comparePassword = await bcrypt.compare(password, user.password);
+  const comparePassword = await bcrypt.compare(password, user.passwordHash);
 
   if (!comparePassword)
-    return res.status(400).json({
-      message: "Wrong Password",
+    return res.status(401).json({
+      success: false,
+      message: "Invalid credentials",
     });
 
-  generateToken(user._id, res);
+  const userWithPlaylist = await getUserWithPlaylist(user.id);
 
-  res.status(200).json({
-    user,
-    message: "User LoggedIN",
-  });
+  return sendAuthSuccess(res, userWithPlaylist, "User Logged In");
 });
 
 export const myProfile = TryCatch(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await getUserWithPlaylist(req.user.id);
 
-  res.json(user);
+  if (!user)
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+
+  res.json(sanitizeUser(user));
 });
 
 export const logoutUser = TryCatch(async (req, res) => {
-  res.cookie("token", "", { maxAge: 0 });
+  res.cookie("token", "", {
+    maxAge: 0,
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
 
   res.json({
+    success: true,
     message: "Logged Out Successfully",
   });
 });
 
 export const saveToPlaylist = TryCatch(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const songId = Number(req.params.id);
 
-  if (user.playlist.includes(req.params.id)) {
-    const index = user.playlist.indexOf(req.params.id);
+  if (Number.isNaN(songId))
+    return res.status(400).json({
+      success: false,
+      message: "Invalid song id",
+    });
 
-    user.playlist.splice(index, 1);
+  const song = await findSongById(songId);
 
-    await user.save();
+  if (!song)
+    return res.status(404).json({
+      success: false,
+      message: "Song not found",
+    });
+
+  const alreadySaved = await isSongInPlaylist(req.user.id, songId);
+
+  if (alreadySaved) {
+    await removeSongFromPlaylist(req.user.id, songId);
 
     return res.json({
+      success: true,
       message: "Removed from playlist",
     });
   }
 
-  user.playlist.push(req.params.id);
-
-  await user.save();
+  await addSongToPlaylist(req.user.id, songId);
 
   return res.json({
-    message: "added to playlist",
+    success: true,
+    message: "Added to playlist",
   });
 });

@@ -7,11 +7,19 @@ import {
   saveToPlaylist,
 } from "../controllers/userControllers.js";
 import { isAuth } from "../middlewares/isAuth.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { authRateLimiter } from "../middlewares/rateLimiter.js";
+import { registerSchema, loginSchema } from "../validators/authSchemas.js";
 
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+router.post(
+  "/register",
+  authRateLimiter,
+  validateRequest(registerSchema),
+  registerUser
+);
+router.post("/login", authRateLimiter, validateRequest(loginSchema), loginUser);
 router.get("/me", isAuth, myProfile);
 router.get("/logout", isAuth, logoutUser);
 router.post("/song/:id", isAuth, saveToPlaylist);

@@ -1,8 +1,30 @@
-import { Album } from "../models/Album.js";
-import { Song } from "../models/Song.js";
 import TryCatch from "../utils/TryCatch.js";
 import getDataurl from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
+import {
+  createAlbum as createAlbumRecord,
+  getAllAlbums as fetchAlbums,
+  findAlbumById,
+} from "../repositories/albumRepository.js";
+import {
+  createSong,
+  deleteSongById,
+  findSongById,
+  getAllSongs as fetchSongs,
+  getSongsByAlbum,
+  updateSongThumbnail,
+} from "../repositories/songRepository.js";
+
+const formatAlbum = (album) => ({
+  ...album,
+  _id: String(album.id),
+});
+
+const formatSong = (song) => ({
+  ...song,
+  _id: String(song.id),
+  album: song.albumId ? String(song.albumId) : null,
+});
 
 export const createAlbum = TryCatch(async (req, res) => {
   if (req.user.role !== "admin")
@@ -18,7 +40,7 @@ export const createAlbum = TryCatch(async (req, res) => {
 
   const cloud = await cloudinary.v2.uploader.upload(fileUrl.content);
 
-  await Album.create({
+  await createAlbumRecord({
     title,
     description,
     thumbnail: {
@@ -33,9 +55,9 @@ export const createAlbum = TryCatch(async (req, res) => {
 });
 
 export const getAllAlbums = TryCatch(async (req, res) => {
-  const albums = await Album.find();
+  const albums = await fetchAlbums();
 
-  res.json(albums);
+  res.json(albums.map(formatAlbum));
 });
 
 export const addSong = TryCatch(async (req, res) => {
@@ -45,6 +67,19 @@ export const addSong = TryCatch(async (req, res) => {
     });
 
   const { title, description, singer, album } = req.body;
+  const albumId = Number(album);
+
+  if (Number.isNaN(albumId))
+    return res.status(400).json({
+      message: "Invalid album id",
+    });
+
+  const albumRecord = await findAlbumById(albumId);
+
+  if (!albumRecord)
+    return res.status(404).json({
+      message: "Album not found",
+    });
 
   const file = req.file;
 
@@ -54,7 +89,7 @@ export const addSong = TryCatch(async (req, res) => {
     resource_type: "video",
   });
 
-  await Song.create({
+  await createSong({
     title,
     description,
     singer,
@@ -62,7 +97,7 @@ export const addSong = TryCatch(async (req, res) => {
       id: cloud.public_id,
       url: cloud.secure_url,
     },
-    album,
+    albumId,
   });
 
   res.json({
@@ -82,16 +117,17 @@ export const addThumbnail = TryCatch(async (req, res) => {
 
   const cloud = await cloudinary.v2.uploader.upload(fileUrl.content);
 
-  await Song.findByIdAndUpdate(
-    req.params.id,
-    {
-      thumbnail: {
-        id: cloud.public_id,
-        url: cloud.secure_url,
-      },
-    },
-    { new: true }
-  );
+  const songId = Number(req.params.id);
+
+  if (Number.isNaN(songId))
+    return res.status(400).json({
+      message: "Invalid song id",
+    });
+
+  await updateSongThumbnail(songId, {
+    id: cloud.public_id,
+    url: cloud.secure_url,
+  });
 
   res.json({
     message: "thumbnail Added",
@@ -99,28 +135,57 @@ export const addThumbnail = TryCatch(async (req, res) => {
 });
 
 export const getAllSongs = TryCatch(async (req, res) => {
-  const songs = await Song.find();
+  const songs = await fetchSongs();
 
-  res.json(songs);
+  res.json(songs.map(formatSong));
 });
 
 export const getAllSongsByAlbum = TryCatch(async (req, res) => {
-  const album = await Album.findById(req.params.id);
-  const songs = await Song.find({ album: req.params.id });
+  const albumId = Number(req.params.id);
 
-  res.json({ album, songs });
+  if (Number.isNaN(albumId))
+    return res.status(400).json({
+      message: "Invalid album id",
+    });
+
+  const album = await findAlbumById(albumId);
+  if (!album)
+    return res.status(404).json({
+      message: "Album not found",
+    });
+
+  const songs = await getSongsByAlbum(albumId);
+
+  res.json({ album: formatAlbum(album), songs: songs.map(formatSong) });
 });
 
 export const deleteSong = TryCatch(async (req, res) => {
-  const song = await Song.findById(req.params.id);
+  const songId = Number(req.params.id);
 
-  await song.deleteOne();
+  if (Number.isNaN(songId))
+    return res.status(400).json({
+      message: "Invalid song id",
+    });
+
+  await deleteSongById(songId);
 
   res.json({ message: "Song Deleted" });
 });
 
 export const getSingleSong = TryCatch(async (req, res) => {
-  const song = await Song.findById(req.params.id);
+  const songId = Number(req.params.id);
 
-  res.json(song);
+  if (Number.isNaN(songId))
+    return res.status(400).json({
+      message: "Invalid song id",
+    });
+
+  const song = await findSongById(songId);
+
+  if (!song)
+    return res.status(404).json({
+      message: "Song not found",
+    });
+
+  res.json(formatSong(song));
 });
