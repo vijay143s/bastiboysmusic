@@ -1,11 +1,11 @@
 import mysql from "mysql2/promise";
 
 const {
-  MYSQL_HOST = "localhost",
+  MYSQL_HOST = "188.68.38.138",
   MYSQL_PORT = "3306",
-  MYSQL_USER = "root",
-  MYSQL_PASSWORD = "",
-  MYSQL_DATABASE = "spotify_db",
+  MYSQL_USER = "topnotch_admin",
+  MYSQL_PASSWORD = "topnotchadmin",
+  MYSQL_DATABASE = "topnotch_Bastiband",
 } = process.env;
 
 export const pool = mysql.createPool({

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { findUserById } from "../repositories/userRepository.js";
+import { jwtSecret } from "../config/auth.js";
 
 export const isAuth = async (req, res, next) => {
   try {
@@ -10,7 +11,7 @@ export const isAuth = async (req, res, next) => {
         message: "Please Login",
       });
 
-    const decodedData = jwt.verify(token, process.env.Jwt_secret);
+  const decodedData = jwt.verify(token, jwtSecret);
 
     if (!decodedData || !decodedData.id)
       return res.status(403).json({
