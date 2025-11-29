@@ -1,37 +1,37 @@
 -- === Albums ===
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Ak Thaluka', 'Imported album Ak Thaluka', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Ak Thaluka') LIMIT 1;
+SELECT 'Ak Thaluka' AS title, 'Imported album Ak Thaluka' AS description, NULL AS thumbnail_id, NULL AS thumbnail_url
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Ak Thaluka') LIMIT 1;
 SET @album_Ak_Thaluka = (SELECT id FROM albums WHERE title='Ak Thaluka' LIMIT 1);
 
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Akhanda 2', 'Imported album Akhanda 2', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Akhanda 2') LIMIT 1;
+SELECT 'Akhanda 2', 'Imported album Akhanda 2', NULL, NULL
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Akhanda 2') LIMIT 1;
 SET @album_Akhanda_2 = (SELECT id FROM albums WHERE title='Akhanda 2' LIMIT 1);
 
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Anaganaga Oka Roju', 'Imported album Anaganaga Oka Roju', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Anaganaga Oka Roju') LIMIT 1;
+SELECT 'Anaganaga Oka Roju', 'Imported album Anaganaga Oka Roju', NULL, NULL
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Anaganaga Oka Roju') LIMIT 1;
 SET @album_Anaganaga_Oka_Roju = (SELECT id FROM albums WHERE title='Anaganaga Oka Roju' LIMIT 1);
 
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Andra King Thaluka', 'Imported album Andra King Thaluka', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Andra King Thaluka') LIMIT 1;
+SELECT 'Andra King Thaluka', 'Imported album Andra King Thaluka', NULL, NULL
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Andra King Thaluka') LIMIT 1;
 SET @album_Andra_King_Thaluka = (SELECT id FROM albums WHERE title='Andra King Thaluka' LIMIT 1);
 
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Arjun Son of Vyjayanthi', 'Imported album Arjun Son of Vyjayanthi', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Arjun Son of Vyjayanthi') LIMIT 1;
+SELECT 'Arjun Son of Vyjayanthi', 'Imported album Arjun Son of Vyjayanthi', NULL, NULL
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Arjun Son of Vyjayanthi') LIMIT 1;
 SET @album_Arjun_Son_of_Vyjayanthi = (SELECT id FROM albums WHERE title='Arjun Son of Vyjayanthi' LIMIT 1);
 
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Bhairavam', 'Imported album Bhairavam', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Bhairavam') LIMIT 1;
+SELECT 'Bhairavam', 'Imported album Bhairavam', NULL, NULL
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Bhairavam') LIMIT 1;
 SET @album_Bhairavam = (SELECT id FROM albums WHERE title='Bhairavam' LIMIT 1);
 
 INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
-SELECT * FROM (SELECT 'Biker', 'Imported album Biker', NULL, NULL) AS tmp
-WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Biker') LIMIT 1;
+SELECT 'Biker', 'Imported album Biker', NULL, NULL
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM albums WHERE title='Biker') LIMIT 1;
 SET @album_Biker = (SELECT id FROM albums WHERE title='Biker' LIMIT 1);
 
 -- === Songs ===
