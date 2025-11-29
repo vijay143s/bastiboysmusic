@@ -1,20 +1,16 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { SongData } from "../context/Song";
 import AlbumItem from "../components/AlbumItem";
-import SongItem from "../components/SongItem";
 
 const Home = () => {
-  const { songs, albums } = SongData();
-
-  const albumTitleMap = useMemo(() => {
-    const map = new Map();
-    albums.forEach((album) => map.set(album._id, album.title));
-    return map;
-  }, [albums]);
+  const { albums } = SongData();
   return (
-    <div className="mb-4">
-      <h1 className="my-5 font-bold text-2xl">Featured Charts</h1>
-      <div className="flex overflow-auto">
+    <div className="mb-8">
+      <div className="flex items-center justify-between my-5">
+        <h1 className="font-bold text-2xl">Featured Albums</h1>
+        <p className="text-slate-400 text-sm">{albums.length} collections</p>
+      </div>
+      <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(180px,1fr))]">
         {albums.map((e, i) => (
           <AlbumItem
             key={i}
@@ -22,19 +18,6 @@ const Home = () => {
             name={e.title}
             desc={e.description}
             id={e._id}
-          />
-        ))}
-      </div>
-
-      <h1 className="my-5 font-bold text-2xl">Today's biggest hits</h1>
-      <div className="flex overflow-auto">
-        {songs.map((e, i) => (
-          <SongItem
-            key={i}
-            image={e.thumbnail.url}
-            name={e.title}
-            id={e._id}
-            albumTitle={albumTitleMap.get(e.album) || "Single"}
           />
         ))}
       </div>

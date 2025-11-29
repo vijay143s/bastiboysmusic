@@ -4,6 +4,7 @@ import { assets } from "../assets/assets";
 import { FaBookmark, FaPlay } from "react-icons/fa";
 import { RiPulseLine } from "react-icons/ri";
 import { UserData } from "../context/User";
+import toast from "react-hot-toast";
 
 const PlayList = () => {
   const {
@@ -43,6 +44,16 @@ const PlayList = () => {
     addToPlaylist(id);
   };
 
+  const handleShufflePlay = () => {
+    if (!myPlaylist.length) {
+      toast.error("Your playlist is empty");
+      return;
+    }
+    const randomSong =
+      myPlaylist[Math.floor(Math.random() * myPlaylist.length)];
+    onclickHander(randomSong._id);
+  };
+
   return (
     <div>
       <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-center">
@@ -73,6 +84,14 @@ const PlayList = () => {
               alt=""
             />
           </p>
+          <div className="flex gap-3 mt-4 flex-wrap">
+            <button
+              className="bg-green-500 text-black font-semibold px-5 py-2 rounded-full"
+              onClick={handleShufflePlay}
+            >
+              Shuffle Play
+            </button>
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 mt-10 mb-4 pl-2 text-[#a7a7a7]">

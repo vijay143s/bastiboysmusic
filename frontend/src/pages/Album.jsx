@@ -5,6 +5,7 @@ import { assets } from "../assets/assets";
 import { UserData } from "../context/User";
 import { FaBookmark, FaPlay } from "react-icons/fa";
 import { RiPulseLine } from "react-icons/ri";
+import toast from "react-hot-toast";
 
 const Album = () => {
   const {
@@ -30,6 +31,40 @@ const Album = () => {
 
   const { addToPlaylist, user } = UserData();
   const playlistIds = Array.isArray(user?.playlist) ? user.playlist : [];
+
+  const handleShufflePlay = () => {
+    if (!albumSong || albumSong.length === 0) {
+      toast.error("No songs available to shuffle");
+      return;
+    }
+    const randomSong =
+      albumSong[Math.floor(Math.random() * albumSong.length)];
+    onclickHander(randomSong._id);
+  };
+
+  const handleAddAlbumToPlaylist = async () => {
+    if (!albumSong || albumSong.length === 0) {
+      toast.error("No songs available to add");
+      return;
+    }
+
+    const playlistSet = new Set(playlistIds);
+    const songsToAdd = albumSong.filter((song) => !playlistSet.has(song._id));
+
+    if (songsToAdd.length === 0) {
+      toast.success("All songs from this album are already in your playlist");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        songsToAdd.map((song) => addToPlaylist(song._id, { silent: true }))
+      );
+      toast.success(`Added ${songsToAdd.length} songs to your playlist`);
+    } catch (error) {
+      toast.error("Failed to add album to playlist");
+    }
+  };
 
   const savePlayListHandler = (id) => {
     addToPlaylist(id);
@@ -60,6 +95,20 @@ const Album = () => {
                   alt=""
                 />
               </p>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <button
+                  className="bg-green-500 text-black font-semibold px-5 py-2 rounded-full"
+                  onClick={handleShufflePlay}
+                >
+                  Shuffle Play
+                </button>
+                <button
+                  className="border border-slate-500 px-5 py-2 rounded-full text-sm hover:border-white"
+                  onClick={handleAddAlbumToPlaylist}
+                >
+                  Add Album to Playlist
+                </button>
+              </div>
             </div>
           </div>
 

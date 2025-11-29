@@ -84,14 +84,19 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  async function addToPlaylist(id) {
+  async function addToPlaylist(id, options = {}) {
+    const { silent = false } = options;
     try {
       const { data } = await axios.post("/api/user/song/" + id);
 
-      toast.success(data.message);
-      fetchUser();
+      if (!silent) toast.success(data.message);
+      await fetchUser();
+      return data;
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (!silent && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      }
+      throw error;
     }
   }
 

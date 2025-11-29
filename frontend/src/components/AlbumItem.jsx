@@ -6,11 +6,12 @@ const AlbumItem = ({ image, name, desc, id }) => {
   return (
     <div
       onClick={() => navigate("/album/" + id)}
-      className="min-w-[180px] p-2 px-3 rounded cursor-pointer hover:bg-[#ffffff26]"
+      className="bg-[#1c1c1c] rounded-xl p-4 cursor-pointer hover:bg-[#2a2a2a] transition flex flex-col"
     >
-      <img src={image} className="rounded w-[160px]" alt="" />
-      <p className="font-bold mt-2 mb-1">{name.slice(0, 12)}..</p>
-      <p className="text-slate-200 text-sm">{desc.slice(0, 18)}..</p>
+      <div className="aspect-square w-full overflow-hidden rounded-lg">
+        <img src={image} className="w-full h-full object-cover" alt="" />
+      </div>
+      <p className="font-bold mt-4 mb-1 truncate">{name}</p>
     </div>
   );
 };

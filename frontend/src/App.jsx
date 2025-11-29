@@ -9,6 +9,7 @@ import Admin from "./pages/Admin";
 import PlayList from "./pages/PlayList";
 import Album from "./pages/Album";
 import Layout from "./components/Layout";
+import Search from "./pages/Search";
 
 const App = () => {
   const { loading, isAuth } = UserData();
@@ -24,6 +25,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/playlist" element={<PlayList />} />
                 <Route path="/album/:id" element={<Album />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/login" element={<Navigate to="/" replace />} />
                 <Route path="/register" element={<Navigate to="/" replace />} />
