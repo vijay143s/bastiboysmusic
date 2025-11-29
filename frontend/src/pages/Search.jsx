@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { UserData } from "../context/User";
 
 const Search = () => {
-  const { songs, albums, setSelectedSong, setIsPlaying } = SongData();
+  const { songs, albums, playQueue, playFromSongs } = SongData();
   const { addToPlaylist } = UserData();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -31,9 +31,14 @@ const Search = () => {
     );
   }, [songs, normalizedQuery]);
 
-  const handlePlaySong = (id) => {
-    setSelectedSong(id);
-    setIsPlaying(true);
+  const handlePlaySong = (id, sourceList) => {
+    const listToUse = sourceList && sourceList.length ? sourceList : songs;
+    const label = sourceList ? "Search Queue" : "All Songs";
+    if (listToUse === songs && !sourceList) {
+      playFromSongs(id);
+    } else {
+      playQueue(listToUse, id, label);
+    }
   };
 
   const handleAddSong = async (id) => {
@@ -101,7 +106,7 @@ const Search = () => {
                   >
                     <div
                       className="flex items-center gap-4 cursor-pointer"
-                      onClick={() => handlePlaySong(song._id)}
+                      onClick={() => handlePlaySong(song._id, songMatches)}
                     >
                       <img
                         src={song.thumbnail?.url || "https://via.placeholder.com/60"}
@@ -119,7 +124,7 @@ const Search = () => {
                       <button
                         className="bg-white text-black rounded-full p-3 hover:scale-95 transition"
                         title="Play"
-                        onClick={() => handlePlaySong(song._id)}
+                        onClick={() => handlePlaySong(song._id, songMatches)}
                       >
                         <FaPlay />
                       </button>

@@ -51,27 +51,34 @@ const Player = () => {
     if (!audio) return;
 
     const handleLoadedMetaData = () => {
-      setDuration(audio.duration);
+      setDuration(audio.duration || 0);
     };
 
     const handleTimeUpdate = () => {
-      setProgress(audio.currentTime);
+      setProgress(audio.currentTime || 0);
+    };
+
+    const handleEnded = () => {
+      nextMusic("auto");
     };
 
     audio.addEventListener("loadedmetadata", handleLoadedMetaData);
     audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
       audio.removeEventListener("loadedmetadata", handleLoadedMetaData);
       audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("ended", handleEnded);
     };
-  }, [song]);
+  }, [song, nextMusic]);
 
   const handleProgressChange = (e) => {
     const newTime = (e.target.value / 100) * duration;
     audioRef.current.currentTime = newTime;
     setProgress(newTime);
   };
+  const progressPercent = duration ? (progress / duration) * 100 : 0;
   return (
     <div>
       {song && (
@@ -109,7 +116,7 @@ const Player = () => {
                 min={"0"}
                 max={"100"}
                 className="progress-bar w-[120px] md:w-[300px]"
-                value={(progress / duration) * 100}
+                value={progressPercent}
                 onChange={handleProgressChange}
               />
             </div>
@@ -124,7 +131,10 @@ const Player = () => {
               >
                 {isPlaying ? <FaPause /> : <FaPlay />}
               </button>
-              <span className="cursor-pointer" onClick={nextMusic}>
+              <span
+                className="cursor-pointer"
+                onClick={() => nextMusic("manual")}
+              >
                 <GrChapterNext />
               </span>
             </div>

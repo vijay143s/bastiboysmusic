@@ -5,6 +5,7 @@ import {
   createUser,
   findUserByEmail,
   getUserWithPlaylist,
+  getAllUsersWithPlaylistSongs,
 } from "../repositories/userRepository.js";
 import {
   addSongToPlaylist,
@@ -154,4 +155,27 @@ export const saveToPlaylist = TryCatch(async (req, res) => {
     success: true,
     message: "Added to playlist",
   });
+});
+
+const formatCommunitySong = (song) => ({
+  ...song,
+  _id: String(song.id),
+  album: song.albumId ? String(song.albumId) : null,
+});
+
+export const getAllCommunityPlaylists = TryCatch(async (req, res) => {
+  const rawPlaylists = await getAllUsersWithPlaylistSongs();
+
+  const playlists = rawPlaylists.map((entry) => ({
+    user: {
+      id: entry.user.id,
+      _id: String(entry.user.id),
+      name: entry.user.name,
+      email: entry.user.email,
+    },
+    songs: entry.songs.map(formatCommunitySong),
+    totalSongs: entry.songs.length,
+  }));
+
+  res.json({ success: true, playlists });
 });

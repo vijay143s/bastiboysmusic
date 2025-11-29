@@ -10,6 +10,8 @@ import PlayList from "./pages/PlayList";
 import Album from "./pages/Album";
 import Layout from "./components/Layout";
 import Search from "./pages/Search";
+import Queue from "./pages/Queue";
+import CommunityPlaylists from "./pages/CommunityPlaylists";
 
 const App = () => {
   const { loading, isAuth } = UserData();
@@ -26,6 +28,8 @@ const App = () => {
                 <Route path="/playlist" element={<PlayList />} />
                 <Route path="/album/:id" element={<Album />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/queue" element={<Queue />} />
+                <Route path="/community" element={<CommunityPlaylists />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/login" element={<Navigate to="/" replace />} />
                 <Route path="/register" element={<Navigate to="/" replace />} />

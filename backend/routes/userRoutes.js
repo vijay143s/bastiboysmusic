@@ -5,6 +5,7 @@ import {
   myProfile,
   registerUser,
   saveToPlaylist,
+  getAllCommunityPlaylists,
 } from "../controllers/userControllers.js";
 import { isAuth } from "../middlewares/isAuth.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
@@ -23,5 +24,6 @@ router.post("/login", authRateLimiter, validateRequest(loginSchema), loginUser);
 router.get("/me", isAuth, myProfile);
 router.get("/logout", isAuth, logoutUser);
 router.post("/song/:id", isAuth, saveToPlaylist);
+router.get("/playlists/all", isAuth, getAllCommunityPlaylists);
 
 export default router;

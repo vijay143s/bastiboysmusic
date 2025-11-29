@@ -12,10 +12,9 @@ const Album = () => {
     fetchAlbumSong,
     albumSong,
     albumData,
-    setIsPlaying,
-    setSelectedSong,
     selectedSong,
     isPlaying,
+    playQueue,
   } = SongData();
 
   const params = useParams();
@@ -24,9 +23,12 @@ const Album = () => {
     fetchAlbumSong(params.id);
   }, [params.id]);
 
-  const onclickHander = (id) => {
-    setSelectedSong(id);
-    setIsPlaying(true);
+  const startAlbumQueue = (songId) => {
+    if (!albumSong || albumSong.length === 0) return;
+    const label = albumData?.title
+      ? `${albumData.title} Queue`
+      : "Album Queue";
+    playQueue(albumSong, songId, label);
   };
 
   const { addToPlaylist, user } = UserData();
@@ -39,7 +41,7 @@ const Album = () => {
     }
     const randomSong =
       albumSong[Math.floor(Math.random() * albumSong.length)];
-    onclickHander(randomSong._id);
+    startAlbumQueue(randomSong._id);
   };
 
   const handleAddAlbumToPlaylist = async () => {
@@ -131,7 +133,7 @@ const Album = () => {
                     isActive ? "bg-[#1db9541a]" : "hover:bg-[#ffffff2b]"
                   }`}
                   key={i}
-                  onClick={() => onclickHander(e._id)}
+                  onClick={() => startAlbumQueue(e._id)}
                 >
                   <p className="text-white flex items-center gap-3">
                     <b className="text-[#a7a7a7]">{i + 1}</b>
@@ -176,7 +178,7 @@ const Album = () => {
                     className="text-[15px] text-center p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100"
                     onClick={(event) => {
                       event.stopPropagation();
-                      onclickHander(e._id);
+                      startAlbumQueue(e._id);
                     }}
                   >
                     <FaPlay />

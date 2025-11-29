@@ -56,3 +56,62 @@ export const getUserWithPlaylist = async (id) => {
   const playlist = await getUserPlaylistIds(id);
   return { ...user, playlist };
 };
+
+export const getAllUsersWithPlaylistSongs = async () => {
+  const [rows] = await pool.query(
+    `SELECT 
+        u.id AS user_id,
+        u.name AS user_name,
+        u.email AS user_email,
+        up.created_at AS saved_at,
+        s.id AS song_id,
+        s.title AS song_title,
+        s.description AS song_description,
+        s.singer AS song_singer,
+        s.thumbnail_id AS song_thumbnail_id,
+        s.thumbnail_url AS song_thumbnail_url,
+        s.audio_id AS song_audio_id,
+        s.audio_url AS song_audio_url,
+        s.album_id AS song_album_id
+      FROM users u
+      LEFT JOIN user_playlists up ON up.user_id = u.id
+      LEFT JOIN songs s ON s.id = up.song_id
+      ORDER BY u.name ASC, up.created_at DESC`
+  );
+
+  const playlistMap = new Map();
+
+  rows.forEach((row) => {
+    if (!playlistMap.has(row.user_id)) {
+      playlistMap.set(row.user_id, {
+        user: {
+          id: row.user_id,
+          name: row.user_name,
+          email: row.user_email,
+        },
+        songs: [],
+      });
+    }
+
+    if (row.song_id) {
+      playlistMap.get(row.user_id).songs.push({
+        id: row.song_id,
+        title: row.song_title,
+        description: row.song_description,
+        singer: row.song_singer,
+        thumbnail: {
+          id: row.song_thumbnail_id,
+          url: row.song_thumbnail_url,
+        },
+        audio: {
+          id: row.song_audio_id,
+          url: row.song_audio_url,
+        },
+        albumId: row.song_album_id,
+        savedAt: row.saved_at,
+      });
+    }
+  });
+
+  return Array.from(playlistMap.values());
+};

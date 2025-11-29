@@ -9,11 +9,10 @@ import toast from "react-hot-toast";
 const PlayList = () => {
   const {
     songs,
-    setSelectedSong,
-    setIsPlaying,
     albums,
     selectedSong,
     isPlaying,
+    playQueue,
   } = SongData();
   const { user, addToPlaylist } = UserData();
   const albumTitleMap = useMemo(() => {
@@ -35,9 +34,9 @@ const PlayList = () => {
     }
   }, [songs, user]);
 
-  const onclickHander = (id) => {
-    setSelectedSong(id);
-    setIsPlaying(true);
+  const startPlaylistQueue = (songId) => {
+    if (!myPlaylist.length) return;
+    playQueue(myPlaylist, songId, "My Playlist");
   };
 
   const savePlayListHandler = (id) => {
@@ -51,7 +50,7 @@ const PlayList = () => {
     }
     const randomSong =
       myPlaylist[Math.floor(Math.random() * myPlaylist.length)];
-    onclickHander(randomSong._id);
+    startPlaylistQueue(randomSong._id);
   };
 
   return (
@@ -112,7 +111,7 @@ const PlayList = () => {
                 isActive ? "bg-[#1db9541a]" : "hover:bg-[#ffffff2b]"
               }`}
               key={i}
-              onClick={() => onclickHander(e._id)}
+              onClick={() => startPlaylistQueue(e._id)}
             >
               <p className="text-white flex items-center gap-3">
                 <b className="text-[#a7a7a7]">{i + 1}</b>
@@ -145,7 +144,7 @@ const PlayList = () => {
                   className="text-[15px] text-center"
                   onClick={(event) => {
                     event.stopPropagation();
-                    onclickHander(e._id);
+                    startPlaylistQueue(e._id);
                   }}
                 >
                   <FaPlay />

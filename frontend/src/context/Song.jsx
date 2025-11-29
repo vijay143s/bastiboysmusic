@@ -11,13 +11,25 @@ export const SongProvider = ({ children }) => {
 
   const [selectedSong, setSelectedSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [queue, setQueue] = useState([]);
+  const [queueIndex, setQueueIndex] = useState(0);
+  const [queueLabel, setQueueLabel] = useState("All Songs");
 
   async function fetchSongs() {
     try {
       const { data } = await axios.get("/api/song/all");
 
       setSongs(data);
-      setSelectedSong(data[0]._id);
+      if (!selectedSong && data.length) {
+        setSelectedSong(data[0]._id);
+      }
+      if (!queue.length && data.length) {
+        setQueue(data);
+        setQueueIndex(0);
+        setQueueLabel("All Songs");
+      } else if (queueLabel === "All Songs" && data.length) {
+        setQueue(data);
+      }
       setIsPlaying(false);
     } catch (error) {
       console.log(error);
@@ -119,25 +131,51 @@ export const SongProvider = ({ children }) => {
     fetchAlbums();
   }, []);
 
-  const [index, setIndex] = useState(0);
+  const playQueue = (collection = [], startSongId, label = "Queue") => {
+    if (!collection.length) return;
 
-  function nextMusic() {
-    if (index === songs.length - 1) {
-      setIndex(0);
-      setSelectedSong(songs[0]._id);
-    } else {
-      setIndex(index + 1);
-      setSelectedSong(songs[index + 1]._id);
+    const normalizedQueue = collection.filter(Boolean);
+    const startIndex = startSongId
+      ? normalizedQueue.findIndex((item) => item._id === startSongId)
+      : 0;
+    const safeIndex = startIndex === -1 ? 0 : startIndex;
+
+    setQueue(normalizedQueue);
+    setQueueLabel(label);
+    setQueueIndex(safeIndex);
+    setSelectedSong(normalizedQueue[safeIndex]._id);
+    setIsPlaying(true);
+  };
+
+  const playFromSongs = (songId) => playQueue(songs, songId, "All Songs");
+
+  const nextMusic = (mode = "manual") => {
+    if (!queue.length) return;
+
+    if (queueIndex === queue.length - 1) {
+      if (mode === "auto") {
+        setIsPlaying(false);
+        return;
+      }
+      setQueueIndex(0);
+      setSelectedSong(queue[0]._id);
+      setIsPlaying(true);
+      return;
     }
-  }
-  function prevMusic() {
-    if (index === 0) {
-      return null;
-    } else {
-      setIndex(index - 1);
-      setSelectedSong(songs[index - 1]._id);
-    }
-  }
+
+    const nextIndex = queueIndex + 1;
+    setQueueIndex(nextIndex);
+    setSelectedSong(queue[nextIndex]._id);
+    setIsPlaying(true);
+  };
+
+  const prevMusic = () => {
+    if (!queue.length) return;
+    const nextIndex = queueIndex === 0 ? queue.length - 1 : queueIndex - 1;
+    setQueueIndex(nextIndex);
+    setSelectedSong(queue[nextIndex]._id);
+    setIsPlaying(true);
+  };
 
   const [albumSong, setAlbumSong] = useState([]);
   const [albumData, setAlbumData] = useState([]);
@@ -170,6 +208,11 @@ export const SongProvider = ({ children }) => {
         selectedSong,
         nextMusic,
         prevMusic,
+  queue,
+  queueLabel,
+  queueIndex,
+  playQueue,
+  playFromSongs,
         fetchAlbumSong,
         albumSong,
         albumData,

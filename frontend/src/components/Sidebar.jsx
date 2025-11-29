@@ -1,66 +1,97 @@
 import React from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
-import PlayListCard from "./PlayListCard";
 import { UserData } from "../context/User";
+
+const NAV_ICON_SIZE = "w-5";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-
   const { user } = UserData();
-  return (
-    <div className="w-[25%] h-full p-2 flex-col gap-2 text-white hidden lg:flex">
-      <div className="bg-[#121212] h-[15%] rounded flex flex-col justify-around">
-        <div
-          className="flex items-center gap-3 pl-8 cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          <img src={assets.home_icon} className="w-6" alt="" />
-          <p className="font-bold">Home</p>
-        </div>
-        <div
-          className="flex items-center gap-3 pl-8 cursor-pointer"
-          onClick={() => navigate("/search")}
-        >
-          <img src={assets.search_icon} className="w-6" alt="" />
-          <p className="font-bold">Search</p>
-        </div>
-      </div>
 
-      <div className="bg-[#121212] h-[85%] rounded">
-        <div className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={assets.stack_icon} className="w-8" alt="" />
-            <p className="font-semibold">Your Library</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <img src={assets.arrow_icon} className="w-8" alt="" />
-            <img src={assets.plus_icon} className="w-8" alt="" />
-          </div>
-        </div>
-        <div onClick={() => navigate("/playlist")}>
-          <PlayListCard />
-        </div>
+  const mainMenu = [
+    {
+      label: "Home",
+      icon: assets.home_icon,
+      path: "/",
+    },
+    {
+      label: "Search",
+      icon: assets.search_icon,
+      path: "/search",
+    },
+    {
+      label: "Queue",
+      icon: assets.stack_icon,
+      path: "/queue",
+    },
+    {
+      label: "Community",
+      icon: assets.plus_icon,
+      path: "/community",
+    },
+  ];
 
-        <div className="p-4 m-2 bg-[#121212] rounded font-semibold flex flex-col items-start justify-start gap-1 pl-4 mt-4">
-          <h1>Let's findsome podcasts to follow</h1>
-          <p className="font-light">we'll keep you update on new episodes</p>
+  const libraryMenu = [
+    {
+      label: "My Playlist",
+      icon: assets.stack_icon,
+      path: "/playlist",
+      subtitle: user?.name ? `Playlist • ${user.name}` : "Your saved songs",
+    },
+  ];
 
-          <button className="px-4 py-1.5 bg-white text-black text-[15px] rounded-full mt-4">
-            Browse Podcasts
-          </button>
-        </div>
+  if (user && user.role === "admin") {
+    libraryMenu.push({
+      label: "Admin Dashboard",
+      icon: assets.arrow_icon,
+      path: "/admin",
+      highlight: true,
+    });
+  }
 
-        {user && user.role === "admin" && (
-          <button
-            className="px-4 py-1.5 bg-white text-black text-[15px] rounded-full mt-4"
-            onClick={() => navigate("/admin")}
-          >
-            Admin Dashboard
-          </button>
+  const renderNavItem = (item) => (
+    <button
+      key={item.label}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left hover:bg-white/10 ${
+        item.highlight ? "bg-white text-black hover:bg-white" : ""
+      }`}
+      onClick={() => navigate(item.path)}
+    >
+      <img src={item.icon} className={`${NAV_ICON_SIZE}`} alt="" />
+      <div>
+        <p className={`font-semibold ${item.highlight ? "text-black" : "text-white"}`}>
+          {item.label}
+        </p>
+        {item.subtitle && (
+          <p className={`text-xs ${item.highlight ? "text-black/70" : "text-gray-400"}`}>
+            {item.subtitle}
+          </p>
         )}
       </div>
-    </div>
+    </button>
+  );
+
+  return (
+    <aside className="hidden lg:flex w-[25%] h-full p-2 text-white">
+      <div className="bg-[#121212] rounded-2xl flex flex-col w-full">
+        <div className="px-5 py-4 border-b border-white/5">
+          <p className="text-lg font-semibold">Browse</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-8">
+          <section className="space-y-1">
+            {mainMenu.map(renderNavItem)}
+          </section>
+          <section className="space-y-2">
+            <p className="uppercase text-xs tracking-[0.2em] text-gray-400 px-1">
+              Your Library
+            </p>
+            <div className="space-y-1">{libraryMenu.map(renderNavItem)}</div>
+          </section>
+        </div>
+      </div>
+    </aside>
   );
 };
 

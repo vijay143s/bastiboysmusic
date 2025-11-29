@@ -9,7 +9,7 @@ const SongItem = ({ image, name, albumTitle, id }) => {
 
   const { addToPlaylist, user } = UserData();
 
-  const { setSelectedSong, setIsPlaying, selectedSong, isPlaying } = SongData();
+  const { playFromSongs, selectedSong, isPlaying } = SongData();
 
   const playList = Array.isArray(user?.playlist) ? user.playlist : [];
 
@@ -19,8 +19,7 @@ const SongItem = ({ image, name, albumTitle, id }) => {
 
   const handlePlay = () => {
     if (selectedSong === id && isPlaying) return;
-    setSelectedSong(id);
-    setIsPlaying(true);
+    playFromSongs(id);
   };
 
   const savetoPlaylistHandler = () => {
