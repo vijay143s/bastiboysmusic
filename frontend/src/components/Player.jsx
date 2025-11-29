@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SongData } from "../context/Song";
 import { GrChapterNext, GrChapterPrevious } from "react-icons/gr";
 import { FaPause, FaPlay } from "react-icons/fa";
@@ -12,7 +12,13 @@ const Player = () => {
     setIsPlaying,
     nextMusic,
     prevMusic,
+    albums,
   } = SongData();
+  const albumTitle = useMemo(() => {
+    if (!song || !song.album) return "Single";
+    const album = albums.find((albumItem) => albumItem._id === song.album);
+    return album ? album.title : "Single";
+  }, [song, albums]);
 
   useEffect(() => {
     fetchSingleSong();
@@ -82,7 +88,7 @@ const Player = () => {
             />
             <div className="hidden md:block">
               <p>{song.title}</p>
-              <p>{song.description && song.description.slice(0, 30)}...</p>
+              <p className="text-sm text-gray-300">{albumTitle}</p>
             </div>
           </div>
 

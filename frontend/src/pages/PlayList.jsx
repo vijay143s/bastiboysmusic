@@ -1,12 +1,25 @@
-import React, { useEffect, useState } from "react";
-import Layout from "../components/Layout";
+import React, { useEffect, useMemo, useState } from "react";
 import { SongData } from "../context/Song";
 import { assets } from "../assets/assets";
 import { FaBookmark, FaPlay } from "react-icons/fa";
+import { RiPulseLine } from "react-icons/ri";
 import { UserData } from "../context/User";
 
-const PlayList = ({ user }) => {
-  const { songs, setSelectedSong, setIsPlaying } = SongData();
+const PlayList = () => {
+  const {
+    songs,
+    setSelectedSong,
+    setIsPlaying,
+    albums,
+    selectedSong,
+    isPlaying,
+  } = SongData();
+  const { user, addToPlaylist } = UserData();
+  const albumTitleMap = useMemo(() => {
+    const map = new Map();
+    albums.forEach((album) => map.set(album._id, album.title));
+    return map;
+  }, [albums]);
 
   const [myPlaylist, setMyPlaylist] = useState([]);
 
@@ -16,6 +29,8 @@ const PlayList = ({ user }) => {
         user.playlist.includes(e._id.toString())
       );
       setMyPlaylist(filteredSongs);
+    } else {
+      setMyPlaylist([]);
     }
   }, [songs, user]);
 
@@ -24,14 +39,12 @@ const PlayList = ({ user }) => {
     setIsPlaying(true);
   };
 
-  const { addToPlaylist } = UserData();
-
   const savePlayListHandler = (id) => {
     addToPlaylist(id);
   };
 
   return (
-    <Layout>
+    <div>
       <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-center">
         {myPlaylist && myPlaylist[0] ? (
           <img
@@ -50,7 +63,7 @@ const PlayList = ({ user }) => {
         <div className="flex flex-col">
           <p>Playlist</p>
           <h2 className="text-3xl font-bold mb-4 md:text-5xl">
-            {user.name} PlayList
+            {user?.name ? `${user.name} PlayList` : "My PlayList"}
           </h2>
           <h4>Your Favourate songs</h4>
           <p className="mt-1">
@@ -67,42 +80,62 @@ const PlayList = ({ user }) => {
           <b className="mr-4">#</b>
         </p>
         <p>Artist</p>
-        <p className="hidden sm:block">Description</p>
+        <p className="hidden sm:block">Album</p>
         <p className="text-center">Actions</p>
       </div>
       <hr />
       {myPlaylist &&
-        myPlaylist.map((e, i) => (
-          <div
-            className="grid grid-cols-3 sm:grid-cols-4 mt-10 mb-4 pl-2 text-[#a7a7a7] hover:bg-[#ffffff2b] cursor-pointer"
-            key={i}
-          >
-            <p className="text-white">
-              <b className="mr-4 text-[#a7a7a7]">{i + 1}</b>
-              <img src={e.thumbnail.url} className="inline w-10 mr-5" alt="" />
-              {e.title}
-            </p>
-            <p className="text-[15px]">{e.singer}</p>
-            <p className="text-[15px] hidden sm:block">
-              {e.description.slice(0, 20)}...
-            </p>
-            <p className="flex justify-center items-center gap-5">
-              <p
-                className="text-[15px] text-center"
-                onClick={() => savePlayListHandler(e._id)}
-              >
-                <FaBookmark />
+        myPlaylist.map((e, i) => {
+          const isActive = selectedSong === e._id;
+          return (
+            <div
+              className={`grid grid-cols-3 sm:grid-cols-4 mt-10 mb-4 pl-2 text-[#a7a7a7] cursor-pointer rounded ${
+                isActive ? "bg-[#1db9541a]" : "hover:bg-[#ffffff2b]"
+              }`}
+              key={i}
+              onClick={() => onclickHander(e._id)}
+            >
+              <p className="text-white flex items-center gap-3">
+                <b className="text-[#a7a7a7]">{i + 1}</b>
+                <img src={e.thumbnail.url} className="inline w-10" alt="" />
+                {isActive && (
+                  <RiPulseLine
+                    className={`text-green-400 ${
+                      isPlaying ? "animate-pulse" : "opacity-60"
+                    }`}
+                  />
+                )}
+                {e.title}
               </p>
-              <p
-                className="text-[15px] text-center"
-                onClick={() => onclickHander(e._id)}
-              >
-                <FaPlay />
+              <p className="text-[15px]">{e.singer}</p>
+              <p className="text-[15px] hidden sm:block">
+                {albumTitleMap.get(e.album) || "Single"}
               </p>
-            </p>
-          </div>
-        ))}
-    </Layout>
+              <div className="flex justify-center items-center gap-5">
+                <button
+                  className="text-[15px] text-center text-green-500"
+                  title="Remove from playlist"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    savePlayListHandler(e._id);
+                  }}
+                >
+                  <FaBookmark />
+                </button>
+                <button
+                  className="text-[15px] text-center"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onclickHander(e._id);
+                  }}
+                >
+                  <FaPlay />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+    </div>
   );
 };
 

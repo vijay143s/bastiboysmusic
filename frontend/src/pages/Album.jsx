@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import Layout from "../components/Layout";
 import { SongData } from "../context/Song";
 import { useParams } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { UserData } from "../context/User";
 import { FaBookmark, FaPlay } from "react-icons/fa";
+import { RiPulseLine } from "react-icons/ri";
 
 const Album = () => {
   const {
@@ -13,6 +13,8 @@ const Album = () => {
     albumData,
     setIsPlaying,
     setSelectedSong,
+    selectedSong,
+    isPlaying,
   } = SongData();
 
   const params = useParams();
@@ -26,13 +28,14 @@ const Album = () => {
     setIsPlaying(true);
   };
 
-  const { addToPlaylist } = UserData();
+  const { addToPlaylist, user } = UserData();
+  const playlistIds = Array.isArray(user?.playlist) ? user.playlist : [];
 
   const savePlayListHandler = (id) => {
     addToPlaylist(id);
   };
   return (
-    <Layout>
+    <div>
       {albumData && (
         <>
           <div className="mt-10 flex gap-8 flex-col md:flex-row md:items-center">
@@ -49,7 +52,7 @@ const Album = () => {
               <h2 className="text-3xl font-bold mb-4 md:text-5xl">
                 {albumData.title} PlayList
               </h2>
-              <h4>{albumData.description}</h4>
+              <h4 className="text-gray-300">Album • {albumData.title}</h4>
               <p className="mt-1">
                 <img
                   src={assets.spotify_logo}
@@ -65,49 +68,77 @@ const Album = () => {
               <b className="mr-4">#</b>
             </p>
             <p>Artist</p>
-            <p className="hidden sm:block">Description</p>
+            <p className="hidden sm:block">Album</p>
             <p className="text-center">Actions</p>
           </div>
 
           <hr />
           {albumSong &&
-            albumSong.map((e, i) => (
-              <div
-                className="grid grid-cols-3 sm:grid-cols-4 mt-10 mb-4 pl-2 text-[#a7a7a7] hover:bg-[#ffffff2b] cursor-pointer"
-                key={i}
-              >
-                <p className="text-white">
-                  <b className="mr-4 text-[#a7a7a7]">{i + 1}</b>
-                  <img
-                    src={e.thumbnail.url}
-                    className="inline w-10 mr-5"
-                    alt=""
-                  />
-                  {e.title}
-                </p>
+            albumSong.map((e, i) => {
+              const isActive = selectedSong === e._id;
+              return (
+                <div
+                  className={`grid grid-cols-3 sm:grid-cols-4 mt-10 mb-4 pl-2 text-[#a7a7a7] cursor-pointer rounded ${
+                    isActive ? "bg-[#1db9541a]" : "hover:bg-[#ffffff2b]"
+                  }`}
+                  key={i}
+                  onClick={() => onclickHander(e._id)}
+                >
+                  <p className="text-white flex items-center gap-3">
+                    <b className="text-[#a7a7a7]">{i + 1}</b>
+                    <img
+                      src={e.thumbnail.url}
+                      className="inline w-10"
+                      alt=""
+                    />
+                    {isActive && (
+                      <RiPulseLine
+                        className={`text-green-400 ${
+                          isPlaying ? "animate-pulse" : "opacity-60"
+                        }`}
+                      />
+                    )}
+                    {e.title}
+                  </p>
                 <p className="text-[15px]">{e.singer}</p>
                 <p className="text-[15px] hidden sm:block">
-                  {e.description.slice(0, 20)}...
+                  {albumData.title}
                 </p>
-                <p className="flex justify-center items-center gap-5">
-                  <p
-                    className="text-[15px] text-center"
-                    onClick={() => savePlayListHandler(e._id)}
+                <div className="flex justify-center items-center gap-5">
+                  <button
+                    className={`text-[15px] text-center p-2 rounded-full transition-all duration-200 ${
+                      playlistIds.includes(e._id)
+                        ? "bg-green-500 text-white shadow-lg"
+                        : "bg-white bg-opacity-80 text-black"
+                    }`}
+                    title={
+                      playlistIds.includes(e._id)
+                        ? "Remove from playlist"
+                        : "Save to playlist"
+                    }
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      savePlayListHandler(e._id);
+                    }}
                   >
                     <FaBookmark />
-                  </p>
-                  <p
-                    className="text-[15px] text-center"
-                    onClick={() => onclickHander(e._id)}
+                  </button>
+                  <button
+                    className="text-[15px] text-center p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onclickHander(e._id);
+                    }}
                   >
                     <FaPlay />
-                  </p>
-                </p>
-              </div>
-            ))}
+                  </button>
+                </div>
+                </div>
+              );
+            })}
         </>
       )}
-    </Layout>
+    </div>
   );
 };
 
