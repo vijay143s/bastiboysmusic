@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserData } from "../context/User";
 import { SongData } from "../context/Song";
+import Disclaimer from "../components/Disclaimer";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -79,6 +80,7 @@ const Register = () => {
           </Link>
         </div>
       </div>
+      <Disclaimer />
     </div>
   );
 };

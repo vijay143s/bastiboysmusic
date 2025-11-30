@@ -86,6 +86,16 @@ const deleteSongById = async (id) => {
   await pool.execute(`DELETE FROM songs WHERE id = ?`, [id]);
 };
 
+const getSongsBySinger = async (singerName) => {
+  const [rows] = await pool.query(
+    `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
+     FROM songs WHERE singer = ? OR FIND_IN_SET(?, singer) > 0 ORDER BY created_at DESC`,
+    [singerName, singerName]
+  );
+
+  return rows.map(mapSongRow);
+};
+
 module.exports = {
   createSong,
   updateSongThumbnail,
@@ -93,4 +103,5 @@ module.exports = {
   getSongsByAlbum,
   findSongById,
   deleteSongById,
+  getSongsBySinger,
 };

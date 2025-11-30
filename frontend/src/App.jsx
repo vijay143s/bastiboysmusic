@@ -12,6 +12,11 @@ import Layout from "./components/Layout";
 import Search from "./pages/Search";
 import Queue from "./pages/Queue";
 import CommunityPlaylists from "./pages/CommunityPlaylists";
+import Albums from "./pages/Albums";
+import Artists from "./pages/Artists";
+import Singers from "./pages/Singers";
+import MusicDirectors from "./pages/MusicDirectors";
+import SearchResults from "./pages/SearchResults";
 
 const App = () => {
   const { loading, isAuth } = UserData();
@@ -31,6 +36,12 @@ const App = () => {
                 <Route path="/queue" element={<Queue />} />
                 <Route path="/community" element={<CommunityPlaylists />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/albums" element={<Albums />} />
+                <Route path="/artists" element={<Artists />} />
+                <Route path="/singers" element={<Singers />} />
+                <Route path="/music-directors" element={<MusicDirectors />} />
+                <Route path="/results/:type/:id" element={<SearchResults />} />
+                <Route path="/results/:type/:name" element={<SearchResults />} />
                 <Route path="/login" element={<Navigate to="/" replace />} />
                 <Route path="/register" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

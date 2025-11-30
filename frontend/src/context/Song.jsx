@@ -40,6 +40,7 @@ export const SongProvider = ({ children }) => {
 
   async function fetchSingleSong() {
     try {
+      if (!selectedSong) return;
       const { data } = await axios.get("/api/song/single/" + selectedSong);
 
       setSong(data);
@@ -109,9 +110,10 @@ export const SongProvider = ({ children }) => {
     try {
       const { data } = await axios.get("/api/song/album/all");
 
-      setAlbums(data);
+      setAlbums(data || []);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching albums:", error);
+      setAlbums([]);
     }
   }
 
@@ -208,11 +210,11 @@ export const SongProvider = ({ children }) => {
         selectedSong,
         nextMusic,
         prevMusic,
-  queue,
-  queueLabel,
-  queueIndex,
-  playQueue,
-  playFromSongs,
+        queue,
+        queueLabel,
+        queueIndex,
+        playQueue,
+        playFromSongs,
         fetchAlbumSong,
         albumSong,
         albumData,

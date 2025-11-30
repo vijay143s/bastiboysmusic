@@ -46,30 +46,31 @@ const Search = () => {
   };
 
   return (
-    <div className="py-6">
-      <div className="mb-8">
+    <div className="py-4 md:py-6 px-2 md:px-0">
+      <div className="mb-6 md:mb-8">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search albums or songs"
-          className="w-full bg-[#1f1f1f] border border-[#2f2f2f] rounded-full px-5 py-3 focus:outline-none focus:border-green-500"
+          className="w-full bg-[#1f1f1f] border border-[#2f2f2f] rounded-full px-4 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:border-green-500"
         />
         {!normalizedQuery && (
-          <p className="text-sm text-slate-400 mt-2">
+          <p className="text-xs md:text-sm text-slate-400 mt-2">
             Start typing to search across your entire library.
           </p>
         )}
       </div>
 
       {normalizedQuery && (
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-8 md:gap-10">
+          {/* Albums Section */}
           <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Albums</h2>
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <h2 className="text-lg md:text-xl font-semibold">Albums</h2>
               {albumMatches.length > 0 && (
                 <button
-                  className="text-sm text-slate-300 hover:text-white"
+                  className="text-xs md:text-sm text-slate-400 hover:text-white"
                   onClick={() => setQuery("")}
                 >
                   Clear
@@ -77,9 +78,9 @@ const Search = () => {
               )}
             </div>
             {albumMatches.length === 0 ? (
-              <p className="text-slate-400">No albums match "{query}".</p>
+              <p className="text-xs md:text-sm text-slate-400">No albums match "{query}".</p>
             ) : (
-              <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(180px,1fr))]">
+              <div className="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {albumMatches.map((album) => (
                   <AlbumItem
                     key={album._id}
@@ -93,10 +94,11 @@ const Search = () => {
             )}
           </section>
 
+          {/* Songs Section */}
           <section>
-            <h2 className="text-xl font-semibold mb-4">Songs</h2>
+            <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Songs</h2>
             {songMatches.length === 0 ? (
-              <p className="text-slate-400">No songs match "{query}".</p>
+              <p className="text-xs md:text-sm text-slate-400">No songs match "{query}".</p>
             ) : (
               <div className="space-y-4">
                 {songMatches.map((song) => (
@@ -109,7 +111,7 @@ const Search = () => {
                       onClick={() => handlePlaySong(song._id, songMatches)}
                     >
                       <img
-                        src={song.thumbnail?.url || "https://via.placeholder.com/60"}
+                        src={song.thumbnail?.url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23333'/%3E%3C/svg%3E"}
                         alt={song.title}
                         className="w-12 h-12 rounded object-cover"
                       />
@@ -121,13 +123,6 @@ const Search = () => {
                       </div>
                     </div>
                     <div className="flex gap-3">
-                      <button
-                        className="bg-white text-black rounded-full p-3 hover:scale-95 transition"
-                        title="Play"
-                        onClick={() => handlePlaySong(song._id, songMatches)}
-                      >
-                        <FaPlay />
-                      </button>
                       <button
                         className="bg-green-500 text-black rounded-full px-4"
                         onClick={() => handleAddSong(song._id)}

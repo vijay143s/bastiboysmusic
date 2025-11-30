@@ -2,76 +2,26 @@ import React from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { UserData } from "../context/User";
+import ProfileMenu from "./ProfileMenu";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { logoutUser } = UserData();
+  const { user } = UserData();
+  
   return (
     <>
-      <div className="w-full flex justify-between items-center font-semibold">
+      <div className="w-full flex justify-between items-center font-semibold px-3 py-2 bg-[#121212] border-b border-white/10">
         <div className="flex items-center gap-2">
-          <img
-            src={assets.arrow_left}
-            className="w-8 bg-black p-2 rounded-2xl cursor-pointer"
-            alt=""
-            onClick={() => navigate(-1)}
+          <img 
+            src={assets.logo} 
+            alt="Logo" 
+            className="w-6 h-6 cursor-pointer"
+            onClick={() => navigate("/")}
           />
-          <img
-            src={assets.arrow_right}
-            className="w-8 bg-black p-2 rounded-2xl cursor-pointer"
-            alt=""
-            onClick={() => navigate(+1)}
-          />
+          <span className="hidden sm:inline text-white text-sm">Basti Boys Music</span>
         </div>
-        <div className="flex items-center gap-4">
-          <p
-            className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl cursor-pointer"
-            onClick={() => navigate("/search")}
-          >
-            Search
-          </p>
-          <p
-            className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl cursor-pointer"
-            onClick={() => navigate("/queue")}
-          >
-            Queue
-          </p>
-          <p
-            className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl cursor-pointer"
-            onClick={() => navigate("/community")}
-          >
-            Community
-          </p>
-          <p className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl hidden md:block cursor-pointer">
-            Explore Premium
-          </p>
-          <p className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl hidden md:block cursor-pointer">
-            Install App
-          </p>
-          <p
-            className="bg-white text-black text-[15px] px-4 py-1 rounded-2xl cursor-pointer"
-            onClick={logoutUser}
-          >
-            Logout
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2 mt-4">
-        <p className="bg-white text-black px-4 py-1 rounded-2xl cursor-pointer">
-          All
-        </p>
-        <p className="bg-black px-4 py-1 rounded-2xl cursor-pointer hidden md:block">
-          Music
-        </p>
-        <p className="bg-black px-4 py-1 rounded-2xl cursor-pointer hidden md:block">
-          Podcasts
-        </p>
-        <p
-          onClick={() => navigate("/playlist")}
-          className="bg-black px-4 py-1 rounded-2xl cursor-pointer  md:hidden"
-        >
-          PlayList
-        </p>
+        
+        {user && <ProfileMenu />}
       </div>
     </>
   );
