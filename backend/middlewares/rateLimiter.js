@@ -1,8 +1,8 @@
-import rateLimit from "express-rate-limit";
+const rateLimit = require("express-rate-limit");
 
 const authLimiterMessage = "Too many authentication attempts. Please try again soon.";
 
-export const authRateLimiter = rateLimit({
+const authRateLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
   standardHeaders: true,
@@ -15,3 +15,5 @@ export const authRateLimiter = rateLimit({
     res.status(429).json({ success: false, message: authLimiterMessage });
   }
 });
+
+module.exports = { authRateLimiter };

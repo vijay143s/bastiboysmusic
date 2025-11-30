@@ -1,16 +1,16 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   loginUser,
   logoutUser,
   myProfile,
   registerUser,
   saveToPlaylist,
   getAllCommunityPlaylists,
-} from "../controllers/userControllers.js";
-import { isAuth } from "../middlewares/isAuth.js";
-import { validateRequest } from "../middlewares/validateRequest.js";
-import { authRateLimiter } from "../middlewares/rateLimiter.js";
-import { registerSchema, loginSchema } from "../validators/authSchemas.js";
+} = require("../controllers/userControllers.js");
+const { isAuth } = require("../middlewares/isAuth.js");
+const { validateRequest } = require("../middlewares/validateRequest.js");
+const { authRateLimiter } = require("../middlewares/rateLimiter.js");
+const { registerSchema, loginSchema } = require("../validators/authSchemas.js");
 
 const router = express.Router();
 
@@ -26,4 +26,4 @@ router.get("/logout", isAuth, logoutUser);
 router.post("/song/:id", isAuth, saveToPlaylist);
 router.get("/playlists/all", isAuth, getAllCommunityPlaylists);
 
-export default router;
+module.exports = router;

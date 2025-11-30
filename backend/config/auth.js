@@ -1,6 +1,6 @@
 const FALLBACK_SECRET = "dev-secret-change-me";
 
-export const jwtSecret = process.env.Jwt_secret || FALLBACK_SECRET;
+const jwtSecret = process.env.Jwt_secret || FALLBACK_SECRET;
 
 if (!process.env.Jwt_secret) {
   const runningMode = process.env.NODE_ENV || "development";
@@ -15,3 +15,5 @@ if (!process.env.Jwt_secret) {
     console.warn(message);
   }
 }
+
+module.exports = { jwtSecret };

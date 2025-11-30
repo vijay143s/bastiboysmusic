@@ -1,18 +1,18 @@
-import TryCatch from "../utils/TryCatch.js";
-import bcrypt from "bcrypt";
-import generateToken from "../utils/generateToken.js";
-import {
+const TryCatch = require("../utils/TryCatch.js");
+const bcrypt = require("bcrypt");
+const generateToken = require("../utils/generateToken.js");
+const {
   createUser,
   findUserByEmail,
   getUserWithPlaylist,
   getAllUsersWithPlaylistSongs,
-} from "../repositories/userRepository.js";
-import {
+} = require("../repositories/userRepository.js");
+const {
   addSongToPlaylist,
   isSongInPlaylist,
   removeSongFromPlaylist,
-} from "../repositories/playlistRepository.js";
-import { findSongById } from "../repositories/songRepository.js";
+} = require("../repositories/playlistRepository.js");
+const { findSongById } = require("../repositories/songRepository.js");
 
 const sanitizeUser = (userDoc) => {
   if (!userDoc) return null;
@@ -38,7 +38,7 @@ const sendAuthSuccess = (res, user, message, statusCode = 200) => {
   });
 };
 
-export const registerUser = TryCatch(async (req, res) => {
+const registerUser = TryCatch(async (req, res) => {
   const { name, email, password } = req.body;
   const normalizedEmail = email.trim().toLowerCase();
   const normalizedName = name.trim();
@@ -70,7 +70,7 @@ export const registerUser = TryCatch(async (req, res) => {
   );
 });
 
-export const loginUser = TryCatch(async (req, res) => {
+const loginUser = TryCatch(async (req, res) => {
   const { email, password } = req.body;
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -95,7 +95,7 @@ export const loginUser = TryCatch(async (req, res) => {
   return sendAuthSuccess(res, userWithPlaylist, "User Logged In");
 });
 
-export const myProfile = TryCatch(async (req, res) => {
+const myProfile = TryCatch(async (req, res) => {
   const user = await getUserWithPlaylist(req.user.id);
 
   if (!user)
@@ -107,7 +107,7 @@ export const myProfile = TryCatch(async (req, res) => {
   res.json(sanitizeUser(user));
 });
 
-export const logoutUser = TryCatch(async (req, res) => {
+const logoutUser = TryCatch(async (req, res) => {
   res.cookie("token", "", {
     maxAge: 0,
     httpOnly: true,
@@ -121,7 +121,7 @@ export const logoutUser = TryCatch(async (req, res) => {
   });
 });
 
-export const saveToPlaylist = TryCatch(async (req, res) => {
+const saveToPlaylist = TryCatch(async (req, res) => {
   const songId = Number(req.params.id);
 
   if (Number.isNaN(songId))
@@ -163,7 +163,7 @@ const formatCommunitySong = (song) => ({
   album: song.albumId ? String(song.albumId) : null,
 });
 
-export const getAllCommunityPlaylists = TryCatch(async (req, res) => {
+const getAllCommunityPlaylists = TryCatch(async (req, res) => {
   const rawPlaylists = await getAllUsersWithPlaylistSongs();
 
   const playlists = rawPlaylists.map((entry) => ({
@@ -179,3 +179,12 @@ export const getAllCommunityPlaylists = TryCatch(async (req, res) => {
 
   res.json({ success: true, playlists });
 });
+
+module.exports = {
+  registerUser,
+  loginUser,
+  myProfile,
+  logoutUser,
+  saveToPlaylist,
+  getAllCommunityPlaylists,
+};

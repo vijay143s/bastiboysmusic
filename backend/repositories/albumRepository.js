@@ -1,4 +1,4 @@
-import { pool } from "../database/db.js";
+const { pool } = require("../database/db.js");
 
 const mapAlbumRow = (row) => ({
   id: row.id,
@@ -12,7 +12,7 @@ const mapAlbumRow = (row) => ({
   updatedAt: row.updated_at,
 });
 
-export const createAlbum = async ({ title, description, thumbnail }) => {
+const createAlbum = async ({ title, description, thumbnail }) => {
   const [result] = await pool.execute(
     `INSERT INTO albums (title, description, thumbnail_id, thumbnail_url)
      VALUES (?, ?, ?, ?)`,
@@ -22,7 +22,7 @@ export const createAlbum = async ({ title, description, thumbnail }) => {
   return findAlbumById(result.insertId);
 };
 
-export const findAlbumById = async (id) => {
+const findAlbumById = async (id) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url, created_at, updated_at
      FROM albums WHERE id = ? LIMIT 1`,
@@ -32,11 +32,17 @@ export const findAlbumById = async (id) => {
   return rows[0] ? mapAlbumRow(rows[0]) : null;
 };
 
-export const getAllAlbums = async () => {
+const getAllAlbums = async () => {
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url, created_at, updated_at
      FROM albums ORDER BY created_at DESC`
   );
 
   return rows.map(mapAlbumRow);
+};
+
+module.exports = {
+  createAlbum,
+  findAlbumById,
+  getAllAlbums,
 };

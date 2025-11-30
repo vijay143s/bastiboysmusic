@@ -10,4 +10,4 @@ const TryCatch = (handler) => {
   };
 };
 
-export default TryCatch;
+module.exports = TryCatch;

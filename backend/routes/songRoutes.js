@@ -1,7 +1,7 @@
-import express from "express";
-import { isAuth } from "../middlewares/isAuth.js";
-import uploadFile from "../middlewares/multer.js";
-import {
+const express = require("express");
+const { isAuth } = require("../middlewares/isAuth.js");
+const uploadFile = require("../middlewares/multer.js");
+const {
   addSong,
   addThumbnail,
   createAlbum,
@@ -10,7 +10,7 @@ import {
   getAllSongs,
   getAllSongsByAlbum,
   getSingleSong,
-} from "../controllers/songControllers.js";
+} = require("../controllers/songControllers.js");
 
 const router = express.Router();
 
@@ -23,4 +23,4 @@ router.delete("/:id", isAuth, deleteSong);
 router.get("/all", isAuth, getAllSongs);
 router.get("/album/:id", isAuth, getAllSongsByAlbum);
 
-export default router;
+module.exports = router;

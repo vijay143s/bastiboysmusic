@@ -1,4 +1,4 @@
-import mysql from "mysql2/promise";
+const mysql = require("mysql2/promise");
 
 const {
   MYSQL_HOST = "188.68.38.138",
@@ -8,7 +8,7 @@ const {
   MYSQL_DATABASE = "topnotch_Bastiband",
 } = process.env;
 
-export const pool = mysql.createPool({
+const pool = mysql.createPool({
   host: MYSQL_HOST,
   port: Number(MYSQL_PORT),
   user: MYSQL_USER,
@@ -29,4 +29,4 @@ const connectDb = async () => {
   }
 };
 
-export default connectDb;
+module.exports = { connectDb, pool };

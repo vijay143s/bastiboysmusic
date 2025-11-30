@@ -1,19 +1,19 @@
-import TryCatch from "../utils/TryCatch.js";
-import getDataurl from "../utils/urlGenerator.js";
-import cloudinary from "cloudinary";
-import {
-  createAlbum as createAlbumRecord,
-  getAllAlbums as fetchAlbums,
+const TryCatch = require("../utils/TryCatch.js");
+const getDataurl = require("../utils/urlGenerator.js");
+const cloudinary = require("cloudinary");
+const {
+  createAlbum: createAlbumRecord,
+  getAllAlbums: fetchAlbums,
   findAlbumById,
-} from "../repositories/albumRepository.js";
-import {
+} = require("../repositories/albumRepository.js");
+const {
   createSong,
   deleteSongById,
   findSongById,
-  getAllSongs as fetchSongs,
+  getAllSongs: fetchSongs,
   getSongsByAlbum,
   updateSongThumbnail,
-} from "../repositories/songRepository.js";
+} = require("../repositories/songRepository.js");
 
 const formatAlbum = (album) => ({
   ...album,
@@ -26,7 +26,7 @@ const formatSong = (song) => ({
   album: song.albumId ? String(song.albumId) : null,
 });
 
-export const createAlbum = TryCatch(async (req, res) => {
+const createAlbum = TryCatch(async (req, res) => {
   if (req.user.role !== "admin")
     return res.status(403).json({
       message: "You are not admin",
@@ -54,13 +54,13 @@ export const createAlbum = TryCatch(async (req, res) => {
   });
 });
 
-export const getAllAlbums = TryCatch(async (req, res) => {
+const getAllAlbums = TryCatch(async (req, res) => {
   const albums = await fetchAlbums();
 
   res.json(albums.map(formatAlbum));
 });
 
-export const addSong = TryCatch(async (req, res) => {
+const addSong = TryCatch(async (req, res) => {
   if (req.user.role !== "admin")
     return res.status(403).json({
       message: "You are not admin",
@@ -105,7 +105,7 @@ export const addSong = TryCatch(async (req, res) => {
   });
 });
 
-export const addThumbnail = TryCatch(async (req, res) => {
+const addThumbnail = TryCatch(async (req, res) => {
   if (req.user.role !== "admin")
     return res.status(403).json({
       message: "You are not admin",
@@ -134,13 +134,13 @@ export const addThumbnail = TryCatch(async (req, res) => {
   });
 });
 
-export const getAllSongs = TryCatch(async (req, res) => {
+const getAllSongs = TryCatch(async (req, res) => {
   const songs = await fetchSongs();
 
   res.json(songs.map(formatSong));
 });
 
-export const getAllSongsByAlbum = TryCatch(async (req, res) => {
+const getAllSongsByAlbum = TryCatch(async (req, res) => {
   const albumId = Number(req.params.id);
 
   if (Number.isNaN(albumId))
@@ -159,7 +159,7 @@ export const getAllSongsByAlbum = TryCatch(async (req, res) => {
   res.json({ album: formatAlbum(album), songs: songs.map(formatSong) });
 });
 
-export const deleteSong = TryCatch(async (req, res) => {
+const deleteSong = TryCatch(async (req, res) => {
   const songId = Number(req.params.id);
 
   if (Number.isNaN(songId))
@@ -172,7 +172,7 @@ export const deleteSong = TryCatch(async (req, res) => {
   res.json({ message: "Song Deleted" });
 });
 
-export const getSingleSong = TryCatch(async (req, res) => {
+const getSingleSong = TryCatch(async (req, res) => {
   const songId = Number(req.params.id);
 
   if (Number.isNaN(songId))
@@ -189,3 +189,14 @@ export const getSingleSong = TryCatch(async (req, res) => {
 
   res.json(formatSong(song));
 });
+
+module.exports = {
+  createAlbum,
+  getAllAlbums,
+  addSong,
+  addThumbnail,
+  getAllSongs,
+  getAllSongsByAlbum,
+  deleteSong,
+  getSingleSong,
+};

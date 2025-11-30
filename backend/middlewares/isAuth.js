@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken";
-import { findUserById } from "../repositories/userRepository.js";
-import { jwtSecret } from "../config/auth.js";
+const jwt = require("jsonwebtoken");
+const { findUserById } = require("../repositories/userRepository.js");
+const { jwtSecret } = require("../config/auth.js");
 
-export const isAuth = async (req, res, next) => {
+const isAuth = async (req, res, next) => {
   try {
     const token = req.cookies.token;
 
@@ -11,7 +11,7 @@ export const isAuth = async (req, res, next) => {
         message: "Please Login",
       });
 
-  const decodedData = jwt.verify(token, jwtSecret);
+    const decodedData = jwt.verify(token, jwtSecret);
 
     if (!decodedData || !decodedData.id)
       return res.status(403).json({
@@ -40,3 +40,5 @@ export const isAuth = async (req, res, next) => {
     });
   }
 };
+
+module.exports = { isAuth };

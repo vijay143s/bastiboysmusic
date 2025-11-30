@@ -1,4 +1,4 @@
-import { pool } from "../database/db.js";
+const { pool } = require("../database/db.js");
 
 const mapUserRow = (row) => ({
   id: row.id,
@@ -10,7 +10,7 @@ const mapUserRow = (row) => ({
   updatedAt: row.updated_at,
 });
 
-export const findUserByEmail = async (email) => {
+const findUserByEmail = async (email) => {
   const [rows] = await pool.query(
     `SELECT id, name, email, role, password_hash, created_at, updated_at
      FROM users WHERE email = ? LIMIT 1`,
@@ -20,7 +20,7 @@ export const findUserByEmail = async (email) => {
   return rows[0] ? mapUserRow(rows[0]) : null;
 };
 
-export const findUserById = async (id) => {
+const findUserById = async (id) => {
   const [rows] = await pool.query(
     `SELECT id, name, email, role, password_hash, created_at, updated_at
      FROM users WHERE id = ? LIMIT 1`,
@@ -30,7 +30,7 @@ export const findUserById = async (id) => {
   return rows[0] ? mapUserRow(rows[0]) : null;
 };
 
-export const createUser = async ({ name, email, passwordHash, role = "user" }) => {
+const createUser = async ({ name, email, passwordHash, role = "user" }) => {
   const [result] = await pool.execute(
     `INSERT INTO users (name, email, password_hash, role)
      VALUES (?, ?, ?, ?)` ,
@@ -40,7 +40,7 @@ export const createUser = async ({ name, email, passwordHash, role = "user" }) =
   return findUserById(result.insertId);
 };
 
-export const getUserPlaylistIds = async (userId) => {
+const getUserPlaylistIds = async (userId) => {
   const [rows] = await pool.query(
     `SELECT song_id FROM user_playlists WHERE user_id = ? ORDER BY id DESC`,
     [userId]
@@ -49,7 +49,7 @@ export const getUserPlaylistIds = async (userId) => {
   return rows.map((row) => String(row.song_id));
 };
 
-export const getUserWithPlaylist = async (id) => {
+const getUserWithPlaylist = async (id) => {
   const user = await findUserById(id);
   if (!user) return null;
 
@@ -57,7 +57,7 @@ export const getUserWithPlaylist = async (id) => {
   return { ...user, playlist };
 };
 
-export const getAllUsersWithPlaylistSongs = async () => {
+const getAllUsersWithPlaylistSongs = async () => {
   const [rows] = await pool.query(
     `SELECT 
         u.id AS user_id,
@@ -114,4 +114,13 @@ export const getAllUsersWithPlaylistSongs = async () => {
   });
 
   return Array.from(playlistMap.values());
+};
+
+module.exports = {
+  findUserByEmail,
+  findUserById,
+  createUser,
+  getUserPlaylistIds,
+  getUserWithPlaylist,
+  getAllUsersWithPlaylistSongs,
 };

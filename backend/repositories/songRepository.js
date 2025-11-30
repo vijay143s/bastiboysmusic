@@ -1,4 +1,4 @@
-import { pool } from "../database/db.js";
+const { pool } = require("../database/db.js");
 
 const mapSongRow = (row) => ({
   id: row.id,
@@ -18,7 +18,7 @@ const mapSongRow = (row) => ({
   updatedAt: row.updated_at,
 });
 
-export const createSong = async ({
+const createSong = async ({
   title,
   description,
   singer,
@@ -44,7 +44,7 @@ export const createSong = async ({
   return findSongById(result.insertId);
 };
 
-export const updateSongThumbnail = async (songId, thumbnail) => {
+const updateSongThumbnail = async (songId, thumbnail) => {
   await pool.execute(
     `UPDATE songs SET thumbnail_id = ?, thumbnail_url = ?, updated_at = NOW() WHERE id = ?`,
     [thumbnail?.id ?? null, thumbnail?.url ?? null, songId]
@@ -53,7 +53,7 @@ export const updateSongThumbnail = async (songId, thumbnail) => {
   return findSongById(songId);
 };
 
-export const getAllSongs = async () => {
+const getAllSongs = async () => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
      FROM songs ORDER BY created_at DESC`
@@ -62,7 +62,7 @@ export const getAllSongs = async () => {
   return rows.map(mapSongRow);
 };
 
-export const getSongsByAlbum = async (albumId) => {
+const getSongsByAlbum = async (albumId) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
      FROM songs WHERE album_id = ? ORDER BY created_at DESC`,
@@ -72,7 +72,7 @@ export const getSongsByAlbum = async (albumId) => {
   return rows.map(mapSongRow);
 };
 
-export const findSongById = async (id) => {
+const findSongById = async (id) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
      FROM songs WHERE id = ? LIMIT 1`,
@@ -82,6 +82,15 @@ export const findSongById = async (id) => {
   return rows[0] ? mapSongRow(rows[0]) : null;
 };
 
-export const deleteSongById = async (id) => {
+const deleteSongById = async (id) => {
   await pool.execute(`DELETE FROM songs WHERE id = ?`, [id]);
+};
+
+module.exports = {
+  createSong,
+  updateSongThumbnail,
+  getAllSongs,
+  getSongsByAlbum,
+  findSongById,
+  deleteSongById,
 };
