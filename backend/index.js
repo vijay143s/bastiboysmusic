@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require('cors')
 const path = require("path");
 const { connectDb } = require("./database/db.js");
 const cookieParser = require("cookie-parser");
