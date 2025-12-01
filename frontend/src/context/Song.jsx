@@ -86,7 +86,20 @@ export const SongProvider = ({ children }) => {
       const { data } = await axios.get(`/api/song/queue/year/${year}?limit=${limit}&offset=${offset}`);
       
       if (data.songs.length > 0) {
-        setQueue(prevQueue => [...prevQueue, ...data.songs]);
+        // Prevent duplicates by checking existing song IDs
+        setQueue(prevQueue => {
+          const existingIds = new Set(prevQueue.map(song => song._id));
+          const newSongs = data.songs.filter(song => !existingIds.has(song._id));
+          
+          if (newSongs.length === 0) {
+            console.log('⚠️ All songs already in queue, skipping duplicates');
+            return prevQueue;
+          }
+          
+          console.log(`✅ Adding ${newSongs.length} new songs (filtered ${data.songs.length - newSongs.length} duplicates)`);
+          return [...prevQueue, ...newSongs];
+        });
+        
         setLoadedYears(prev => new Set([...prev, year]));
         
         // Update offset for this year
