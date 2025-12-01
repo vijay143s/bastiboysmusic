@@ -29,19 +29,19 @@ const ProfileMenu = () => {
       {/* Profile Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-black font-bold hover:bg-green-400 transition-colors active:scale-95 text-lg"
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 text-black font-bold hover:bg-green-400 transition-all duration-200 active:scale-95 text-lg shadow-lg"
       >
         {user?.name?.[0]?.toUpperCase() || "U"}
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-56 bg-[#282828] text-white rounded-lg shadow-2xl z-50 border border-white/10">
+        <div className="absolute right-0 top-12 w-56 bg-[#1b1b1b] text-white rounded-lg shadow-xl z-50 border border-slate-700">
           {/* User Info Header */}
-          <div className="px-4 py-3 border-b border-white/10">
-            <p className="text-xs text-gray-400">Logged in as</p>
-            <p className="font-semibold truncate">{user?.name}</p>
-            <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+          <div className="px-4 py-3 border-b border-slate-700">
+            <p className="text-xs text-slate-400">Logged in as</p>
+            <p className="font-semibold truncate text-white">{user?.name}</p>
+            <p className="text-xs text-slate-400 capitalize">{user?.role || "User"}</p>
           </div>
 
           {/* Menu Items */}
@@ -50,19 +50,19 @@ const ProfileMenu = () => {
               <button
                 key={item.label}
                 onClick={() => handleNavigate(item.path)}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 text-white"
               >
-                <span>{item.icon}</span>
+                <span className="text-base">{item.icon}</span>
                 {item.label}
               </button>
             ))}
           </div>
 
           {/* Logout Button */}
-          <div className="border-t border-white/10 p-2">
+          <div className="border-t border-slate-700 p-2">
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-3 rounded"
+              className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-[#2a1a1a] transition-colors flex items-center gap-3 rounded"
             >
               <FaSignOutAlt size={14} />
               Logout
@@ -74,7 +74,7 @@ const ProfileMenu = () => {
       {/* Overlay to close menu */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         ></div>
       )}

@@ -15,6 +15,14 @@ export const SongProvider = ({ children }) => {
   const [queueIndex, setQueueIndex] = useState(0);
   const [queueLabel, setQueueLabel] = useState("All Songs");
 
+  // Year-based queue pagination state
+  const [availableYears, setAvailableYears] = useState([]);
+  const [loadedYears, setLoadedYears] = useState(new Set());
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentYearIndex, setCurrentYearIndex] = useState(0);
+  const [yearOffsets, setYearOffsets] = useState(new Map()); // Track offset for each year
+  const [hasMoreInCurrentYear, setHasMoreInCurrentYear] = useState(true);
+
   async function fetchSongs() {
     try {
       const { data } = await axios.get("/api/song/all");
@@ -34,6 +42,151 @@ export const SongProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  // Optimized function for queue - fetches only essential data
+  async function fetchQueueSongs() {
+    try {
+      const { data } = await axios.get("/api/song/queue");
+      
+      if (!selectedSong && data.length) {
+        setSelectedSong(data[0]._id);
+      }
+      if (!queue.length && data.length) {
+        setQueue(data);
+        setQueueIndex(0);
+        setQueueLabel("All Songs");
+      } else if (queueLabel === "All Songs" && data.length) {
+        setQueue(data);
+      }
+      setIsPlaying(false);
+    } catch (error) {
+      console.log(error);
+      // Fallback to regular fetch if queue endpoint fails
+      await fetchSongs();
+    }
+  }
+
+  // Fetch available years for queue pagination
+  async function fetchAvailableYears() {
+    try {
+      const { data } = await axios.get("/api/song/queue/years");
+      setAvailableYears(data.years);
+      return data.years;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+
+  // Load songs for a specific year with offset support
+  async function loadSongsByYear(year, limit = 50, offset = 0) {
+    try {
+      setIsLoadingMore(true);
+      const { data } = await axios.get(`/api/song/queue/year/${year}?limit=${limit}&offset=${offset}`);
+      
+      if (data.songs.length > 0) {
+        setQueue(prevQueue => [...prevQueue, ...data.songs]);
+        setLoadedYears(prev => new Set([...prev, year]));
+        
+        // Update offset for this year
+        setYearOffsets(prev => new Map([...prev, [year, data.nextOffset]]));
+        
+        // Check if this year has more songs
+        if (!data.hasMore) {
+          setHasMoreInCurrentYear(false);
+        }
+      }
+      
+      return {
+        songsLoaded: data.songs.length,
+        hasMore: data.hasMore,
+        total: data.total
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        songsLoaded: 0,
+        hasMore: false,
+        total: 0
+      };
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }
+
+  // Initialize queue with year-based pagination
+  async function initializeYearBasedQueue() {
+    try {
+      // Clear existing queue first
+      setQueue([]);
+      setLoadedYears(new Set());
+      setYearOffsets(new Map());
+      setCurrentYearIndex(0);
+      setHasMoreInCurrentYear(true);
+      
+      const years = await fetchAvailableYears();
+      if (years.length > 0) {
+        // Load songs from the most recent year first
+        const { data } = await axios.get(`/api/song/queue/year/${years[0]}?limit=50&offset=0`);
+        
+        if (data.songs.length > 0) {
+          setQueue(data.songs);
+          setLoadedYears(new Set([years[0]]));
+          setYearOffsets(new Map([[years[0], data.nextOffset]]));
+          setHasMoreInCurrentYear(data.hasMore);
+          
+          if (!selectedSong) {
+            setSelectedSong(data.songs[0]._id);
+          }
+          
+          setQueueIndex(0);
+          setQueueLabel("All Songs");
+          setIsPlaying(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      // Fallback to old method
+      await fetchQueueSongs();
+    }
+  }
+
+  // Load next batch of songs (for Load More button)
+  async function loadNextYearSongs() {
+    if (isLoadingMore || availableYears.length === 0) {
+      return false;
+    }
+    
+    const currentYear = availableYears[currentYearIndex];
+    
+    // First, try to load more songs from the current year
+    if (hasMoreInCurrentYear && currentYear) {
+      const currentOffset = yearOffsets.get(currentYear) || 0;
+      const result = await loadSongsByYear(currentYear, 50, currentOffset);
+      
+      if (result.songsLoaded > 0) {
+        return true;
+      } else {
+        // No more songs in current year, try next year
+        setHasMoreInCurrentYear(false);
+      }
+    }
+    
+    // Move to next year if current year is exhausted
+    if (!hasMoreInCurrentYear && currentYearIndex + 1 < availableYears.length) {
+      const nextYearIndex = currentYearIndex + 1;
+      const nextYear = availableYears[nextYearIndex];
+      
+      setCurrentYearIndex(nextYearIndex);
+      setHasMoreInCurrentYear(true);
+      
+      const result = await loadSongsByYear(nextYear, 50, 0);
+      return result.songsLoaded > 0;
+    }
+    
+    // No more years to load
+    return false;
   }
 
   const [song, setSong] = useState([]);
@@ -129,7 +282,7 @@ export const SongProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    fetchSongs();
+    initializeYearBasedQueue(); // Use year-based pagination instead of loading all songs
     fetchAlbums();
   }, []);
 
@@ -180,7 +333,7 @@ export const SongProvider = ({ children }) => {
   };
 
   const [albumSong, setAlbumSong] = useState([]);
-  const [albumData, setAlbumData] = useState([]);
+  const [albumData, setAlbumData] = useState(null);
 
   async function fetchAlbumSong(id) {
     try {
@@ -220,6 +373,13 @@ export const SongProvider = ({ children }) => {
         albumData,
         fetchSongs,
         fetchAlbums,
+        // Year-based queue pagination
+        availableYears,
+        loadedYears,
+        isLoadingMore,
+        loadNextYearSongs,
+        hasMoreInCurrentYear,
+        currentYearIndex,
       }}
     >
       {children}

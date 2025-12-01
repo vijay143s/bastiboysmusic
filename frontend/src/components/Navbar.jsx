@@ -11,17 +11,23 @@ const Navbar = () => {
   return (
     <>
       <div className="w-full flex justify-between items-center font-semibold px-3 py-2 bg-[#121212] border-b border-white/10">
-        <div className="flex items-center gap-2">
+        {/* Mobile logo and name - visible on mobile only */}
+        <div className="lg:hidden flex items-center gap-2">
           <img 
             src={assets.logo} 
             alt="Logo" 
             className="w-6 h-6 cursor-pointer"
             onClick={() => navigate("/")}
           />
-          <span className="hidden sm:inline text-white text-sm">Basti Boys Music</span>
+          <span className="text-white text-sm">Basti Boys Music</span>
         </div>
         
-        {user && <ProfileMenu />}
+        {/* Desktop - empty div for spacing */}
+        <div className="hidden lg:block"></div>
+        
+        <div className="flex items-center gap-4">
+          {user && <ProfileMenu />}
+        </div>
       </div>
     </>
   );

@@ -96,6 +96,173 @@ const getSongsBySinger = async (singerName) => {
   return rows.map(mapSongRow);
 };
 
+// Optimized function for queue - only returns essential data
+const getQueueSongs = async () => {
+  const [rows] = await pool.query(`
+    SELECT 
+      s.id, 
+      s.title, 
+      s.singer,
+      s.thumbnail_url,
+      s.album_id,
+      a.title as album_name
+    FROM songs s
+    LEFT JOIN albums a ON s.album_id = a.id
+    ORDER BY s.created_at DESC
+  `);
+
+  return rows.map(row => ({
+    _id: row.id,
+    title: row.title,
+    singer: row.singer,
+    thumbnail: {
+      url: row.thumbnail_url
+    },
+    album: row.album_id, // Keep the album ID for compatibility
+    albumName: row.album_name // Add album name directly
+  }));
+};
+
+// Get available years for pagination
+const getAvailableYears = async () => {
+  const [rows] = await pool.query(`
+    SELECT DISTINCT YEAR(created_at) as year 
+    FROM songs 
+    ORDER BY year DESC
+  `);
+
+  return rows.map(row => row.year);
+};
+
+// Year-based paginated queue function with offset support
+const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
+  const [rows] = await pool.query(`
+    SELECT 
+      s.id, 
+      s.title, 
+      s.singer,
+      s.thumbnail_url,
+      s.album_id,
+      s.created_at,
+      a.title as album_name
+    FROM songs s
+    LEFT JOIN albums a ON s.album_id = a.id
+    WHERE YEAR(s.created_at) = ?
+    ORDER BY s.created_at DESC
+    LIMIT ? OFFSET ?
+  `, [year, limit, offset]);
+
+  // Get total count for this year
+  const [countResult] = await pool.query(`
+    SELECT COUNT(*) as total
+    FROM songs s
+    WHERE YEAR(s.created_at) = ?
+  `, [year]);
+
+  const total = countResult[0].total;
+
+  return {
+    year: year,
+    songs: rows.map(row => ({
+      _id: row.id,
+      title: row.title,
+      singer: row.singer,
+      thumbnail: {
+        url: row.thumbnail_url
+      },
+      album: row.album_id,
+      albumName: row.album_name,
+      createdAt: row.created_at
+    })),
+    count: rows.length,
+    total: total,
+    hasMore: offset + rows.length < total,
+    nextOffset: offset + rows.length
+  };
+};
+
+// Optimized function for single song player - only returns essential playback data
+const findSongByIdForPlayer = async (id) => {
+  const [rows] = await pool.query(`
+    SELECT 
+      s.id,
+      s.title,
+      s.singer,
+      s.thumbnail_url,
+      s.audio_url,
+      s.album_id
+    FROM songs s
+    WHERE s.id = ? LIMIT 1
+  `, [id]);
+
+  if (!rows[0]) return null;
+
+  const row = rows[0];
+  return {
+    _id: row.id,
+    id: row.id,
+    title: row.title,
+    singer: row.singer,
+    thumbnail: {
+      url: row.thumbnail_url
+    },
+    audio: {
+      url: row.audio_url
+    },
+    album: String(row.album_id)
+  };
+};
+
+// Search songs across all fields
+const searchSongs = async (searchTerm, limit = 50, offset = 0) => {
+  const searchPattern = `%${searchTerm}%`;
+  
+  try {
+    // Simplified search query matching the existing structure used in getQueueSongs
+    const searchQuery = `
+      SELECT s.id as _id, s.title, s.description as artist, s.singer,
+             s.thumbnail_url as thumbnail, s.audio_url as audio, s.album_id as album,
+             s.created_at as createdAt, s.updated_at as updatedAt
+      FROM songs s 
+      WHERE s.title LIKE ? 
+         OR s.description LIKE ? 
+         OR s.singer LIKE ?
+      ORDER BY s.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    
+    // Count query for total results
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM songs s 
+      WHERE s.title LIKE ? 
+         OR s.description LIKE ? 
+         OR s.singer LIKE ?
+    `;
+    
+    const [rows] = await pool.execute(searchQuery, [
+      searchPattern, searchPattern, searchPattern, // for WHERE clause
+      limit, offset
+    ]);
+    
+    const [totalResult] = await pool.execute(countQuery, [
+      searchPattern, searchPattern, searchPattern
+    ]);
+    
+    const hasMore = offset + limit < totalResult[0].total;
+    
+    return {
+      songs: rows,
+      total: totalResult[0].total,
+      hasMore,
+      nextOffset: hasMore ? offset + limit : null
+    };
+  } catch (error) {
+    console.error('Search songs error:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createSong,
   updateSongThumbnail,
@@ -104,4 +271,9 @@ module.exports = {
   findSongById,
   deleteSongById,
   getSongsBySinger,
+  getQueueSongs,
+  getAvailableYears,
+  getQueueSongsByYear,
+  findSongByIdForPlayer,
+  searchSongs,
 };

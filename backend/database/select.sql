@@ -1,1 +1,1 @@
-select * from albums limit 5;
+select * from albums where id = 285;

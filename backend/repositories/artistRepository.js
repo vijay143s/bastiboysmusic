@@ -41,12 +41,23 @@ const getArtistsByAlbum = async (albumId) => {
 
 
 const getAlbumsByArtist = async (artistId) => {
+  // First get the artist name for this ID
+  const [artistRows] = await pool.query(
+    `SELECT artist_name FROM artists WHERE artist_id = ? LIMIT 1`,
+    [artistId]
+  );
+  
+  if (!artistRows.length) return [];
+  
+  const artistName = artistRows[0].artist_name;
+  
+  // Then get all albums by this artist name
   const [rows] = await pool.query(
     `SELECT DISTINCT a.id, a.title, a.description, a.thumbnail_id, a.thumbnail_url, a.year, a.director, a.music_director, a.star_cast, a.created_at, a.updated_at
      FROM albums a 
      INNER JOIN artists ar ON a.id = ar.album_id 
-     WHERE ar.artist_id = ? ORDER BY a.created_at DESC`,
-    [artistId]
+     WHERE ar.artist_name = ? ORDER BY a.created_at DESC`,
+    [artistName]
   );
 
   return rows.map(row => ({
@@ -94,13 +105,13 @@ const deleteArtistsByAlbum = async (albumId) => {
 
 const getTopArtists = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT artist_id, artist_name, COUNT(*) as album_count
-     FROM artists GROUP BY artist_id, artist_name ORDER BY album_count DESC LIMIT ?`,
+    `SELECT MIN(artist_id) as artistId, artist_name, COUNT(*) as album_count
+     FROM artists GROUP BY artist_name ORDER BY album_count DESC LIMIT ?`,
     [limit]
   );
 
   return rows.map(row => ({
-    artistId: row.artist_id,
+    artistId: row.artistId,
     artistName: row.artist_name,
     albumCount: row.album_count,
   }));
@@ -109,13 +120,13 @@ const getTopArtists = async (limit = 10) => {
 const getArtistsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT artist_id, artist_name, COUNT(*) as album_count
-     FROM artists GROUP BY artist_id, artist_name ORDER BY artist_name LIMIT ? OFFSET ?`,
+    `SELECT MIN(artist_id) as artist_id, artist_name, COUNT(*) as album_count
+     FROM artists GROUP BY artist_name ORDER BY artist_name LIMIT ? OFFSET ?`,
     [limit, offset]
   );
 
   const [countResult] = await pool.query(
-    `SELECT COUNT(DISTINCT artist_id) as total FROM artists`
+    `SELECT COUNT(DISTINCT artist_name) as total FROM artists`
   );
   const total = countResult[0].total;
 
@@ -134,6 +145,19 @@ const getArtistsPaginated = async (page = 1, limit = 12) => {
   };
 };
 
+// Optimized search - returns only essential data for search functionality
+const getArtistsForSearch = async () => {
+  const [rows] = await pool.query(
+    `SELECT MIN(artist_id) as artist_id, artist_name 
+     FROM artists GROUP BY artist_name ORDER BY artist_name ASC`
+  );
+
+  return rows.map(row => ({
+    artistId: row.artist_id,
+    artistName: row.artist_name,
+  }));
+};
+
 module.exports = {
   createArtist,
   findArtistById,
@@ -145,4 +169,5 @@ module.exports = {
   getAlbumsByArtist,
   getTopArtists,
   getArtistsPaginated,
+  getArtistsForSearch,
 };

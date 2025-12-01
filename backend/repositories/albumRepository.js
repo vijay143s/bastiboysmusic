@@ -47,27 +47,46 @@ const getAllAlbums = async () => {
 
 const getLatestAlbums = async (year, limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, thumbnail_id, thumbnail_url, year, director, music_director, star_cast, created_at, updated_at
+    `SELECT id, title, description, thumbnail_id, thumbnail_url
      FROM albums WHERE year = ? ORDER BY created_at DESC LIMIT ?`,
     [year, limit]
   );
 
-  return rows.map(mapAlbumRow);
+  return rows.map(row => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    thumbnail: {
+      id: row.thumbnail_id,
+      url: row.thumbnail_url,
+    },
+  }));
 };
 
 const getAlbumsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT id, title, description, thumbnail_id, thumbnail_url, year, director, music_director, star_cast, created_at, updated_at
+    `SELECT id, title, description, thumbnail_id, thumbnail_url
      FROM albums ORDER BY created_at DESC LIMIT ? OFFSET ?`,
     [limit, offset]
   );
+
+  // Map rows with only essential fields for listing
+  const albumsData = rows.map(row => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    thumbnail: {
+      id: row.thumbnail_id,
+      url: row.thumbnail_url,
+    },
+  }));
 
   const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM albums`);
   const total = countResult[0].total;
 
   return {
-    data: rows.map(mapAlbumRow),
+    data: albumsData,
     pagination: {
       page,
       limit,
@@ -77,10 +96,28 @@ const getAlbumsPaginated = async (page = 1, limit = 12) => {
   };
 };
 
+// Optimized search - returns only essential data for search functionality including thumbnails
+const getAlbumsForSearch = async () => {
+  const [rows] = await pool.query(
+    `SELECT id, title, description, thumbnail_id, thumbnail_url FROM albums ORDER BY title ASC`
+  );
+
+  return rows.map(row => ({
+    _id: row.id,
+    title: row.title,
+    description: row.description,
+    thumbnail: {
+      id: row.thumbnail_id,
+      url: row.thumbnail_url,
+    },
+  }));
+};
+
 module.exports = {
   createAlbum,
   findAlbumById,
   getAllAlbums,
   getLatestAlbums,
   getAlbumsPaginated,
+  getAlbumsForSearch,
 };

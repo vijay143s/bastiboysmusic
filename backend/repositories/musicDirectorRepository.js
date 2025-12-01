@@ -103,13 +103,13 @@ const deleteMusicDirectorsByAlbum = async (albumId) => {
 
 const getTopMusicDirectors = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT director_id, director_name, COUNT(*) as album_count
-     FROM music_directors GROUP BY director_id, director_name ORDER BY album_count DESC LIMIT ?`,
+    `SELECT MIN(director_id) as directorId, director_name, COUNT(*) as album_count
+     FROM music_directors GROUP BY director_name ORDER BY album_count DESC LIMIT ?`,
     [limit]
   );
 
   return rows.map(row => ({
-    directorId: row.director_id,
+    directorId: row.directorId,
     directorName: row.director_name,
     albumCount: row.album_count,
   }));
@@ -118,19 +118,19 @@ const getTopMusicDirectors = async (limit = 10) => {
 const getMusicDirectorsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT director_id, director_name, COUNT(*) as album_count
-     FROM music_directors GROUP BY director_id, director_name ORDER BY director_name LIMIT ? OFFSET ?`,
+    `SELECT MIN(director_id) as directorId, director_name, COUNT(*) as album_count
+     FROM music_directors GROUP BY director_name ORDER BY director_name LIMIT ? OFFSET ?`,
     [limit, offset]
   );
 
   const [countResult] = await pool.query(
-    `SELECT COUNT(DISTINCT director_id) as total FROM music_directors`
+    `SELECT COUNT(DISTINCT director_name) as total FROM music_directors`
   );
   const total = countResult[0].total;
 
   return {
     data: rows.map(row => ({
-      directorId: row.director_id,
+      directorId: row.directorId,
       directorName: row.director_name,
       albumCount: row.album_count,
     })),
@@ -141,6 +141,19 @@ const getMusicDirectorsPaginated = async (page = 1, limit = 12) => {
       pages: Math.ceil(total / limit),
     },
   };
+};
+
+// Optimized search - returns only essential data for search functionality
+const getMusicDirectorsForSearch = async () => {
+  const [rows] = await pool.query(
+    `SELECT MIN(director_id) as directorId, director_name 
+     FROM music_directors GROUP BY director_name ORDER BY director_name ASC`
+  );
+
+  return rows.map(row => ({
+    directorId: row.directorId,
+    directorName: row.director_name,
+  }));
 };
 
 module.exports = {
@@ -155,4 +168,5 @@ module.exports = {
   getMusicDirectorsPaginated,
   getAlbumsByMusicDirector,
   getAlbumsByMusicDirectorName,
+  getMusicDirectorsForSearch,
 };

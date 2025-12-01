@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { SongData } from "../context/Song";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { UserData } from "../context/User";
 import { RiPulseLine } from "react-icons/ri";
@@ -17,6 +17,7 @@ const Album = () => {
   } = SongData();
 
   const params = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAlbumSong(params.id);
@@ -72,6 +73,16 @@ const Album = () => {
   };
   return (
     <div className="px-2 md:px-0">
+      {/* Back Button */}
+      <div className="mb-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center justify-center w-10 h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+        >
+          <img src={assets.arrow_left} alt="Back" className="w-4 h-4" />
+        </button>
+      </div>
+      
       {albumData && (
         <>
           {/* Album Header */}

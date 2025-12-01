@@ -2,20 +2,24 @@ const TryCatch = require("../utils/TryCatch.js");
 const {
   getLatestAlbums,
   getAlbumsPaginated,
+  getAlbumsForSearch,
 } = require("../repositories/albumRepository.js");
 const {
   getTopArtists,
   getArtistsPaginated,
   getAlbumsByArtist,
+  getArtistsForSearch,
 } = require("../repositories/artistRepository.js");
 const {
   getTopSingers,
   getSingersPaginated,
+  getSingersForSearch,
 } = require("../repositories/singerRepository.js");
 const {
   getTopMusicDirectors,
   getMusicDirectorsPaginated,
   getAlbumsByMusicDirectorName,
+  getMusicDirectorsForSearch,
 } = require("../repositories/musicDirectorRepository.js");
 const {
   getSongsBySinger,
@@ -263,6 +267,47 @@ const getAlbumsByMusicDirector = TryCatch(async (req, res) => {
   });
 });
 
+// Optimized search endpoints - minimal data for search functionality
+const getAlbumsForSearchEndpoint = TryCatch(async (req, res) => {
+  const albums = await getAlbumsForSearch();
+  
+  res.json({
+    message: "Albums for search retrieved successfully",
+    data: albums,
+    count: albums.length,
+  });
+});
+
+const getArtistsForSearchEndpoint = TryCatch(async (req, res) => {
+  const artists = await getArtistsForSearch();
+  
+  res.json({
+    message: "Artists for search retrieved successfully",
+    data: artists,
+    count: artists.length,
+  });
+});
+
+const getSingersForSearchEndpoint = TryCatch(async (req, res) => {
+  const singers = await getSingersForSearch();
+  
+  res.json({
+    message: "Singers for search retrieved successfully",
+    data: singers,
+    count: singers.length,
+  });
+});
+
+const getMusicDirectorsForSearchEndpoint = TryCatch(async (req, res) => {
+  const directors = await getMusicDirectorsForSearch();
+  
+  res.json({
+    message: "Music directors for search retrieved successfully",
+    data: directors,
+    count: directors.length,
+  });
+});
+
 module.exports = {
   getLatestAlbumsByYear,
   getAllAlbumsPaginated,
@@ -276,4 +321,9 @@ module.exports = {
   getSongsBySingerName,
   getAlbumsByArtistId,
   getAlbumsByMusicDirector,
+  // Optimized search endpoints
+  getAlbumsForSearchEndpoint,
+  getArtistsForSearchEndpoint,
+  getSingersForSearchEndpoint,
+  getMusicDirectorsForSearchEndpoint,
 };

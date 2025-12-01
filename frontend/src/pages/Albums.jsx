@@ -6,9 +6,12 @@ import Loading from "../components/Loading";
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
+  const [allAlbums, setAllAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredAlbums, setFilteredAlbums] = useState([]);
 
   const page = Number(searchParams.get("page")) || 1;
   const limit = 12;
@@ -22,6 +25,12 @@ const Albums = () => {
         );
         setAlbums(response.data.data);
         setPagination(response.data.pagination);
+        
+        // If it's the first page and no search, fetch minimal data for searching
+        if (page === 1 && !searchQuery) {
+          const searchResponse = await axios.get(`/api/home/search/albums`);
+          setAllAlbums(searchResponse.data.data);
+        }
       } catch (error) {
         console.error("Failed to fetch albums:", error);
         setAlbums([]);
@@ -32,6 +41,22 @@ const Albums = () => {
 
     fetchAlbums();
   }, [page]);
+
+  // Filter albums based on search query
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredAlbums([]);
+      return;
+    }
+    
+    const filtered = allAlbums.filter(album => 
+      album.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      album.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredAlbums(filtered);
+  }, [searchQuery, allAlbums]);
+
+  const displayAlbums = searchQuery ? filteredAlbums : albums;
 
   const handlePrevPage = () => {
     if (page > 1) {
@@ -49,19 +74,51 @@ const Albums = () => {
 
   return (
     <div className="w-full px-4 md:px-6 py-4">
-      <h1 className="text-2xl md:text-3xl font-bold text-white mb-6">
-        All Albums
-      </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">
+          All Albums
+        </h1>
+        
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search albums..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-gray-800 text-white placeholder-gray-400 px-4 py-2 rounded-lg border border-gray-700 focus:border-green-500 focus:outline-none w-full sm:w-64"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
 
-      {albums.length > 0 ? (
+      {displayAlbums.length > 0 ? (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-            {albums.map((album) => (
-              <AlbumItem key={album._id} album={album} />
+            {displayAlbums.map((album) => (
+              <AlbumItem
+                key={album._id}
+                image={album.thumbnail?.url}
+                name={album.title}
+                desc={album.description}
+                id={album._id}
+              />
             ))}
           </div>
+          
+          {searchQuery && (
+            <div className="text-center text-gray-400 mb-4">
+              Found {filteredAlbums.length} album{filteredAlbums.length !== 1 ? 's' : ''} matching "{searchQuery}"
+            </div>
+          )}
 
-          {pagination && pagination.pages > 1 && (
+          {!searchQuery && pagination && pagination.pages > 1 && (
             <div className="flex items-center justify-center gap-4 mt-8">
               <button
                 onClick={handlePrevPage}

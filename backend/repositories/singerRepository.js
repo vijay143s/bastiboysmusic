@@ -77,11 +77,20 @@ const deleteSingersBySong = async (songId) => {
 
 const getTopSingers = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT singer_id, singer_name FROM singers ORDER BY singer_id DESC LIMIT ?`,
+    `SELECT s.singer_id, s.singer_name, COUNT(so.id) as song_count
+     FROM singers s 
+     LEFT JOIN songs so ON (so.singer = s.singer_name OR FIND_IN_SET(s.singer_name, so.singer) > 0)
+     GROUP BY s.singer_id, s.singer_name 
+     ORDER BY song_count DESC, s.singer_name ASC 
+     LIMIT ?`,
     [limit]
   );
 
-  return rows.map(mapSingerRow);
+  return rows.map(row => ({
+    singerId: row.singer_id,
+    singerName: row.singer_name,
+    songCount: row.song_count
+  }));
 };
 
 const getSingersPaginated = async (page = 1, limit = 12) => {
@@ -105,6 +114,18 @@ const getSingersPaginated = async (page = 1, limit = 12) => {
   };
 };
 
+// Optimized search - returns only essential data for search functionality
+const getSingersForSearch = async () => {
+  const [rows] = await pool.query(
+    `SELECT singer_id, singer_name FROM singers ORDER BY singer_name ASC`
+  );
+
+  return rows.map(row => ({
+    singerId: row.singer_id,
+    singerName: row.singer_name,
+  }));
+};
+
 module.exports = {
   createSinger,
   findSingerById,
@@ -116,4 +137,5 @@ module.exports = {
   getSongsBySinger,
   getTopSingers,
   getSingersPaginated,
+  getSingersForSearch,
 };

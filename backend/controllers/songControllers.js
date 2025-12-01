@@ -13,6 +13,11 @@ const {
   getAllSongs: fetchSongs,
   getSongsByAlbum,
   updateSongThumbnail,
+  getQueueSongs,
+  getAvailableYears,
+  getQueueSongsByYear,
+  findSongByIdForPlayer,
+  searchSongs: searchSongsRepo,
 } = require("../repositories/songRepository.js");
 const {
   createArtist,
@@ -190,6 +195,45 @@ const getAllSongs = TryCatch(async (req, res) => {
   res.json(songs.map(formatSong));
 });
 
+// Optimized endpoint for queue - returns only essential data
+const getQueueData = TryCatch(async (req, res) => {
+  const songs = await getQueueSongs();
+  res.json(songs);
+});
+
+// Get available years for queue pagination
+const getQueueYears = TryCatch(async (req, res) => {
+  const years = await getAvailableYears();
+  res.json({ years });
+});
+
+// Get queue songs by year for pagination
+const getQueueByYear = TryCatch(async (req, res) => {
+  const year = Number(req.params.year);
+  const limit = Number(req.query.limit) || 50;
+  const offset = Number(req.query.offset) || 0;
+
+  if (Number.isNaN(year)) {
+    return res.status(400).json({
+      message: "Invalid year parameter",
+    });
+  }
+
+  const result = await getQueueSongsByYear(year, limit, offset);
+  res.json(result);
+});
+
+const searchSongs = TryCatch(async (req, res) => {
+  const { q: query, limit = 50, offset = 0 } = req.query;
+  
+  if (!query || query.trim().length === 0) {
+    return res.json({ songs: [], total: 0, hasMore: false });
+  }
+
+  const result = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset));
+  res.json(result);
+});
+
 const getAllSongsByAlbum = TryCatch(async (req, res) => {
   const albumId = Number(req.params.id);
 
@@ -233,14 +277,14 @@ const getSingleSong = TryCatch(async (req, res) => {
       message: "Invalid song id",
     });
 
-  const song = await findSongById(songId);
+  const song = await findSongByIdForPlayer(songId);
 
   if (!song)
     return res.status(404).json({
       message: "Song not found",
     });
 
-  res.json(formatSong(song));
+  res.json(song); // Return optimized song data directly
 });
 
 module.exports = {
@@ -249,6 +293,9 @@ module.exports = {
   addSong,
   addThumbnail,
   getAllSongs,
+  getQueueData,
+  getQueueYears,
+  getQueueByYear,
   getAllSongsByAlbum,
   deleteSong,
   getSingleSong,
@@ -327,4 +374,5 @@ module.exports = {
       musicDirector,
     });
   }),
+  searchSongs,
 };

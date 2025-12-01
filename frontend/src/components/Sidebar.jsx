@@ -54,18 +54,18 @@ const Sidebar = () => {
   const renderNavItem = (item) => (
     <button
       key={item.label}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left hover:bg-white/10 ${
+      className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors text-left hover:bg-white/10 ${
         item.highlight ? "bg-white text-black hover:bg-white" : ""
       }`}
       onClick={() => navigate(item.path)}
     >
-      <img src={item.icon} className={`${NAV_ICON_SIZE}`} alt="" />
-      <div>
-        <p className={`font-semibold ${item.highlight ? "text-black" : "text-white"}`}>
+      <img src={item.icon} className={`${NAV_ICON_SIZE} flex-shrink-0`} alt="" />
+      <div className="min-w-0 flex-1">
+        <p className={`font-semibold truncate ${item.highlight ? "text-black" : "text-white"}`}>
           {item.label}
         </p>
         {item.subtitle && (
-          <p className={`text-xs ${item.highlight ? "text-black/70" : "text-gray-400"}`}>
+          <p className={`text-xs truncate ${item.highlight ? "text-black/70" : "text-gray-400"}`}>
             {item.subtitle}
           </p>
         )}
@@ -76,13 +76,16 @@ const Sidebar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-[25%] h-full p-2 text-white">
-        <div className="bg-[#121212] rounded-2xl flex flex-col w-full">
-          <div className="px-5 py-4 border-b border-white/5">
-            <p className="text-lg font-semibold">Browse</p>
+      <aside className="hidden lg:flex w-full h-full p-2 text-white">
+        <div className="bg-[#121212] rounded-2xl flex flex-col w-full min-w-0">
+          <div className="px-5 py-4 border-b border-white/5 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <img src={assets.logo} alt="Logo" className="w-6 h-6" />
+              <p className="text-lg font-semibold">Basti Boys Music</p>
+            </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-8">
+          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
             <section className="space-y-1">
               {mainMenu.map(renderNavItem)}
             </section>
@@ -129,7 +132,10 @@ const Sidebar = () => {
           <aside className="absolute left-0 top-0 h-full w-72 bg-[#0f0f0f] text-white flex flex-col p-2 z-50 overflow-y-auto shadow-2xl rounded-r-2xl border-r border-white/10">
             {/* Header with Close Button */}
             <div className="flex justify-between items-center px-5 py-4 border-b border-white/5">
-              <p className="text-lg font-semibold">Menu</p>
+              <div className="flex items-center gap-2">
+                <img src={assets.logo} alt="Logo" className="w-5 h-5" />
+                <p className="text-lg font-semibold">Basti Boys Music</p>
+              </div>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-white text-2xl hover:bg-white/10 p-1 rounded transition"

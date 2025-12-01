@@ -12,6 +12,11 @@ const {
   getSongsBySingerName,
   getAlbumsByArtistId,
   getAlbumsByMusicDirector,
+  // Optimized search endpoints
+  getAlbumsForSearchEndpoint,
+  getArtistsForSearchEndpoint,
+  getSingersForSearchEndpoint,
+  getMusicDirectorsForSearchEndpoint,
 } = require("../controllers/homeControllers.js");
 
 const router = express.Router();
@@ -35,5 +40,11 @@ router.get("/singers", getAllSingersPaginated);
 router.get("/music-directors/top", getTopMusicDirectorsSection);
 router.get("/music-directors/:directorName/albums", getAlbumsByMusicDirector);
 router.get("/music-directors", getAllMusicDirectorsPaginated);
+
+// Optimized Search Routes - minimal data for search functionality
+router.get("/search/albums", getAlbumsForSearchEndpoint);
+router.get("/search/artists", getArtistsForSearchEndpoint);
+router.get("/search/singers", getSingersForSearchEndpoint);
+router.get("/search/music-directors", getMusicDirectorsForSearchEndpoint);
 
 module.exports = router;
