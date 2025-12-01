@@ -67,7 +67,9 @@ export const UserProvider = ({ children }) => {
 
   async function fetchUser() {
     try {
-      const { data } = await authAxios.get("/api/user/me");
+      const { data } = await authAxios.get("/api/user/me", {
+        timeout: 5000 // 5 second timeout to fail fast
+      });
 
       setUser(data);
       setIsAuth(true);
@@ -75,7 +77,7 @@ export const UserProvider = ({ children }) => {
     } catch (error) {
       // Silently handle auth check failures (user not logged in or network issues)
       // This is expected behavior when user is not authenticated
-      if (error.code !== 'ERR_NETWORK') {
+      if (error.code !== 'ERR_NETWORK' && error.code !== 'ECONNABORTED') {
         console.log('Auth check failed:', error.message);
       }
       setIsAuth(false);
@@ -99,7 +101,20 @@ export const UserProvider = ({ children }) => {
       const { data } = await authAxios.post("/api/user/song/" + id);
 
       if (!silent) toast.success(data.message);
-      await fetchUser();
+      
+      // Update local user state instead of refetching to avoid CORS issues
+      if (data.message.includes("Added")) {
+        setUser(prev => ({
+          ...prev,
+          playlist: [...(prev.playlist || []), id]
+        }));
+      } else if (data.message.includes("Removed")) {
+        setUser(prev => ({
+          ...prev,
+          playlist: (prev.playlist || []).filter(songId => songId !== id)
+        }));
+      }
+      
       return data;
     } catch (error) {
       if (!silent && error.response?.data?.message) {
