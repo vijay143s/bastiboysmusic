@@ -103,23 +103,23 @@ const deleteMusicDirectorsByAlbum = async (albumId) => {
 
 const getTopMusicDirectors = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT MIN(director_id) as directorId, director_name, COUNT(*) as album_count
-     FROM music_directors GROUP BY director_name ORDER BY album_count DESC LIMIT ?`,
+    `SELECT MIN(director_id) as directorId, director_name as directorName, COUNT(*) as albumCount
+     FROM music_directors GROUP BY director_name ORDER BY albumCount DESC LIMIT ?`,
     [limit]
   );
 
   return rows.map(row => ({
     directorId: row.directorId,
-    directorName: row.director_name,
-    albumCount: row.album_count,
+    directorName: row.directorName,
+    albumCount: String(row.albumCount),
   }));
 };
 
 const getMusicDirectorsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT MIN(director_id) as directorId, director_name, COUNT(*) as album_count
-     FROM music_directors GROUP BY director_name ORDER BY director_name LIMIT ? OFFSET ?`,
+    `SELECT MIN(director_id) as directorId, director_name as directorName, COUNT(*) as albumCount
+     FROM music_directors GROUP BY director_name ORDER BY directorName LIMIT ? OFFSET ?`,
     [limit, offset]
   );
 
@@ -131,8 +131,8 @@ const getMusicDirectorsPaginated = async (page = 1, limit = 12) => {
   return {
     data: rows.map(row => ({
       directorId: row.directorId,
-      directorName: row.director_name,
-      albumCount: row.album_count,
+      directorName: row.directorName,
+      albumCount: String(row.albumCount),
     })),
     pagination: {
       page,

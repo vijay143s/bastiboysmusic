@@ -81,7 +81,7 @@ const deleteSingersBySong = async (songId) => {
 
 const getTopSingers = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT s.singer_id, s.singer_name, COUNT(so.id) as song_count
+    `SELECT s.singer_id as singerId, s.singer_name as singerName, COUNT(so.id) as songCount
      FROM singers s 
      LEFT JOIN songs so ON (
        so.singer = s.singer_name 
@@ -91,22 +91,22 @@ const getTopSingers = async (limit = 10) => {
        )
      )
      GROUP BY s.singer_id, s.singer_name 
-     ORDER BY song_count DESC, s.singer_name ASC 
+     ORDER BY songCount DESC, s.singer_name ASC 
      LIMIT ?`,
     [limit]
   );
 
   return rows.map(row => ({
-    singerId: row.singer_id,
-    singerName: row.singer_name,
-    songCount: row.song_count
+    singerId: row.singerId,
+    singerName: row.singerName,
+    songCount: String(row.songCount)
   }));
 };
 
 const getSingersPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT singer_id, singer_name FROM singers ORDER BY singer_name LIMIT ? OFFSET ?`,
+    `SELECT singer_id as singerId, singer_name as singerName FROM singers ORDER BY singer_name LIMIT ? OFFSET ?`,
     [limit, offset]
   );
 
@@ -114,7 +114,10 @@ const getSingersPaginated = async (page = 1, limit = 12) => {
   const total = countResult[0].total;
 
   return {
-    data: rows.map(mapSingerRow),
+    data: rows.map(row => ({
+      singerId: row.singerId,
+      singerName: row.singerName,
+    })),
     pagination: {
       page,
       limit,

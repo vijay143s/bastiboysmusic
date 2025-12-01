@@ -43,7 +43,7 @@ const runSqlFile = async (filePath) => {
   console.log(`   Found ${statements.length} statements to execute`);
 
   // Execute in batches to avoid timeout/memory issues
-  const BATCH_SIZE = 100;
+  const BATCH_SIZE = 10;
   let executed = 0;
 
   let errors = 0;
