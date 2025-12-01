@@ -24,6 +24,6 @@ router.post("/login", authRateLimiter, validateRequest(loginSchema), loginUser);
 router.get("/me", isAuth, myProfile);
 router.get("/logout", isAuth, logoutUser);
 router.post("/song/:id", isAuth, saveToPlaylist);
-router.get("/playlists/all", isAuth, getAllCommunityPlaylists);
+router.get("/playlists/all", getAllCommunityPlaylists); // Public endpoint - no auth needed
 
 module.exports = router;
