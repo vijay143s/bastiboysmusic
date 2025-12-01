@@ -63,6 +63,25 @@ const getLatestAlbums = async (year, limit = 10) => {
   }));
 };
 
+const getAlbumsByYearValue = async (year, limit = 50) => {
+  const [rows] = await pool.query(
+    `SELECT id, title, description, thumbnail_id, thumbnail_url, year
+     FROM albums WHERE year = ? ORDER BY title ASC LIMIT ?`,
+    [year, limit]
+  );
+
+  return rows.map(row => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    year: row.year,
+    thumbnail: {
+      id: row.thumbnail_id,
+      url: row.thumbnail_url,
+    },
+  }));
+};
+
 const getAlbumsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
@@ -118,6 +137,7 @@ module.exports = {
   findAlbumById,
   getAllAlbums,
   getLatestAlbums,
+  getAlbumsByYearValue,
   getAlbumsPaginated,
   getAlbumsForSearch,
 };

@@ -3,6 +3,7 @@ const {
   getLatestAlbums,
   getAlbumsPaginated,
   getAlbumsForSearch,
+  getAlbumsByYearValue,
 } = require("../repositories/albumRepository.js");
 const {
   getTopArtists,
@@ -23,6 +24,8 @@ const {
 } = require("../repositories/musicDirectorRepository.js");
 const {
   getSongsBySinger,
+  getTopYears,
+  getSongsByYear,
 } = require("../repositories/songRepository.js");
 
 const formatAlbum = (album) => ({
@@ -187,6 +190,68 @@ const getAllMusicDirectorsPaginated = TryCatch(async (req, res) => {
   });
 });
 
+// Get available years for Years section
+const getTopYearsSection = TryCatch(async (req, res) => {
+  const limit = req.query.limit ? Number(req.query.limit) : 10;
+
+  if (Number.isNaN(limit) || limit < 1) {
+    return res.status(400).json({
+      message: "Invalid limit parameter",
+    });
+  }
+
+  const years = await getTopYears(limit);
+
+  res.json({
+    message: "Top years retrieved successfully",
+    data: years,
+    count: years.length,
+  });
+});
+
+// Get songs by year with pagination
+const getSongsByYearPaginated = TryCatch(async (req, res) => {
+  const year = Number(req.params.year);
+  const page = req.query.page ? Number(req.query.page) : 1;
+  const limit = req.query.limit ? Number(req.query.limit) : 20;
+
+  if (Number.isNaN(year) || Number.isNaN(page) || Number.isNaN(limit) || page < 1 || limit < 1) {
+    return res.status(400).json({
+      message: "Invalid parameters",
+    });
+  }
+
+  const result = await getSongsByYear(year, page, limit);
+
+  res.json({
+    message: `Songs from ${year} retrieved successfully`,
+    data: result.data,
+    pagination: result.pagination,
+    year: year,
+  });
+});
+
+// Get albums by year
+const getAlbumsByYear = TryCatch(async (req, res) => {
+  const year = Number(req.params.year);
+  const limit = req.query.limit ? Number(req.query.limit) : 50;
+
+  if (Number.isNaN(year) || Number.isNaN(limit) || limit < 1) {
+    return res.status(400).json({
+      message: "Invalid parameters",
+    });
+  }
+
+  const albums = await getAlbumsByYearValue(year, limit);
+
+  res.json({
+    message: `Albums from ${year} retrieved successfully`,
+    data: albums.map(formatAlbum),
+    count: albums.length,
+    year: year,
+  });
+});
+
 // Get songs by album ID
 const getSongsByAlbumId = TryCatch(async (req, res) => {
   const { albumId } = req.params;
@@ -321,6 +386,10 @@ module.exports = {
   getSongsBySingerName,
   getAlbumsByArtistId,
   getAlbumsByMusicDirector,
+  // Years section
+  getTopYearsSection,
+  getSongsByYearPaginated,
+  getAlbumsByYear,
   // Optimized search endpoints
   getAlbumsForSearchEndpoint,
   getArtistsForSearchEndpoint,

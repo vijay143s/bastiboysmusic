@@ -92,12 +92,41 @@ const AlbumCard = ({ album, onNavigate }) => {
   );
 };
 
+const YearCard = ({ yearData, onNavigate }) => {
+  return (
+    <div
+      onClick={() => onNavigate("year", null, yearData.year)}
+      className="flex-shrink-0 w-40 text-center cursor-pointer group"
+    >
+      <div className="w-full h-40 bg-gradient-to-br from-green-900 to-green-800 rounded-lg flex items-center justify-center mb-3 group-hover:from-green-800 group-hover:to-green-700 transition-all">
+        <div className="text-center">
+          <span className="text-4xl font-bold text-white block">
+            {yearData.year}
+          </span>
+          <div className="mt-2 px-2 py-1 bg-white/20 rounded-full">
+            <span className="text-xs font-medium text-white">
+              {yearData.songCount} songs
+            </span>
+          </div>
+        </div>
+      </div>
+      <h3 className="text-white font-semibold text-sm group-hover:text-green-400 transition-colors">
+        {yearData.year}
+      </h3>
+      <p className="text-gray-400 text-xs mt-1">
+        {yearData.songCount} song{yearData.songCount !== 1 ? "s" : ""}
+      </p>
+    </div>
+  );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const [latestAlbums, setLatestAlbums] = useState([]);
   const [topArtists, setTopArtists] = useState([]);
   const [topSingers, setTopSingers] = useState([]);
   const [topDirectors, setTopDirectors] = useState([]);
+  const [topYears, setTopYears] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const handleCardClick = (type, id, name) => {
@@ -109,6 +138,8 @@ const Home = () => {
       navigate(`/results/singer/${encodeURIComponent(name)}`);
     } else if (type === "director") {
       navigate(`/results/director/${encodeURIComponent(name)}`);
+    } else if (type === "year") {
+      navigate(`/results/year/${name}`);
     }
   };
 
@@ -116,17 +147,19 @@ const Home = () => {
     const fetchHomeSections = async () => {
       try {
         setLoading(true);
-        const [albumsRes, artistsRes, singersRes, directorsRes] = await Promise.all([
+        const [albumsRes, artistsRes, singersRes, directorsRes, yearsRes] = await Promise.all([
           axios.get("/api/home/albums/latest?limit=10"),
           axios.get("/api/home/artists/top?limit=10"),
           axios.get("/api/home/singers/top?limit=10"),
           axios.get("/api/home/music-directors/top?limit=10"),
+          axios.get("/api/home/years/top?limit=10"),
         ]);
 
         setLatestAlbums(albumsRes.data.data);
         setTopArtists(artistsRes.data.data);
         setTopSingers(singersRes.data.data);
         setTopDirectors(directorsRes.data.data);
+        setTopYears(yearsRes.data.data);
       } catch (error) {
         console.error("Failed to fetch home sections:", error);
       } finally {
@@ -181,6 +214,17 @@ const Home = () => {
           <MusicDirectorCard director={director} onNavigate={handleCardClick} />
         )}
         onMoreClick={() => navigate("/music-directors")}
+      />
+
+      {/* Years */}
+      <HorizontalScroll
+        title="Years"
+        items={topYears}
+        loading={loading}
+        renderItem={(yearData) => (
+          <YearCard yearData={yearData} onNavigate={handleCardClick} />
+        )}
+        onMoreClick={() => navigate("/years")}
       />
     </div>
   );

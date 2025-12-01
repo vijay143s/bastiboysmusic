@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
-"""
-Database initialization script to execute SQL files
-This script connects to MySQL and runs SQL files to set up the database schema
+"""Simple PostgreSQL initialization helper.
+
+Connects to PostgreSQL using psycopg and executes the requested SQL files
+so the backend can be prepared without relying on MySQL tooling.
 """
 
-import mysql.connector
 import os
 import sys
 from pathlib import Path
 
-# Load environment variables
+try:
+    import psycopg
+    from psycopg import errors as pg_errors
+except ImportError as exc:
+    print("Error: psycopg (v3) is required to run init_db.py. Install it via 'pip install psycopg'.")
+    raise
+
+# Load environment variables if available
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -18,125 +25,77 @@ except ImportError:
 
 
 def get_db_config():
-    """
-    Get database configuration from environment variables
-    """
-    return {
-        'host': os.getenv('MYSQL_HOST', 'localhost'),
-        'port': int(os.getenv('MYSQL_PORT', 3306)),
-        'user': os.getenv('MYSQL_USER', 'root'),
-        'password': os.getenv('MYSQL_PASSWORD', ''),
-        'database': os.getenv('MYSQL_DATABASE', 'bastiboysmusic')
+    """Build PostgreSQL connection settings from environment variables."""
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        return {"conninfo": database_url}
+
+    sslmode = "require" if os.getenv("POSTGRES_SSL", "").lower() == "true" else None
+    settings = {
+        "host": os.getenv("POSTGRES_HOST", "localhost"),
+        "port": int(os.getenv("POSTGRES_PORT", 5432)),
+        "user": os.getenv("POSTGRES_USER", "postgres"),
+        "password": os.getenv("POSTGRES_PASSWORD", ""),
+        "dbname": os.getenv("POSTGRES_DATABASE", "bastiboysmusic"),
+        "sslmode": sslmode,
     }
+
+    # Remove unset optional values
+    return {"kwargs": {k: v for k, v in settings.items() if v}}
+
+
+def get_connection(config):
+    """Return an open psycopg connection from the provided config dict."""
+    if "conninfo" in config:
+        return psycopg.connect(config["conninfo"])
+    return psycopg.connect(**config.get("kwargs", {}))
 
 
 def execute_sql_file(connection, file_path):
-    """
-    Execute a single SQL file
-    
-    Args:
-        connection: MySQL database connection
-        file_path: Path to SQL file
-    """
+    """Execute a SQL file against the provided PostgreSQL connection."""
     if not os.path.exists(file_path):
         print(f"Error: File not found - {file_path}")
         return False
-    
-    cursor = None
+
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            sql_content = f.read()
-        
-        cursor = connection.cursor()
-        
-        # Disable foreign key checks for schema.sql to allow dropping tables
-        if 'schema.sql' in file_path:
-            cursor.execute("SET FOREIGN_KEY_CHECKS=0")
-        
-        # Split by semicolon and execute each statement
-        statements = [stmt.strip() for stmt in sql_content.split(';') if stmt.strip()]
-        
-        for statement in statements:
-            if statement:
-                print(f"Executing: {statement[:80]}...")
-                cursor.execute(statement)
-                
-                # Fetch and display results for SELECT queries
-                if statement.strip().upper().startswith('SELECT'):
-                    results = cursor.fetchall()
-                    if results:
-                        print(f"Results ({len(results)} rows):")
-                        # Get column names
-                        columns = [desc[0] for desc in cursor.description]
-                        print(f"  {' | '.join(columns)}")
-                        print("  " + "-" * 80)
-                        for row in results:
-                            print(f"  {' | '.join(str(val) for val in row)}")
-                    else:
-                        print("No results returned")
-        
-        # Re-enable foreign key checks after schema.sql
-        if 'schema.sql' in file_path:
-            cursor.execute("SET FOREIGN_KEY_CHECKS=1")
-        
+        with open(file_path, "r", encoding="utf-8") as handle:
+            sql_content = handle.read()
+
+        print(f"Executing {file_path}...")
+        with connection.cursor() as cursor:
+            cursor.execute(sql_content)
+
         connection.commit()
-        
         print(f"✓ Successfully executed {file_path}")
         return True
-        
-    except mysql.connector.Error as err:
+    except (pg_errors.DatabaseError, pg_errors.OperationalError) as err:
+        connection.rollback()
         print(f"Error executing {file_path}: {err}")
-        # Rollback on error
-        try:
-            connection.rollback()
-        except:
-            pass
         return False
     except Exception as err:
-        print(f"Unexpected error: {err}")
-        # Rollback on error
-        try:
-            connection.rollback()
-        except:
-            pass
+        connection.rollback()
+        print(f"Unexpected error while executing {file_path}: {err}")
         return False
-    finally:
-        # Always close the cursor
-        if cursor is not None:
-            try:
-                cursor.close()
-            except Exception as err:
-                print(f"Error closing cursor: {err}")
 
 
 def init_database(sql_files=None):
-    """
-    Initialize the database by executing SQL files in order
-    
-    Args:
-        sql_files: List of SQL files to execute. If None, runs all default files.
-    """
+    """Initialize the database by running SQL files in order."""
     connection = None
     try:
         config = get_db_config()
-        
-        print("Connecting to MySQL database...")
-        connection = mysql.connector.connect(**config)
+        print("Connecting to PostgreSQL database...")
+        connection = get_connection(config)
         print("✓ Connected successfully!")
-        
-        # Get the directory where this script is located
+
         script_dir = Path(__file__).parent.absolute()
-        
-        # Default SQL files to execute in order
         default_files = [
-            'schema.sql',
-            'insert.sql',  # Optional: if you have initial data
+            "schema.sql",
+            "insert.sql",  # Optional seed data file (ignored if missing)
         ]
-        
-        # Use provided files or defaults
+
         files_to_run = sql_files if sql_files else default_files
-        
         success = True
+
         for sql_file in files_to_run:
             file_path = script_dir / sql_file
             if file_path.exists():
@@ -144,33 +103,22 @@ def init_database(sql_files=None):
                     success = False
             else:
                 print(f"Skipping {sql_file} (not found)")
-        
+
         if success:
             print("\n✓ Database initialization completed successfully!")
             return 0
-        else:
-            print("\n✗ Database initialization completed with errors")
-            return 1
-            
-    except mysql.connector.Error as err:
-        print(f"Error connecting to MySQL: {err}")
+
+        print("\n✗ Database initialization completed with errors")
+        return 1
+    except (pg_errors.DatabaseError, pg_errors.OperationalError) as err:
+        print(f"Error connecting to PostgreSQL: {err}")
         return 1
     except Exception as err:
         print(f"Unexpected error: {err}")
         return 1
     finally:
-        # Close connection and cleanup
         if connection is not None:
             try:
-                # Close all active cursors
-                for cursor in connection.get_warnings():
-                    pass
-                
-                # Rollback any uncommitted transactions in case of error
-                if connection.is_connected():
-                    connection.rollback()
-                
-                # Close the connection
                 connection.close()
                 print("\n✓ Database connection closed successfully")
             except Exception as err:

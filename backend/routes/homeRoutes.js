@@ -12,6 +12,10 @@ const {
   getSongsBySingerName,
   getAlbumsByArtistId,
   getAlbumsByMusicDirector,
+  // Years section
+  getTopYearsSection,
+  getSongsByYearPaginated,
+  getAlbumsByYear,
   // Optimized search endpoints
   getAlbumsForSearchEndpoint,
   getArtistsForSearchEndpoint,
@@ -40,6 +44,11 @@ router.get("/singers", getAllSingersPaginated);
 router.get("/music-directors/top", getTopMusicDirectorsSection);
 router.get("/music-directors/:directorName/albums", getAlbumsByMusicDirector);
 router.get("/music-directors", getAllMusicDirectorsPaginated);
+
+// Years Routes
+router.get("/years/top", getTopYearsSection);
+router.get("/years/:year/songs", getSongsByYearPaginated);
+router.get("/years/:year/albums", getAlbumsByYear);
 
 // Optimized Search Routes - minimal data for search functionality
 router.get("/search/albums", getAlbumsForSearchEndpoint);

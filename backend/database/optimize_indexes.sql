@@ -20,14 +20,12 @@ CREATE INDEX IF NOT EXISTS idx_music_directors_director_name ON music_directors(
 CREATE INDEX IF NOT EXISTS idx_music_directors_album_id ON music_directors(album_id);
 CREATE INDEX IF NOT EXISTS idx_music_directors_name_id ON music_directors(director_name, director_id);
 
--- Songs table indexes
-CREATE INDEX IF NOT EXISTS idx_songs_album ON songs(album);
+CREATE INDEX IF NOT EXISTS idx_songs_album ON songs(album_id);
 CREATE INDEX IF NOT EXISTS idx_songs_singer ON songs(singer);
 CREATE INDEX IF NOT EXISTS idx_songs_title ON songs(title);
 
--- Show current indexes
-SHOW INDEX FROM albums;
-SHOW INDEX FROM artists;
-SHOW INDEX FROM singers;
-SHOW INDEX FROM music_directors;
-SHOW INDEX FROM songs;
+-- Show current indexes (PostgreSQL)
+SELECT schemaname, tablename, indexname, indexdef
+FROM pg_indexes
+WHERE tablename IN ('albums', 'artists', 'singers', 'music_directors', 'songs')
+ORDER BY tablename, indexname;

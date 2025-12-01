@@ -9,11 +9,11 @@ const cloudinary = require("cloudinary");
 const envPath = path.resolve(__dirname, ".env");
 dotenv.config({ path: envPath });
 
-// Debug: Log environment variables
-console.log("MySQL_HOST:", process.env.MYSQL_HOST);
-console.log("MySQL_PORT:", process.env.MYSQL_PORT);
-console.log("MySQL_USER:", process.env.MYSQL_USER);
-console.log("MySQL_DATABASE:", process.env.MYSQL_DATABASE);
+// Debug: Log database environment variables
+console.log("POSTGRES_HOST:", process.env.POSTGRES_HOST || "<via DATABASE_URL>");
+console.log("POSTGRES_PORT:", process.env.POSTGRES_PORT || "<via DATABASE_URL>");
+console.log("POSTGRES_USER:", process.env.POSTGRES_USER || "<via DATABASE_URL>");
+console.log("POSTGRES_DATABASE:", process.env.POSTGRES_DATABASE || "<via DATABASE_URL>");
 
 cloudinary.v2.config({
   cloud_name: process.env.Cloud_Name,

@@ -38,7 +38,11 @@ const getSongsBySinger = async (singer_name) => {
   const [rows] = await pool.query(
     `SELECT id, title
     FROM songs
-    WHERE singer = ? OR FIND_IN_SET(?, singer) > 0
+    WHERE singer = ?
+      OR EXISTS (
+        SELECT 1 FROM unnest(string_to_array(COALESCE(singer, ''), ',')) AS value
+        WHERE trim(value) = trim(?)
+      )
     ORDER BY title`,
     [singer_name, singer_name]
   );
@@ -79,7 +83,13 @@ const getTopSingers = async (limit = 10) => {
   const [rows] = await pool.query(
     `SELECT s.singer_id, s.singer_name, COUNT(so.id) as song_count
      FROM singers s 
-     LEFT JOIN songs so ON (so.singer = s.singer_name OR FIND_IN_SET(s.singer_name, so.singer) > 0)
+     LEFT JOIN songs so ON (
+       so.singer = s.singer_name 
+       OR EXISTS (
+         SELECT 1 FROM unnest(string_to_array(COALESCE(so.singer, ''), ',')) AS value
+         WHERE trim(value) = trim(s.singer_name)
+       )
+     )
      GROUP BY s.singer_id, s.singer_name 
      ORDER BY song_count DESC, s.singer_name ASC 
      LIMIT ?`,

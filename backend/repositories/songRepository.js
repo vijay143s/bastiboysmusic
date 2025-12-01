@@ -89,7 +89,14 @@ const deleteSongById = async (id) => {
 const getSongsBySinger = async (singerName) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
-     FROM songs WHERE singer = ? OR FIND_IN_SET(?, singer) > 0 ORDER BY created_at DESC`,
+     FROM songs 
+     WHERE singer = ? 
+       OR EXISTS (
+         SELECT 1 
+         FROM unnest(string_to_array(COALESCE(singer, ''), ',')) AS value
+         WHERE trim(value) = trim(?)
+       )
+     ORDER BY created_at DESC`,
     [singerName, singerName]
   );
 
@@ -126,7 +133,7 @@ const getQueueSongs = async () => {
 // Get available years for pagination
 const getAvailableYears = async () => {
   const [rows] = await pool.query(`
-    SELECT DISTINCT YEAR(created_at) as year 
+    SELECT DISTINCT EXTRACT(YEAR FROM created_at)::int as year 
     FROM songs 
     ORDER BY year DESC
   `);
@@ -147,7 +154,7 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
       a.title as album_name
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    WHERE YEAR(s.created_at) = ?
+    WHERE EXTRACT(YEAR FROM s.created_at)::int = ?
     ORDER BY s.created_at DESC
     LIMIT ? OFFSET ?
   `, [year, limit, offset]);
@@ -156,7 +163,7 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
   const [countResult] = await pool.query(`
     SELECT COUNT(*) as total
     FROM songs s
-    WHERE YEAR(s.created_at) = ?
+    WHERE EXTRACT(YEAR FROM s.created_at)::int = ?
   `, [year]);
 
   const total = countResult[0].total;
@@ -263,6 +270,78 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0) => {
   }
 };
 
+// Get top years with song counts for Years section
+const getTopYears = async (limit = 10) => {
+  const [rows] = await pool.execute(`
+    SELECT 
+      a.year as year,
+      COUNT(s.id) as songCount
+    FROM songs s
+    INNER JOIN albums a ON s.album_id = a.id
+    WHERE a.year IS NOT NULL AND a.year > 0
+    GROUP BY a.year
+    ORDER BY a.year DESC, songCount DESC
+    LIMIT ?
+  `, [limit]);
+
+  return rows.map(row => ({
+    year: row.year,
+    songCount: row.songCount
+  }));
+};
+
+// Get songs by year with pagination for Years section
+const getSongsByYear = async (year, page = 1, limit = 20) => {
+  const offset = (page - 1) * limit;
+  
+  const [rows] = await pool.execute(`
+    SELECT 
+      s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, 
+      s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at,
+      a.title as album_name, a.year as album_year
+    FROM songs s
+    INNER JOIN albums a ON s.album_id = a.id
+    WHERE a.year = ?
+    ORDER BY s.created_at DESC
+    LIMIT ? OFFSET ?
+  `, [year, limit, offset]);
+
+  // Get total count for this year
+  const [countRows] = await pool.execute(`
+    SELECT COUNT(*) as total
+    FROM songs s
+    INNER JOIN albums a ON s.album_id = a.id
+    WHERE a.year = ?
+  `, [year]);
+
+  const total = countRows[0].total;
+  const totalPages = Math.ceil(total / limit);
+  const hasNext = page < totalPages;
+  const hasPrev = page > 1;
+
+  return {
+    data: rows.map(row => ({ 
+      _id: row.id,
+      title: row.title,
+      singer: row.singer,
+      thumbnail: {
+        url: row.thumbnail_url
+      },
+      album: row.album_id,
+      albumName: row.album_name,
+      createdAt: row.created_at
+    })),
+    pagination: {
+      currentPage: page,
+      totalPages: totalPages,
+      totalItems: total,
+      hasNext: hasNext,
+      hasPrev: hasPrev,
+      limit: limit
+    }
+  };
+};
+
 module.exports = {
   createSong,
   updateSongThumbnail,
@@ -274,6 +353,8 @@ module.exports = {
   getQueueSongs,
   getAvailableYears,
   getQueueSongsByYear,
+  getTopYears,
+  getSongsByYear,
   findSongByIdForPlayer,
   searchSongs,
 };

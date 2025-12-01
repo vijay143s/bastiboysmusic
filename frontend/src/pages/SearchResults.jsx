@@ -16,6 +16,8 @@ const SearchResults = () => {
   const [title, setTitle] = useState("");
   const [albumData, setAlbumData] = useState(null);
   const [artistData, setArtistData] = useState(null);
+  const [showAlbums, setShowAlbums] = useState(true);
+  const [showSongs, setShowSongs] = useState(true);
   
   const { playQueue, selectedSong, isPlaying } = SongData();
   const { addToPlaylist, user } = UserData();
@@ -170,6 +172,18 @@ const SearchResults = () => {
           };
           setArtistData(directorInfo); // Reuse artistData state for director header
           setTitle(`Albums by Music Director ${directorName}`);
+        } else if (type === "year") {
+          const yearValue = id || name;
+          
+          // Fetch both albums and songs for the year
+          const [songsResponse, albumsResponse] = await Promise.all([
+            axios.get(`/api/home/years/${yearValue}/songs?limit=100`),
+            axios.get(`/api/home/years/${yearValue}/albums?limit=50`)
+          ]);
+          
+          response = songsResponse;
+          setAlbumData(albumsResponse?.data?.data || []);
+          setTitle(`Music from ${yearValue}`);
         }
 
         setResults(response?.data?.data || []);
@@ -236,6 +250,18 @@ const SearchResults = () => {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">{artistData.name}</h1>
             </div>
           </div>
+        ) : type === "year" ? (
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg">
+              <span className="text-2xl md:text-3xl font-bold text-black">
+                {(id || name)?.toString().slice(-2) || "YR"}
+              </span>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 mb-2">YEAR</p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">{title}</h1>
+            </div>
+          </div>
         ) : (
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">{title}</h1>
         )}
@@ -261,6 +287,129 @@ const SearchResults = () => {
                   />
                 );
               })}
+            </div>
+          ) : type === "year" ? (
+            <div className="space-y-6">
+              {/* Albums Section */}
+              {albumData && albumData.length > 0 && (
+                <div className="space-y-4">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer p-3 bg-[#1a1a1a] rounded-lg hover:bg-[#2a2a2a] transition-colors"
+                    onClick={() => setShowAlbums(!showAlbums)}
+                  >
+                    <h2 className="text-xl font-semibold text-white">Albums ({albumData.length})</h2>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transform transition-transform ${showAlbums ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  
+                  {showAlbums && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {albumData.map((album) => {
+                        const albumId = String(album._id || album.id);
+                        return (
+                          <AlbumItem
+                            key={albumId}
+                            image={album.thumbnail?.url}
+                            name={album.title}
+                            desc={album.description}
+                            id={albumId}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Songs Section */}
+              {results && results.length > 0 && (
+                <div className="space-y-4">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer p-3 bg-[#1a1a1a] rounded-lg hover:bg-[#2a2a2a] transition-colors"
+                    onClick={() => setShowSongs(!showSongs)}
+                  >
+                    <h2 className="text-xl font-semibold text-white">Songs ({results.length})</h2>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transform transition-transform ${showSongs ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  
+                  {showSongs && (
+                    <div className="space-y-2">
+                      {results.map((song, index) => {
+                        const isActive = selectedSong === song._id;
+                        return (
+                          <div
+                            key={song._id}
+                            className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-[#ffffff1a] active:scale-[0.99] ${
+                              isActive ? "bg-[#1db9541a] border border-green-500" : "bg-[#0a0a0a]/50"
+                            }`}
+                            onClick={() => startSongQueue(song._id)}
+                          >
+                            {/* Track number */}
+                            <div className="w-8 text-center text-gray-400">
+                              {isActive && isPlaying ? (
+                                <RiPulseLine className="text-green-400 text-lg animate-pulse" />
+                              ) : (
+                                <span className="text-sm font-medium">{index + 1}</span>
+                              )}
+                            </div>
+                            
+                            {/* Song thumbnail */}
+                            <img
+                              src={song.thumbnail?.url}
+                              className="w-12 h-12 rounded object-cover flex-shrink-0"
+                              alt={song.title}
+                            />
+                            
+                            {/* Song info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className={`font-semibold truncate ${
+                                  isActive ? "text-green-400" : "text-white"
+                                }`}>
+                                  {song.title}
+                                </p>
+                              </div>
+                              <p className="text-sm text-gray-400 truncate">{song.singer || "Unknown Artist"}</p>
+                            </div>
+                            
+                            {/* Like button */}
+                            <button
+                              className={`p-2 rounded-full transition-all duration-300 flex-shrink-0 ${
+                                playlistIds.includes(song._id)
+                                  ? "bg-green-500 shadow-lg"
+                                  : "hover:bg-gray-700"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                savePlayListHandler(song._id);
+                              }}
+                            >
+                              <img 
+                                src="/src/assets/like.png" 
+                                alt="like" 
+                                className="w-4 h-4"
+                              />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
