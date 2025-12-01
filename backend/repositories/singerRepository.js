@@ -8,17 +8,17 @@ const mapSingerRow = (row) => ({
 const createSinger = async ({ singerName }) => {
   const [result] = await pool.execute(
     `INSERT INTO singers (singer_name)
-     VALUES (?)`,
+     VALUES ($1) RETURNING singer_id`,
     [singerName]
   );
 
-  return findSingerById(result.insertId);
+  return findSingerById(result[0].singer_id);
 };
 
 const findSingerById = async (singerId) => {
   const [rows] = await pool.query(
     `SELECT singer_id, singer_name
-     FROM singers WHERE singer_id = ? LIMIT 1`,
+     FROM singers WHERE singer_id = $1 LIMIT 1`,
     [singerId]
   );
 
@@ -38,13 +38,13 @@ const getSongsBySinger = async (singer_name) => {
   const [rows] = await pool.query(
     `SELECT id, title
     FROM songs
-    WHERE singer = ?
+    WHERE singer = $1
       OR EXISTS (
         SELECT 1 FROM unnest(string_to_array(COALESCE(singer, ''), ',')) AS value
-        WHERE trim(value) = trim(?)
+        WHERE trim(value) = trim($1)
       )
     ORDER BY title`,
-    [singer_name, singer_name]
+    [singer_name]
   );
 
   return rows.map(row => ({
@@ -64,7 +64,7 @@ const getAllSingers = async () => {
 
 const updateSinger = async (singerId, { singerName }) => {
   await pool.execute(
-    `UPDATE singers SET singer_name = ? WHERE singer_id = ?`,
+    `UPDATE singers SET singer_name = $1 WHERE singer_id = $2`,
     [singerName, singerId]
   );
 
@@ -72,7 +72,7 @@ const updateSinger = async (singerId, { singerName }) => {
 };
 
 const deleteSingerById = async (singerId) => {
-  await pool.execute(`DELETE FROM singers WHERE singer_id = ?`, [singerId]);
+  await pool.execute(`DELETE FROM singers WHERE singer_id = $1`, [singerId]);
 };
 
 const deleteSingersBySong = async (songId) => {
@@ -81,7 +81,7 @@ const deleteSingersBySong = async (songId) => {
 
 const getTopSingers = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT s.singer_id as singerId, s.singer_name as singerName, COUNT(so.id) as songCount
+    `SELECT s.singer_id as singerid, s.singer_name as singername, COUNT(so.id) as songcount
      FROM singers s 
      LEFT JOIN songs so ON (
        so.singer = s.singer_name 
@@ -91,22 +91,22 @@ const getTopSingers = async (limit = 10) => {
        )
      )
      GROUP BY s.singer_id, s.singer_name 
-     ORDER BY songCount DESC, s.singer_name ASC 
-     LIMIT ?`,
+     ORDER BY songcount DESC, s.singer_name ASC 
+     LIMIT $1`,
     [limit]
   );
 
   return rows.map(row => ({
-    singerId: row.singerId,
-    singerName: row.singerName,
-    songCount: String(row.songCount)
+    singerId: row.singerid,
+    singerName: row.singername,
+    songCount: String(row.songcount)
   }));
 };
 
 const getSingersPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT singer_id as singerId, singer_name as singerName FROM singers ORDER BY singer_name LIMIT ? OFFSET ?`,
+    `SELECT singer_id as singerid, singer_name as singername FROM singers ORDER BY singer_name LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
 
@@ -115,8 +115,8 @@ const getSingersPaginated = async (page = 1, limit = 12) => {
 
   return {
     data: rows.map(row => ({
-      singerId: row.singerId,
-      singerName: row.singerName,
+      singerId: row.singerid,
+      singerName: row.singername,
     })),
     pagination: {
       page,

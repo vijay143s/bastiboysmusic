@@ -12,17 +12,17 @@ const mapArtistRow = (row) => ({
 const createArtist = async ({ artistName, albumId, albumName }) => {
   const [result] = await pool.execute(
     `INSERT INTO artists (artist_name, album_id, album_name)
-     VALUES (?, ?, ?)`,
+     VALUES ($1, $2, $3) RETURNING artist_id`,
     [artistName, albumId, albumName]
   );
 
-  return findArtistById(result.insertId);
+  return findArtistById(result[0].artist_id);
 };
 
 const findArtistById = async (artistId) => {
   const [rows] = await pool.query(
     `SELECT artist_id, artist_name, album_id, album_name
-     FROM artists WHERE artist_id = ? LIMIT 1`,
+     FROM artists WHERE artist_id = $1 LIMIT 1`,
     [artistId]
   );
 
@@ -32,7 +32,7 @@ const findArtistById = async (artistId) => {
 const getArtistsByAlbum = async (albumId) => {
   const [rows] = await pool.query(
     `SELECT artist_id, artist_name, album_id, album_name, created_at, updated_at
-     FROM artists WHERE album_id = ? ORDER BY created_at DESC`,
+     FROM artists WHERE album_id = $1 ORDER BY created_at DESC`,
     [albumId]
   );
 
@@ -43,7 +43,7 @@ const getArtistsByAlbum = async (albumId) => {
 const getAlbumsByArtist = async (artistId) => {
   // First get the artist name for this ID
   const [artistRows] = await pool.query(
-    `SELECT artist_name FROM artists WHERE artist_id = ? LIMIT 1`,
+    `SELECT artist_name FROM artists WHERE artist_id = $1 LIMIT 1`,
     [artistId]
   );
   
@@ -56,7 +56,7 @@ const getAlbumsByArtist = async (artistId) => {
     `SELECT DISTINCT a.id, a.title, a.description, a.thumbnail_id, a.thumbnail_url, a.year, a.director, a.music_director, a.star_cast, a.created_at, a.updated_at
      FROM albums a 
      INNER JOIN artists ar ON a.id = ar.album_id 
-     WHERE ar.artist_name = ? ORDER BY a.created_at DESC`,
+     WHERE ar.artist_name = $1 ORDER BY a.created_at DESC`,
     [artistName]
   );
 
@@ -88,7 +88,7 @@ const getAllArtists = async () => {
 
 const updateArtist = async (artistId, { artistName, albumName }) => {
   await pool.execute(
-    `UPDATE artists SET artist_name = ?, album_name = ?, updated_at = NOW() WHERE artist_id = ?`,
+    `UPDATE artists SET artist_name = $1, album_name = $2, updated_at = NOW() WHERE artist_id = $3`,
     [artistName, albumName, artistId]
   );
 
@@ -96,32 +96,32 @@ const updateArtist = async (artistId, { artistName, albumName }) => {
 };
 
 const deleteArtistById = async (artistId) => {
-  await pool.execute(`DELETE FROM artists WHERE artist_id = ?`, [artistId]);
+  await pool.execute(`DELETE FROM artists WHERE artist_id = $1`, [artistId]);
 };
 
 const deleteArtistsByAlbum = async (albumId) => {
-  await pool.execute(`DELETE FROM artists WHERE album_id = ?`, [albumId]);
+  await pool.execute(`DELETE FROM artists WHERE album_id = $1`, [albumId]);
 };
 
 const getTopArtists = async (limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT MIN(artist_id) as artistId, artist_name as artistName, COUNT(*) as albumCount
-     FROM artists GROUP BY artist_name ORDER BY albumCount DESC LIMIT ?`,
+    `SELECT MIN(artist_id) as artistid, artist_name as artistname, COUNT(*) as albumcount
+     FROM artists GROUP BY artist_name ORDER BY albumcount DESC LIMIT $1`,
     [limit]
   );
 
   return rows.map(row => ({
-    artistId: row.artistId,
-    artistName: row.artistName,
-    albumCount: String(row.albumCount),
+    artistId: row.artistid,
+    artistName: row.artistname,
+    albumCount: String(row.albumcount),
   }));
 };
 
 const getArtistsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
-    `SELECT MIN(artist_id) as artistId, artist_name as artistName, COUNT(*) as albumCount
-     FROM artists GROUP BY artist_name ORDER BY artistName LIMIT ? OFFSET ?`,
+    `SELECT MIN(artist_id) as artistid, artist_name as artistname, COUNT(*) as albumcount
+     FROM artists GROUP BY artist_name ORDER BY artistname LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
 
@@ -132,9 +132,9 @@ const getArtistsPaginated = async (page = 1, limit = 12) => {
 
   return {
     data: rows.map(row => ({
-      artistId: row.artistId,
-      artistName: row.artistName,
-      albumCount: String(row.albumCount),
+      artistId: row.artistid,
+      artistName: row.artistname,
+      albumCount: String(row.albumcount),
     })),
     pagination: {
       page,
@@ -148,13 +148,13 @@ const getArtistsPaginated = async (page = 1, limit = 12) => {
 // Optimized search - returns only essential data for search functionality
 const getArtistsForSearch = async () => {
   const [rows] = await pool.query(
-    `SELECT MIN(artist_id) as artist_id, artist_name 
+    `SELECT MIN(artist_id) as artistid, artist_name as artistname 
      FROM artists GROUP BY artist_name ORDER BY artist_name ASC`
   );
 
   return rows.map(row => ({
-    artistId: row.artist_id,
-    artistName: row.artist_name,
+    artistId: row.artistid,
+    artistName: row.artistname,
   }));
 };
 

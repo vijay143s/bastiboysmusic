@@ -19,17 +19,17 @@ const mapAlbumRow = (row) => ({
 const createAlbum = async ({ title, description, thumbnail, year, director, musicDirector, starCast }) => {
   const [result] = await pool.execute(
     `INSERT INTO albums (title, description, thumbnail_id, thumbnail_url, year, director, music_director, star_cast)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
     [title, description, thumbnail?.id ?? null, thumbnail?.url ?? null, year ?? null, director ?? null, musicDirector ?? null, starCast ?? null]
   );
 
-  return findAlbumById(result.insertId);
+  return findAlbumById(result[0].id);
 };
 
 const findAlbumById = async (id) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url, year, director, music_director, star_cast, created_at, updated_at
-     FROM albums WHERE id = ? LIMIT 1`,
+     FROM albums WHERE id = $1 LIMIT 1`,
     [id]
   );
 
@@ -48,7 +48,7 @@ const getAllAlbums = async () => {
 const getLatestAlbums = async (year, limit = 10) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url
-     FROM albums WHERE year = ? ORDER BY created_at DESC LIMIT ?`,
+     FROM albums WHERE year = $1 ORDER BY created_at DESC LIMIT $2`,
     [year, limit]
   );
 
@@ -66,7 +66,7 @@ const getLatestAlbums = async (year, limit = 10) => {
 const getAlbumsByYearValue = async (year, limit = 50) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url, year
-     FROM albums WHERE year = ? ORDER BY title ASC LIMIT ?`,
+     FROM albums WHERE year = $1 ORDER BY title ASC LIMIT $2`,
     [year, limit]
   );
 
@@ -86,7 +86,7 @@ const getAlbumsPaginated = async (page = 1, limit = 12) => {
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url
-     FROM albums ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+     FROM albums ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
 

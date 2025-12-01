@@ -28,7 +28,7 @@ const createSong = async ({
 }) => {
   const [result] = await pool.execute(
     `INSERT INTO songs (title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)` ,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id` ,
     [
       title,
       description,
@@ -41,12 +41,12 @@ const createSong = async ({
     ]
   );
 
-  return findSongById(result.insertId);
+  return findSongById(result[0].id);
 };
 
 const updateSongThumbnail = async (songId, thumbnail) => {
   await pool.execute(
-    `UPDATE songs SET thumbnail_id = ?, thumbnail_url = ?, updated_at = NOW() WHERE id = ?`,
+    `UPDATE songs SET thumbnail_id = $1, thumbnail_url = $2, updated_at = NOW() WHERE id = $3`,
     [thumbnail?.id ?? null, thumbnail?.url ?? null, songId]
   );
 
@@ -65,7 +65,7 @@ const getAllSongs = async () => {
 const getSongsByAlbum = async (albumId) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
-     FROM songs WHERE album_id = ? ORDER BY created_at DESC`,
+     FROM songs WHERE album_id = $1 ORDER BY created_at DESC`,
     [albumId]
   );
 
@@ -75,7 +75,7 @@ const getSongsByAlbum = async (albumId) => {
 const findSongById = async (id) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
-     FROM songs WHERE id = ? LIMIT 1`,
+     FROM songs WHERE id = $1 LIMIT 1`,
     [id]
   );
 
@@ -83,21 +83,21 @@ const findSongById = async (id) => {
 };
 
 const deleteSongById = async (id) => {
-  await pool.execute(`DELETE FROM songs WHERE id = ?`, [id]);
+  await pool.execute(`DELETE FROM songs WHERE id = $1`, [id]);
 };
 
 const getSongsBySinger = async (singerName) => {
   const [rows] = await pool.query(
     `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
      FROM songs 
-     WHERE singer = ? 
+     WHERE singer = $1 
        OR EXISTS (
          SELECT 1 
          FROM unnest(string_to_array(COALESCE(singer, ''), ',')) AS value
-         WHERE trim(value) = trim(?)
+         WHERE trim(value) = trim($1)
        )
      ORDER BY created_at DESC`,
-    [singerName, singerName]
+    [singerName]
   );
 
   return rows.map(mapSongRow);
@@ -154,16 +154,16 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
       a.title as album_name
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    WHERE EXTRACT(YEAR FROM s.created_at)::int = ?
+    WHERE EXTRACT(YEAR FROM s.created_at)::int = $1
     ORDER BY s.created_at DESC
-    LIMIT ? OFFSET ?
+    LIMIT $2 OFFSET $3
   `, [year, limit, offset]);
 
   // Get total count for this year
   const [countResult] = await pool.query(`
     SELECT COUNT(*) as total
     FROM songs s
-    WHERE EXTRACT(YEAR FROM s.created_at)::int = ?
+    WHERE EXTRACT(YEAR FROM s.created_at)::int = $1
   `, [year]);
 
   const total = countResult[0].total;
@@ -199,7 +199,7 @@ const findSongByIdForPlayer = async (id) => {
       s.audio_url,
       s.album_id
     FROM songs s
-    WHERE s.id = ? LIMIT 1
+    WHERE s.id = $1 LIMIT 1
   `, [id]);
 
   if (!rows[0]) return null;
@@ -231,20 +231,20 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0) => {
              s.thumbnail_url as thumbnail, s.audio_url as audio, s.album_id as album,
              s.created_at as createdAt, s.updated_at as updatedAt
       FROM songs s 
-      WHERE s.title LIKE ? 
-         OR s.description LIKE ? 
-         OR s.singer LIKE ?
+      WHERE s.title LIKE $1 
+         OR s.description LIKE $2 
+         OR s.singer LIKE $3
       ORDER BY s.created_at DESC
-      LIMIT ? OFFSET ?
+      LIMIT $4 OFFSET $5
     `;
     
     // Count query for total results
     const countQuery = `
       SELECT COUNT(*) as total
       FROM songs s 
-      WHERE s.title LIKE ? 
-         OR s.description LIKE ? 
-         OR s.singer LIKE ?
+      WHERE s.title LIKE $1 
+         OR s.description LIKE $2 
+         OR s.singer LIKE $3
     `;
     
     const [rows] = await pool.execute(searchQuery, [
@@ -281,7 +281,7 @@ const getTopYears = async (limit = 10) => {
     WHERE a.year IS NOT NULL AND a.year > 0
     GROUP BY a.year
     ORDER BY a.year DESC, songCount DESC
-    LIMIT ?
+    LIMIT $1
   `, [limit]);
 
   return rows.map(row => ({
@@ -301,9 +301,9 @@ const getSongsByYear = async (year, page = 1, limit = 20) => {
       a.title as album_name, a.year as album_year
     FROM songs s
     INNER JOIN albums a ON s.album_id = a.id
-    WHERE a.year = ?
+    WHERE a.year = $1
     ORDER BY s.created_at DESC
-    LIMIT ? OFFSET ?
+    LIMIT $2 OFFSET $3
   `, [year, limit, offset]);
 
   // Get total count for this year
@@ -311,7 +311,7 @@ const getSongsByYear = async (year, page = 1, limit = 20) => {
     SELECT COUNT(*) as total
     FROM songs s
     INNER JOIN albums a ON s.album_id = a.id
-    WHERE a.year = ?
+    WHERE a.year = $1
   `, [year]);
 
   const total = countRows[0].total;

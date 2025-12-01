@@ -13,7 +13,7 @@ const mapUserRow = (row) => ({
 const findUserByEmail = async (email) => {
   const [rows] = await pool.query(
     `SELECT id, name, email, role, password_hash, created_at, updated_at
-     FROM users WHERE email = ? LIMIT 1`,
+     FROM users WHERE email = $1 LIMIT 1`,
     [email]
   );
 
@@ -23,7 +23,7 @@ const findUserByEmail = async (email) => {
 const findUserById = async (id) => {
   const [rows] = await pool.query(
     `SELECT id, name, email, role, password_hash, created_at, updated_at
-     FROM users WHERE id = ? LIMIT 1`,
+     FROM users WHERE id = $1 LIMIT 1`,
     [id]
   );
 
@@ -33,16 +33,16 @@ const findUserById = async (id) => {
 const createUser = async ({ name, email, passwordHash, role = "user" }) => {
   const [result] = await pool.execute(
     `INSERT INTO users (name, email, password_hash, role)
-     VALUES (?, ?, ?, ?)` ,
+     VALUES ($1, $2, $3, $4) RETURNING id` ,
     [name, email, passwordHash, role]
   );
 
-  return findUserById(result.insertId);
+  return findUserById(result[0].id);
 };
 
 const getUserPlaylistIds = async (userId) => {
   const [rows] = await pool.query(
-    `SELECT song_id FROM user_playlists WHERE user_id = ? ORDER BY id DESC`,
+    `SELECT song_id FROM user_playlists WHERE user_id = $1 ORDER BY id DESC`,
     [userId]
   );
 
