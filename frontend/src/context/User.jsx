@@ -73,7 +73,11 @@ export const UserProvider = ({ children }) => {
       setIsAuth(true);
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      // Silently handle auth check failures (user not logged in or network issues)
+      // This is expected behavior when user is not authenticated
+      if (error.code !== 'ERR_NETWORK') {
+        console.log('Auth check failed:', error.message);
+      }
       setIsAuth(false);
       setLoading(false);
     }
