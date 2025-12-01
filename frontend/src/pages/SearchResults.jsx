@@ -55,6 +55,14 @@ const SearchResults = () => {
             setTitle(`Songs from Album`);
           }
         } else if (type === "artist" && id) {
+          // Safety check - ensure id is valid before making API call
+          if (!id || id === "undefined" || id === "null") {
+            console.error("Invalid artist ID:", id);
+            setResults([]);
+            setLoading(false);
+            return;
+          }
+          
           response = await axios.get(`/api/home/artists/${id}/albums`);
           let artistName = "Artist"; // Default fallback
           

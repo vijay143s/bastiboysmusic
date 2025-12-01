@@ -24,7 +24,7 @@ const router = express.Router();
 // Album routes
 router.post("/album/new", isAuth, uploadFile, createAlbum);
 router.get("/album/all", getAllAlbums);
-router.get("/album/:id", isAuth, getAllSongsByAlbum);
+router.get("/album/:id", getAllSongsByAlbum); // Public route - removed isAuth
 router.post("/album/:id/artist", isAuth, addArtistToAlbum);
 router.post("/album/:id/musicdirector", isAuth, addMusicDirectorToAlbum);
 

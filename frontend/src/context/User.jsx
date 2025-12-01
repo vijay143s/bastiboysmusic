@@ -2,6 +2,9 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
+// Configure axios to send credentials with all requests
+axios.defaults.withCredentials = true;
+
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
