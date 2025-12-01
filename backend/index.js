@@ -22,7 +22,7 @@ cloudinary.v2.config({
 });
 
 const app = express();
-
+app.set('trust proxy', 1);
 // using middlewares
 app.use(express.json());
 app.use(cookieParser());
