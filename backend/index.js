@@ -25,10 +25,14 @@ cloudinary.v2.config({
 const app = express();
 app.set('trust proxy', 1);
 
+
 app.use(cors({
-  origin: 'https://bastiboysmusic.onrender.com', // or '*'
+  origin: (origin, callback) => {
+    callback(null, origin); // Echo back the origin
+  },
   credentials: true
 }));
+
 
 // using middlewares
 app.use(express.json());
