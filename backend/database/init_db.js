@@ -29,11 +29,44 @@ const runSqlFile = async (filePath) => {
 
   console.log(`📄 Executing ${path.basename(filePath)}...`);
   
-  // Split by semicolons and filter out empty statements
-  const statements = sql
-    .split(";")
-    .map((stmt) => stmt.trim())
-    .filter((stmt) => stmt.length > 0);
+  // Smart SQL splitter that handles dollar-quoted strings (PostgreSQL functions)
+  const statements = [];
+  let currentStatement = '';
+  let inDollarQuote = false;
+  let dollarQuoteTag = '';
+  
+  const lines = sql.split('\n');
+  for (const line of lines) {
+    // Check for dollar-quote start/end
+    const dollarMatches = line.match(/\$\$|\$[a-zA-Z_][a-zA-Z0-9_]*\$/g);
+    if (dollarMatches) {
+      for (const match of dollarMatches) {
+        if (!inDollarQuote) {
+          inDollarQuote = true;
+          dollarQuoteTag = match;
+        } else if (match === dollarQuoteTag) {
+          inDollarQuote = false;
+          dollarQuoteTag = '';
+        }
+      }
+    }
+    
+    currentStatement += line + '\n';
+    
+    // Only split on semicolon if not inside dollar-quote
+    if (!inDollarQuote && line.trim().endsWith(';')) {
+      const stmt = currentStatement.trim();
+      if (stmt.length > 0 && !stmt.startsWith('--')) {
+        statements.push(stmt);
+      }
+      currentStatement = '';
+    }
+  }
+  
+  // Add any remaining statement
+  if (currentStatement.trim().length > 0 && !currentStatement.trim().startsWith('--')) {
+    statements.push(currentStatement.trim());
+  }
 
   if (statements.length === 0) {
     console.warn(`⚠️  No statements found in ${filePath}`);
@@ -42,22 +75,19 @@ const runSqlFile = async (filePath) => {
 
   console.log(`   Found ${statements.length} statements to execute`);
 
-  // Execute in batches to avoid timeout/memory issues
-  const BATCH_SIZE = 10;
+  // Execute statements individually for better error handling
   let executed = 0;
-
   let errors = 0;
   
-  for (let i = 0; i < statements.length; i += BATCH_SIZE) {
-    const batch = statements.slice(i, i + BATCH_SIZE);
-    const batchSql = batch.join(";\n") + ";";
+  for (let i = 0; i < statements.length; i++) {
+    const statement = statements[i];
     
     try {
-      const result = await pool.query(batchSql);
+      const result = await pool.query(statement);
       
       // Print results for SELECT queries
-      const firstStatement = batch[0].trim().toUpperCase();
-      if (firstStatement.startsWith('SELECT') || firstStatement.includes('SELECT')) {
+      const firstWord = statement.trim().toUpperCase().split(/\s+/)[0];
+      if (firstWord === 'SELECT') {
         const rows = result[0];
         if (rows && rows.length > 0) {
           console.log(`\n📊 Results (${rows.length} rows):`);
@@ -67,23 +97,26 @@ const runSqlFile = async (filePath) => {
         }
       }
       
-      executed += batch.length;
-      if (statements.length > BATCH_SIZE) {
+      executed++;
+      if (statements.length > 10) {
         process.stdout.write(`\r   Progress: ${executed}/${statements.length} statements (${errors} errors ignored)`);
       }
     } catch (error) {
       errors++;
-      if (errors <= 5) {
-        console.warn(`\n⚠️  Error at statement ${i + 1} (ignored): ${error.message}`);
+      // Ignore "already exists" errors
+      if (!error.message.includes('already exists')) {
+        if (errors <= 5) {
+          console.warn(`\n⚠️  Error at statement ${i + 1}: ${error.message}`);
+        }
       }
-      executed += batch.length;
-      if (statements.length > BATCH_SIZE) {
+      executed++;
+      if (statements.length > 10) {
         process.stdout.write(`\r   Progress: ${executed}/${statements.length} statements (${errors} errors ignored)`);
       }
     }
   }
 
-  if (statements.length > BATCH_SIZE) {
+  if (statements.length > 10) {
     console.log(); // New line after progress indicator
   }
   

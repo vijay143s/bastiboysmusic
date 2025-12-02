@@ -1,13 +1,24 @@
 -- Drop existing tables if they exist (in reverse order of foreign key dependencies)
-DROP TABLE IF EXISTS user_playlists;
-DROP TABLE IF EXISTS singers;
-DROP TABLE IF EXISTS music_directors;
-DROP TABLE IF EXISTS artists;
-DROP TABLE IF EXISTS songs;
-DROP TABLE IF EXISTS albums;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS user_playlists CASCADE;
+DROP TABLE IF EXISTS singers CASCADE;
+DROP TABLE IF EXISTS music_directors CASCADE;
+DROP TABLE IF EXISTS artists CASCADE;
+DROP TABLE IF EXISTS songs CASCADE;
+DROP TABLE IF EXISTS albums CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
-DROP TYPE IF EXISTS user_role;
+DROP TYPE IF EXISTS user_role CASCADE;
+
+-- Drop existing triggers if they exist
+DROP TRIGGER IF EXISTS set_timestamp_users ON users;
+DROP TRIGGER IF EXISTS set_timestamp_albums ON albums;
+DROP TRIGGER IF EXISTS set_timestamp_songs ON songs;
+DROP TRIGGER IF EXISTS set_timestamp_artists ON artists;
+DROP TRIGGER IF EXISTS set_timestamp_music_directors ON music_directors;
+DROP TRIGGER IF EXISTS set_timestamp_user_playlists ON user_playlists;
+
+-- Drop existing function if it exists
+DROP FUNCTION IF EXISTS set_updated_at() CASCADE;
 
 CREATE TYPE user_role AS ENUM ('user', 'admin');
 
@@ -61,6 +72,11 @@ CREATE TABLE IF NOT EXISTS songs (
         FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE
 );
 
+-- Drop existing indexes if they exist
+DROP INDEX IF EXISTS idx_album_title;
+DROP INDEX IF EXISTS idx_song_title;
+DROP INDEX IF EXISTS idx_song_album;
+
 -- Create Index for faster queries
 CREATE INDEX idx_album_title ON albums(title);
 CREATE INDEX idx_song_title ON songs(title);
@@ -96,6 +112,13 @@ CREATE TABLE IF NOT EXISTS music_directors (
         FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE,
         CONSTRAINT unique_director_album UNIQUE (director_name, album_id)
 );
+
+-- Drop existing indexes if they exist
+DROP INDEX IF EXISTS idx_artist_album;
+DROP INDEX IF EXISTS idx_artist_name;
+DROP INDEX IF EXISTS idx_singer_name;
+DROP INDEX IF EXISTS idx_director_album;
+DROP INDEX IF EXISTS idx_director_name;
 
 -- Create Indexes for faster queries
 CREATE INDEX idx_artist_album ON artists(album_id);
