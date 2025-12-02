@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/
-          server-dir: /home/hrlabels/bbmusic.hrlabels.in/
+          server-dir: /home/hrlabels/
           exclude: |
             **/.git*
             **/.git*/**
@@ -73,7 +73,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd /home/hrlabels/bbmusic.hrlabels.in
-            npm install --production
-            pm2 restart bastiboysmusic || pm2 start backend/index.js --name bastiboysmusic
+          
