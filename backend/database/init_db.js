@@ -35,7 +35,9 @@ const runSqlFile = async (filePath) => {
   let inDollarQuote = false;
   let dollarQuoteTag = '';
   
-  const lines = sql.split('\n');
+  // Normalize line endings to \n
+  const normalizedSQL = sql.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalizedSQL.split('\n');
   for (const line of lines) {
     // Check for dollar-quote start/end
     const dollarMatches = line.match(/\$\$|\$[a-zA-Z_][a-zA-Z0-9_]*\$/g);
@@ -56,7 +58,12 @@ const runSqlFile = async (filePath) => {
     // Only split on semicolon if not inside dollar-quote
     if (!inDollarQuote && line.trim().endsWith(';')) {
       const stmt = currentStatement.trim();
-      if (stmt.length > 0 && !stmt.startsWith('--')) {
+      // Skip empty statements and comment-only statements
+      const hasCode = stmt.length > 0 && stmt.split('\n').some(l => {
+        const trimmed = l.trim();
+        return trimmed.length > 0 && !trimmed.startsWith('--');
+      });
+      if (hasCode) {
         statements.push(stmt);
       }
       currentStatement = '';
@@ -64,8 +71,13 @@ const runSqlFile = async (filePath) => {
   }
   
   // Add any remaining statement
-  if (currentStatement.trim().length > 0 && !currentStatement.trim().startsWith('--')) {
-    statements.push(currentStatement.trim());
+  const remainingStmt = currentStatement.trim();
+  const hasCode = remainingStmt.length > 0 && remainingStmt.split('\n').some(l => {
+    const trimmed = l.trim();
+    return trimmed.length > 0 && !trimmed.startsWith('--');
+  });
+  if (hasCode) {
+    statements.push(remainingStmt);
   }
 
   if (statements.length === 0) {
@@ -74,6 +86,15 @@ const runSqlFile = async (filePath) => {
   }
 
   console.log(`   Found ${statements.length} statements to execute`);
+  
+  // Log all CREATE TABLE statements for debugging
+  statements.forEach((stmt, i) => {
+    if (stmt.trim().toUpperCase().startsWith('CREATE TABLE')) {
+      const match = stmt.match(/CREATE TABLE[^(]+\s+([a-z_]+)/i);
+      const lineCount = stmt.split('\n').length;
+      console.log(`   Statement ${i+1}: CREATE TABLE ${match ? match[1] : '?'} (${lineCount} lines, ${stmt.length} chars)`);
+    }
+  });
 
   // Execute statements individually for better error handling
   let executed = 0;
@@ -103,10 +124,12 @@ const runSqlFile = async (filePath) => {
       }
     } catch (error) {
       errors++;
-      // Ignore "already exists" errors
-      if (!error.message.includes('already exists')) {
-        if (errors <= 5) {
-          console.warn(`\n⚠️  Error at statement ${i + 1}: ${error.message}`);
+      // Always show errors for CREATE TABLE statements
+      const firstWord = statement.trim().toUpperCase().split(/\s+/)[0];
+      if (firstWord === 'CREATE' || !error.message.includes('already exists') && !error.message.includes('does not exist')) {
+        console.warn(`\n⚠️  Error at statement ${i + 1}: ${error.message}`);
+        if (firstWord === 'CREATE') {
+          console.log(`Statement: ${statement.substring(0, 100)}...`);
         }
       }
       executed++;
