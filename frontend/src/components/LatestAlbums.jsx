@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaChevronDown, FaChevronUp, FaPlay, FaPause } from "react-icons/fa6";
@@ -9,7 +9,16 @@ import Loading from "./Loading";
 
 const LatestAlbums = () => {
   const navigate = useNavigate();
-  const { setSelectedSong, setIsPlaying, selectedSong, isPlaying, playQueue, setOnQueueEnd } = SongData();
+  const {
+    setSelectedSong,
+    setIsPlaying,
+    selectedSong,
+    isPlaying,
+    playQueue,
+    setOnQueueEnd,
+    queue,
+    queueLabel,
+  } = SongData();
   const { user, addToPlaylist } = UserData();
   const [albums, setAlbums] = useState([]);
   const [currentLimit, setCurrentLimit] = useState(10);
@@ -24,6 +33,12 @@ const LatestAlbums = () => {
   const [years, setYears] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredAlbums, setFilteredAlbums] = useState([]);
+
+  const resolveSongId = (song) => {
+    if (!song) return null;
+    const rawId = song._id ?? song.id ?? song.songId ?? song.song_id ?? song;
+    return rawId ? String(rawId) : null;
+  };
 
   const isInPlaylist = (songId) => {
     if (!user || !user.playlist) return false;
@@ -40,22 +55,45 @@ const LatestAlbums = () => {
     }
   };
 
+  const fetchLatestAlbums = useCallback(async (limit = 10) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data } = await axios.get(`/api/home/albums/latest-smart?limit=${limit}`);
+      setAlbums(data.data || []);
+      setMaxYear(data.maxYear);
+      setCurrentYear(data.currentYear);
+      setYears(data.years || []);
+      setCurrentLimit(limit);
+      return data;
+    } catch (error) {
+      console.error("Error fetching latest albums:", error);
+      setError("Failed to load latest albums");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchLatestAlbums();
-  }, []);
+  }, [fetchLatestAlbums]);
 
   // Set up callback for when queue ends to load more albums
   useEffect(() => {
     setOnQueueEnd(() => async () => {
-      // Load 10 more albums when queue ends
+      if (queueLabel !== "Latest Albums") return;
+
       const newLimit = currentLimit + 10;
-      await fetchLatestAlbums(newLimit);
-      
-      // Fetch all songs from all albums and continue playing
-      const { data } = await axios.get(`/api/home/albums/latest-smart?limit=${newLimit}`);
-      const newAlbums = data.data || [];
-      
-      const allSongsPromises = newAlbums.map(async (album) => {
+      const latestData = await fetchLatestAlbums(newLimit);
+      const updatedAlbums = latestData?.data || [];
+      const nextAlbums = updatedAlbums.slice(currentLimit);
+
+      if (!nextAlbums.length) {
+        return;
+      }
+
+      const albumSongsPromises = nextAlbums.map(async (album) => {
         try {
           const { data } = await axios.get(`/api/home/albums/${album._id}/songs`);
           return data.data || [];
@@ -65,17 +103,26 @@ const LatestAlbums = () => {
         }
       });
 
-      const albumsWithSongs = await Promise.all(allSongsPromises);
-      const allSongs = albumsWithSongs.flat();
-      
-      if (allSongs.length > 0) {
-        playQueue(allSongs, allSongs[0]._id, 'Latest Albums');
+      const albumsWithSongs = await Promise.all(albumSongsPromises);
+      const newSongs = albumsWithSongs.flat();
+
+      if (!newSongs.length) {
+        return;
       }
+
+      const firstNewSongId = newSongs
+        .map((song) => song?._id || song?.id || song?.songId || song?.song_id)
+        .find(Boolean);
+
+      if (!firstNewSongId) return;
+
+      const combinedQueue = queue.length ? [...queue, ...newSongs] : newSongs;
+      playQueue(combinedQueue, String(firstNewSongId), "Latest Albums");
     });
 
     // Clean up callback when component unmounts
     return () => setOnQueueEnd(null);
-  }, [currentLimit, setOnQueueEnd, playQueue]);
+  }, [currentLimit, fetchLatestAlbums, playQueue, queue, queueLabel, setOnQueueEnd]);
 
   // Filter albums based on search query
   useEffect(() => {
@@ -90,24 +137,6 @@ const LatestAlbums = () => {
     );
     setFilteredAlbums(filtered);
   }, [searchQuery, albums]);
-
-  const fetchLatestAlbums = async (limit = 10) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const { data } = await axios.get(`/api/home/albums/latest-smart?limit=${limit}`);
-      setAlbums(data.data || []);
-      setMaxYear(data.maxYear);
-      setCurrentYear(data.currentYear);
-      setYears(data.years || []);
-      setCurrentLimit(limit);
-    } catch (error) {
-      console.error("Error fetching latest albums:", error);
-      setError("Failed to load latest albums");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const toggleAlbum = async (albumId) => {
     const isCurrentlyExpanded = expandedAlbums[albumId];
@@ -137,13 +166,11 @@ const LatestAlbums = () => {
 
   const handleSongClick = async (song, currentAlbumId) => {
     // Ensure we have a valid ID
-    const songId = song._id || song.id;
-    if (!songId) {
+    const normalizedId = resolveSongId(song);
+    if (!normalizedId) {
       console.error("Invalid song ID:", song);
       return;
     }
-    
-    const normalizedId = String(songId);
     
     if (selectedSong === normalizedId && isPlaying) {
       setIsPlaying(false);
@@ -299,15 +326,15 @@ const LatestAlbums = () => {
                       <div className="p-4 text-center text-gray-400">Loading songs...</div>
                     ) : albumSongs[album._id] && albumSongs[album._id].length > 0 ? (
                       <div className="divide-y divide-gray-700">
-                        {albumSongs[album._id].map((song) => {
-                          const songId = song._id || song.id;
-                          const normalizedId = String(songId);
-                          const isCurrentSong = selectedSong === normalizedId;
+                        {albumSongs[album._id].map((song, idx) => {
+                          const normalizedId = resolveSongId(song);
+                          const isCurrentSong = normalizedId ? selectedSong === normalizedId : false;
                           const isCurrentlyPlaying = isCurrentSong && isPlaying;
+                          const playlistId = normalizedId || String(song._id || song.id || song.songId || song.song_id || idx);
 
                           return (
                             <div
-                              key={songId}
+                              key={playlistId}
                               onClick={() => handleSongClick(song, album._id)}
                               className={`flex items-center gap-4 p-3 hover:bg-gray-700 cursor-pointer transition-colors ${
                                 isCurrentSong ? "bg-gray-700" : ""
@@ -327,11 +354,11 @@ const LatestAlbums = () => {
                                 <p className="text-gray-400 text-xs truncate">{song.singer}</p>
                               </div>
                               <button
-                                onClick={(e) => handleAddToPlaylist(e, songId)}
+                                onClick={(e) => handleAddToPlaylist(e, playlistId)}
                                 className="flex-shrink-0 hover:scale-110 transition-transform"
-                                title={isInPlaylist(songId) ? "In Playlist" : "Add to Playlist"}
+                                title={isInPlaylist(playlistId) ? "In Playlist" : "Add to Playlist"}
                               >
-                                {isInPlaylist(songId) ? (
+                                {isInPlaylist(playlistId) ? (
                                   <AiFillHeart className="text-red-500" size={18} />
                                 ) : (
                                   <AiOutlineHeart className="text-gray-400 hover:text-red-500" size={18} />

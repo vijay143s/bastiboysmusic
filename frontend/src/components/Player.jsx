@@ -3,6 +3,7 @@ import { SongData } from "../context/Song";
 import { UserData } from "../context/User";
 import { GrChapterNext, GrChapterPrevious } from "react-icons/gr";
 import { FaPause, FaPlay } from "react-icons/fa";
+import { FaShuffle } from "react-icons/fa6";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import axios from "axios";
 
@@ -16,6 +17,8 @@ const Player = () => {
     nextMusic,
     prevMusic,
     albums,
+    queue,
+    loadDefaultQueue,
   } = SongData();
   
   const { user, addToPlaylist } = UserData();
@@ -67,6 +70,27 @@ const Player = () => {
       audioRef.current.play();
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const handleShuffle = async () => {
+    if (queue.length === 0) {
+      await loadDefaultQueue();
+    } else if (queue.length > 0) {
+      const randomIndex = Math.floor(Math.random() * queue.length);
+      const randomSong = queue[randomIndex];
+      const songId = randomSong._id || randomSong.id;
+      if (songId) {
+        setIsPlaying(false);
+        setTimeout(() => {
+          nextMusic("manual");
+          // Force navigation to random index
+          const audio = audioRef.current;
+          if (audio) {
+            audio.currentTime = 0;
+          }
+        }, 50);
+      }
+    }
   };
 
   const [volume, setVolume] = useState(1);
@@ -200,6 +224,13 @@ const Player = () => {
               >
                 <GrChapterNext />
               </span>
+              <span
+                className="cursor-pointer text-lg hover:text-green-400 transition"
+                onClick={handleShuffle}
+                title="Shuffle"
+              >
+                <FaShuffle />
+              </span>
               <button
                 className="cursor-pointer text-lg hover:scale-110 transition active:scale-95"
                 onClick={handleAddToPlaylist}
@@ -264,6 +295,13 @@ const Player = () => {
                   onClick={() => nextMusic("manual")}
                 >
                   <GrChapterNext size={20} />
+                </span>
+                <span
+                  className="cursor-pointer hover:text-green-400 transition"
+                  onClick={handleShuffle}
+                  title="Shuffle"
+                >
+                  <FaShuffle size={20} />
                 </span>
               </div>
 

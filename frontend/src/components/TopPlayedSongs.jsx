@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SongData } from "../context/Song";
 import { UserData } from "../context/User";
@@ -7,7 +7,13 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import Loading from "./Loading";
 
 const TopPlayedSongs = () => {
-  const { setSelectedSong, setIsPlaying, selectedSong, isPlaying, songs: allSongs } = SongData();
+  const {
+    setSelectedSong,
+    setIsPlaying,
+    selectedSong,
+    isPlaying,
+    playQueue,
+  } = SongData();
   const { user, addToPlaylist } = UserData();
   const [topSongs, setTopSongs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +22,12 @@ const TopPlayedSongs = () => {
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const limit = 20;
+
+  const resolveSongId = (song) => {
+    if (!song) return null;
+    const rawId = song._id ?? song.id ?? song.songId ?? song.song_id ?? song.uuid;
+    return rawId ? String(rawId) : null;
+  };
 
   const isInPlaylist = (songId) => {
     if (!user || !user.playlist) return false;
@@ -62,8 +74,13 @@ const TopPlayedSongs = () => {
   }, []);
 
   const handleShuffle = () => {
-    setOffset(0);
-    fetchTopPlayed(false, true);
+    if (topSongs.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * topSongs.length);
+    const randomSong = topSongs[randomIndex];
+    const normalizedId = resolveSongId(randomSong);
+    if (normalizedId && topSongs.length) {
+      playQueue(topSongs, normalizedId, "Top Played Songs");
+    }
   };
 
   const handleLoadMore = () => {
@@ -71,12 +88,27 @@ const TopPlayedSongs = () => {
   };
 
   const handleSongClick = async (song) => {
+    const normalizedId = resolveSongId(song);
+    if (!normalizedId) {
+      console.error("Invalid song id", song);
+      return;
+    }
+
     // Toggle play/pause if clicking on already selected song
-    if (selectedSong === song.id && isPlaying) {
+    if (selectedSong === normalizedId && isPlaying) {
       setIsPlaying(false);
     } else {
-      setSelectedSong(song.id);
-      setIsPlaying(true);
+      if (selectedSong === normalizedId && !isPlaying) {
+        setIsPlaying(true);
+        return;
+      }
+
+      if (topSongs.length) {
+        playQueue(topSongs, normalizedId, "Top Played Songs");
+      } else {
+        setSelectedSong(normalizedId);
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -132,12 +164,13 @@ const TopPlayedSongs = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {topSongs && topSongs.length > 0 ? (
               topSongs.map((song) => {
-                const isCurrentSong = selectedSong === song.id;
+                const normalizedId = resolveSongId(song);
+                const isCurrentSong = normalizedId ? selectedSong === normalizedId : false;
                 const isCurrentlyPlaying = isCurrentSong && isPlaying;
                 
                 return (
                   <div
-                    key={song.id}
+                    key={normalizedId || song.id}
                     onClick={() => handleSongClick(song)}
                     className={`bg-gray-800 hover:bg-gray-700 rounded-lg p-4 cursor-pointer transition-all group ${
                       isCurrentSong ? 'ring-2 ring-green-500' : ''

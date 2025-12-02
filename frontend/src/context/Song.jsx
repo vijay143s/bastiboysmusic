@@ -25,10 +25,30 @@ export const SongProvider = ({ children }) => {
   const [yearOffsets, setYearOffsets] = useState(new Map()); // Track offset for each year
   const [hasMoreInCurrentYear, setHasMoreInCurrentYear] = useState(true);
 
+  const { user } = UserData();
+
+  const normalizeSongId = (value) => {
+    if (value === undefined || value === null) return null;
+    return String(value);
+  };
+
+  const getSongId = (song) => {
+    if (!song) return null;
+    if (typeof song === "string" || typeof song === "number") {
+      return normalizeSongId(song);
+    }
+    return normalizeSongId(
+      song._id ?? song.id ?? song.songId ?? song.song_id
+    );
+  };
+
   // Function to save last played song
   const saveLastPlayedSong = async (songId) => {
+    const normalizedId = normalizeSongId(songId);
+    if (!normalizedId || !user?._id) return;
+
     try {
-      await axios.post("/api/user/last-played", { songId });
+      await axios.post("/api/user/last-played", { songId: normalizedId });
     } catch (error) {
       console.error("Error saving last played song:", error);
     }
@@ -36,20 +56,22 @@ export const SongProvider = ({ children }) => {
 
   // Wrapper for setSelectedSong that also saves to backend
   const setSelectedSongAndSave = (songId) => {
-    setSelectedSong(songId);
-    if (songId) {
-      saveLastPlayedSong(songId);
+    const normalizedId = normalizeSongId(songId);
+    setSelectedSong(normalizedId);
+    if (normalizedId) {
+      saveLastPlayedSong(normalizedId);
     }
   };
 
-  const { user } = UserData();
-
   // Restore last played song on app load
   useEffect(() => {
-    if (user && user.lastPlayedSongId && !selectedSong) {
-      setSelectedSong(user.lastPlayedSongId);
+    const lastPlayedId = normalizeSongId(user?.lastPlayedSongId);
+    if (lastPlayedId && !selectedSong && !queue.length) {
+      setSelectedSong(lastPlayedId);
+      // Don't auto-play on restore, let user manually play
+      // setIsPlaying(true);
     }
-  }, [user]);
+  }, [user?.lastPlayedSongId]);
 
   async function fetchSongs() {
     try {
@@ -57,7 +79,10 @@ export const SongProvider = ({ children }) => {
 
       setSongs(data);
       if (!selectedSong && data.length) {
-        setSelectedSong(data[0]._id);
+        const firstSongId = getSongId(data[0]);
+        if (firstSongId) {
+          setSelectedSong(firstSongId);
+        }
       }
       if (!queue.length && data.length) {
         setQueue(data);
@@ -66,7 +91,6 @@ export const SongProvider = ({ children }) => {
       } else if (queueLabel === "All Songs" && data.length) {
         setQueue(data);
       }
-      setIsPlaying(false);
     } catch (error) {
       console.log(error);
     }
@@ -78,7 +102,10 @@ export const SongProvider = ({ children }) => {
       const { data } = await axios.get("/api/song/queue");
       
       if (!selectedSong && data.length) {
-        setSelectedSong(data[0]._id);
+        const firstSongId = getSongId(data[0]);
+        if (firstSongId) {
+          setSelectedSong(firstSongId);
+        }
       }
       if (!queue.length && data.length) {
         setQueue(data);
@@ -87,7 +114,6 @@ export const SongProvider = ({ children }) => {
       } else if (queueLabel === "All Songs" && data.length) {
         setQueue(data);
       }
-      setIsPlaying(false);
     } catch (error) {
       console.log(error);
       // Fallback to regular fetch if queue endpoint fails
@@ -165,12 +191,14 @@ export const SongProvider = ({ children }) => {
           setHasMoreInCurrentYear(data.hasMore);
           
           if (!selectedSong) {
-            setSelectedSong(data.songs[0]._id);
+            const firstSongId = getSongId(data.songs[0]);
+            if (firstSongId) {
+              setSelectedSong(firstSongId);
+            }
           }
           
           setQueueIndex(0);
           setQueueLabel("All Songs");
-          setIsPlaying(false);
         }
       }
     } catch (error) {
@@ -318,52 +346,102 @@ export const SongProvider = ({ children }) => {
   const playQueue = (collection = [], startSongId, label = "Queue") => {
     if (!collection.length) return;
 
-    const normalizedQueue = collection.filter(Boolean);
-    const startIndex = startSongId
-      ? normalizedQueue.findIndex((item) => item._id === startSongId)
+    const normalizedQueue = collection
+      .map((item) => {
+        if (!item) return null;
+        const normalizedId = getSongId(item);
+        if (!normalizedId) return null;
+
+        if (typeof item === "object") {
+          return item._id === normalizedId ? { ...item } : { ...item, _id: normalizedId };
+        }
+
+        return { _id: normalizedId };
+      })
+      .filter(Boolean);
+
+    if (!normalizedQueue.length) return;
+
+    const targetId = startSongId ? normalizeSongId(startSongId) : null;
+    const startIndex = targetId
+      ? normalizedQueue.findIndex((item) => getSongId(item) === targetId)
       : 0;
     const safeIndex = startIndex === -1 ? 0 : startIndex;
 
     setQueue(normalizedQueue);
     setQueueLabel(label);
     setQueueIndex(safeIndex);
-    setSelectedSongAndSave(normalizedQueue[safeIndex]._id);
-    setIsPlaying(true);
+
+    const nextSongId = getSongId(normalizedQueue[safeIndex]);
+    if (nextSongId) {
+      setSelectedSongAndSave(nextSongId);
+      setIsPlaying(true);
+    }
   };
 
   const playFromSongs = (songId) => playQueue(songs, songId, "All Songs");
 
-  const nextMusic = (mode = "manual") => {
+  const jumpToIndex = (index) => {
     if (!queue.length) return;
+    if (index < 0 || index >= queue.length) return;
 
-    if (queueIndex === queue.length - 1) {
-      if (mode === "auto") {
-        // Call onQueueEnd callback if it exists
-        if (onQueueEnd) {
-          onQueueEnd();
-        } else {
-          setIsPlaying(false);
+    const songId = getSongId(queue[index]);
+    if (!songId) return;
+
+    setQueueIndex(index);
+    setSelectedSongAndSave(songId);
+    setIsPlaying(true);
+  };
+
+  const loadDefaultQueue = async () => {
+    try {
+      const { data } = await axios.get("/api/song/top-played?limit=50&offset=0");
+      if (data.songs && data.songs.length) {
+        const firstSongId = getSongId(data.songs[0]);
+        if (firstSongId) {
+          playQueue(data.songs, firstSongId, "Top Played Songs");
+          return true;
         }
-        return;
       }
-      setQueueIndex(0);
-      setSelectedSong(queue[0]._id);
-      setIsPlaying(true);
+    } catch (error) {
+      console.error("Failed to load default queue:", error);
+    }
+    return false;
+  };
+
+  const nextMusic = async (mode = "manual") => {
+    if (!queue.length) {
+      if (mode === "manual") {
+        await loadDefaultQueue();
+      }
       return;
     }
 
-    const nextIndex = queueIndex + 1;
-    setQueueIndex(nextIndex);
-    setSelectedSong(queue[nextIndex]._id);
-    setIsPlaying(true);
+    const lastIndex = queue.length - 1;
+
+    if (queueIndex >= lastIndex) {
+      if (mode === "auto") {
+        if (onQueueEnd) {
+          const maybePromise = onQueueEnd();
+          if (maybePromise && typeof maybePromise.then === "function") {
+            maybePromise.catch((error) => console.error("Queue end handler failed", error));
+          }
+        } else {
+          setIsPlaying(false);
+        }
+      } else {
+        jumpToIndex(0);
+      }
+      return;
+    }
+
+    jumpToIndex(queueIndex + 1);
   };
 
   const prevMusic = () => {
     if (!queue.length) return;
     const nextIndex = queueIndex === 0 ? queue.length - 1 : queueIndex - 1;
-    setQueueIndex(nextIndex);
-    setSelectedSongAndSave(queue[nextIndex]._id);
-    setIsPlaying(true);
+    jumpToIndex(nextIndex);
   };
 
   const [albumSong, setAlbumSong] = useState([]);
@@ -402,6 +480,7 @@ export const SongProvider = ({ children }) => {
         queueIndex,
         playQueue,
         playFromSongs,
+        loadDefaultQueue,
         fetchAlbumSong,
         albumSong,
         albumData,
