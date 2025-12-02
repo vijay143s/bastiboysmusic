@@ -55,8 +55,11 @@ const updateSongThumbnail = async (songId, thumbnail) => {
 
 const getAllSongs = async () => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
-     FROM songs ORDER BY created_at DESC`
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at
+     FROM songs s
+     LEFT JOIN albums a ON s.album_id = a.id
+     WHERE s.audio_url IS NOT NULL 
+     ORDER BY a.year DESC, s.created_at DESC`
   );
 
   return rows.map(mapSongRow);
@@ -64,8 +67,11 @@ const getAllSongs = async () => {
 
 const getSongsByAlbum = async (albumId) => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
-     FROM songs WHERE album_id = ? AND audio_url IS NOT NULL ORDER BY created_at DESC`,
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at
+     FROM songs s
+     LEFT JOIN albums a ON s.album_id = a.id
+     WHERE s.album_id = ? AND s.audio_url IS NOT NULL 
+     ORDER BY a.year DESC, s.created_at DESC`,
     [albumId]
   );
 
@@ -88,8 +94,11 @@ const deleteSongById = async (id) => {
 
 const getSongsBySinger = async (singerName) => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
-     FROM songs WHERE singer = ? OR FIND_IN_SET(?, singer) > 0 ORDER BY created_at DESC`,
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at
+     FROM songs s
+     LEFT JOIN albums a ON s.album_id = a.id
+     WHERE (s.singer = ? OR FIND_IN_SET(?, s.singer) > 0) AND s.audio_url IS NOT NULL 
+     ORDER BY a.year DESC, s.created_at DESC`,
     [singerName, singerName]
   );
 
@@ -108,7 +117,8 @@ const getQueueSongs = async () => {
       a.title as album_name
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    ORDER BY s.created_at DESC
+    WHERE s.audio_url IS NOT NULL
+    ORDER BY a.year DESC, s.created_at DESC
   `);
 
   return rows.map(row => ({
@@ -144,11 +154,12 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
       s.thumbnail_url,
       s.album_id,
       s.created_at,
-      a.title as album_name
+      a.title as album_name,
+      a.year
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    WHERE YEAR(s.created_at) = ?
-    ORDER BY s.created_at DESC
+    WHERE YEAR(s.created_at) = ? AND s.audio_url IS NOT NULL
+    ORDER BY a.year DESC, s.created_at DESC
     LIMIT ? OFFSET ?
   `, [year, limit, offset]);
 
@@ -156,7 +167,7 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
   const [countResult] = await pool.query(`
     SELECT COUNT(*) as total
     FROM songs s
-    WHERE YEAR(s.created_at) = ?
+    WHERE YEAR(s.created_at) = ? AND s.audio_url IS NOT NULL
   `, [year]);
 
   const total = countResult[0].total;
@@ -235,11 +246,12 @@ const getTopPlayedSongs = async (limit = 20, offset = 0) => {
       a.year as album_year
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
+    WHERE s.audio_url IS NOT NULL
     ORDER BY s.play_count DESC, a.year DESC
     LIMIT ? OFFSET ?
   `, [limit, offset]);
 
-  const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM songs`);
+  const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM songs WHERE audio_url IS NOT NULL`);
   const total = countResult[0].total;
 
   return {
@@ -313,8 +325,9 @@ const getAlbumsByYear = async (year) => {
           s.audio_url,
           s.play_count
         FROM songs s
-        WHERE s.album_id = ?
-        ORDER BY s.title ASC
+        LEFT JOIN albums a ON s.album_id = a.id
+        WHERE s.album_id = ? AND s.audio_url IS NOT NULL
+        ORDER BY a.year DESC, s.title ASC
       `, [album.id]);
 
       return {
@@ -363,11 +376,12 @@ const getQueueSongsByYearBatch = async (limit = 1000, offset = 0) => {
       a.year
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
+    WHERE s.audio_url IS NOT NULL
     ORDER BY a.year DESC, s.created_at DESC
     LIMIT ? OFFSET ?
   `, [limit, offset]);
 
-  const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM songs`);
+  const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM songs WHERE audio_url IS NOT NULL`);
   const total = countResult[0].total;
 
   return {
@@ -398,7 +412,7 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
   
   try {
     // Build WHERE clause with enhanced search (title, description, singer, album name, year)
-    let whereClause = `WHERE (
+    let whereClause = `WHERE s.audio_url IS NOT NULL AND (
       s.title LIKE ? OR 
       s.description LIKE ? OR 
       s.singer LIKE ? OR 
@@ -420,7 +434,7 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
       FROM songs s 
       LEFT JOIN albums a ON s.album_id = a.id
       ${whereClause}
-      ORDER BY s.created_at DESC
+      ORDER BY a.year DESC, s.created_at DESC
       LIMIT ? OFFSET ?
     `;
     

@@ -6,6 +6,7 @@ const {
   registerUser,
   saveToPlaylist,
   getAllCommunityPlaylists,
+  updateUserLastPlayedSong,
 } = require("../controllers/userControllers.js");
 const { isAuth } = require("../middlewares/isAuth.js");
 const { validateRequest } = require("../middlewares/validateRequest.js");
@@ -24,6 +25,7 @@ router.post("/login", authRateLimiter, validateRequest(loginSchema), loginUser);
 router.get("/me", isAuth, myProfile);
 router.get("/logout", isAuth, logoutUser);
 router.post("/song/:id", isAuth, saveToPlaylist);
+router.post("/last-played", isAuth, updateUserLastPlayedSong);
 router.get("/playlists/all", isAuth, getAllCommunityPlaylists);
 
 module.exports = router;

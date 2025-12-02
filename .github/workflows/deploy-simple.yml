@@ -3,7 +3,7 @@ name: Deploy to cPanel (FTP Only)
 on:
   push:
     branches:
-      - enhancements
+      - 'enhance*'
   workflow_dispatch:
 
 jobs:

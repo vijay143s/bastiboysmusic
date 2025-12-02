@@ -15,7 +15,7 @@ const ProfileMenu = () => {
   ];
 
   const handleLogout = () => {
-    logoutUser();
+    logoutUser(navigate);
     setIsOpen(false);
   };
 

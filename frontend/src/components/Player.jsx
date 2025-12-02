@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SongData } from "../context/Song";
+import { UserData } from "../context/User";
 import { GrChapterNext, GrChapterPrevious } from "react-icons/gr";
 import { FaPause, FaPlay } from "react-icons/fa";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import axios from "axios";
 
 const Player = () => {
@@ -15,6 +17,9 @@ const Player = () => {
     prevMusic,
     albums,
   } = SongData();
+  
+  const { user, addToPlaylist } = UserData();
+  
   const albumTitle = useMemo(() => {
     if (!song || !song.album) return "Single";
     const album = albums.find((albumItem) => albumItem._id === song.album);
@@ -23,6 +28,28 @@ const Player = () => {
 
   const [playCountUpdated, setPlayCountUpdated] = useState(false);
   const playCountThreshold = 0.3; // 30% of song duration
+  
+  const isInPlaylist = useMemo(() => {
+    if (!user || !user.playlist || !song || !song._id) return false;
+    return user.playlist.includes(String(song._id));
+  }, [user, song]);
+
+  const handleAddToPlaylist = async (e) => {
+    if (e) e.stopPropagation();
+    if (!song || !song._id) {
+      console.error("No song selected");
+      return;
+    }
+    if (!user || !user._id) {
+      console.error("User not authenticated");
+      return;
+    }
+    try {
+      await addToPlaylist(song._id, { silent: true });
+    } catch (error) {
+      console.error("Error adding to playlist:", error);
+    }
+  };
 
   useEffect(() => {
     fetchSingleSong();
@@ -32,6 +59,8 @@ const Player = () => {
   const audioRef = useRef(null);
 
   const handlePlayPause = () => {
+    if (!audioRef.current) return;
+    
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -45,7 +74,9 @@ const Player = () => {
   const handleVolumeChange = (e) => {
     const newVolume = e.target.value;
     setVolume(newVolume);
-    audioRef.current.volume = newVolume;
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
   };
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -88,6 +119,7 @@ const Player = () => {
   }, [song, nextMusic, duration, playCountUpdated, selectedSong]);
 
   const handleProgressChange = (e) => {
+    if (!audioRef.current) return;
     const newTime = (e.target.value / 100) * duration;
     audioRef.current.currentTime = newTime;
     setProgress(newTime);
@@ -168,6 +200,18 @@ const Player = () => {
               >
                 <GrChapterNext />
               </span>
+              <button
+                className="cursor-pointer text-lg hover:scale-110 transition active:scale-95"
+                onClick={handleAddToPlaylist}
+                title={isInPlaylist ? "In Playlist" : "Add to Playlist"}
+                disabled={!user || !user._id}
+              >
+                {isInPlaylist ? (
+                  <AiFillHeart className="text-red-500" size={22} />
+                ) : (
+                  <AiOutlineHeart className="text-white hover:text-red-500" size={22} />
+                )}
+              </button>
             </div>
           </div>
 
@@ -183,10 +227,22 @@ const Player = () => {
                 className="w-12 h-12 rounded"
                 alt=""
               />
-              <div>
-                <p className="font-semibold text-sm">{song.title}</p>
-                <p className="text-xs text-gray-400">{song.singer || albumTitle}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">{song.title}</p>
+                <p className="text-xs text-gray-400 truncate">{song.singer || albumTitle}</p>
               </div>
+              <button
+                className="cursor-pointer hover:scale-110 transition active:scale-95"
+                onClick={handleAddToPlaylist}
+                title={isInPlaylist ? "In Playlist" : "Add to Playlist"}
+                disabled={!user || !user._id}
+              >
+                {isInPlaylist ? (
+                  <AiFillHeart className="text-red-500" size={24} />
+                ) : (
+                  <AiOutlineHeart className="text-white hover:text-red-500" size={24} />
+                )}
+              </button>
             </div>
 
             <div className="flex flex-col items-center gap-2 flex-1">

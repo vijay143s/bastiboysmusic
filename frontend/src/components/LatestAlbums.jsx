@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaChevronDown, FaChevronUp, FaPlay, FaPause } from "react-icons/fa6";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { SongData } from "../context/Song";
+import { UserData } from "../context/User";
 import Loading from "./Loading";
 
 const LatestAlbums = () => {
   const navigate = useNavigate();
   const { setSelectedSong, setIsPlaying, selectedSong, isPlaying, playQueue, setOnQueueEnd } = SongData();
+  const { user, addToPlaylist } = UserData();
   const [albums, setAlbums] = useState([]);
   const [currentLimit, setCurrentLimit] = useState(10);
   const [loading, setLoading] = useState(true);
@@ -21,6 +24,21 @@ const LatestAlbums = () => {
   const [years, setYears] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredAlbums, setFilteredAlbums] = useState([]);
+
+  const isInPlaylist = (songId) => {
+    if (!user || !user.playlist) return false;
+    return user.playlist.includes(String(songId));
+  };
+
+  const handleAddToPlaylist = async (e, songId) => {
+    e.stopPropagation();
+    if (!user || !user._id) return;
+    try {
+      await addToPlaylist(songId);
+    } catch (error) {
+      console.error("Error adding to playlist:", error);
+    }
+  };
 
   useEffect(() => {
     fetchLatestAlbums();
@@ -205,7 +223,7 @@ const LatestAlbums = () => {
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
+            <h2 className="text-xl md:text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
               {getTitle()}
             </h2>
             {isExpanded ? (
@@ -308,6 +326,17 @@ const LatestAlbums = () => {
                                 </p>
                                 <p className="text-gray-400 text-xs truncate">{song.singer}</p>
                               </div>
+                              <button
+                                onClick={(e) => handleAddToPlaylist(e, songId)}
+                                className="flex-shrink-0 hover:scale-110 transition-transform"
+                                title={isInPlaylist(songId) ? "In Playlist" : "Add to Playlist"}
+                              >
+                                {isInPlaylist(songId) ? (
+                                  <AiFillHeart className="text-red-500" size={18} />
+                                ) : (
+                                  <AiOutlineHeart className="text-gray-400 hover:text-red-500" size={18} />
+                                )}
+                              </button>
                             </div>
                           );
                         })}

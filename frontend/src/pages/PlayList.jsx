@@ -2,44 +2,74 @@ import React, { useEffect, useMemo, useState } from "react";
 import { SongData } from "../context/Song";
 import { assets } from "../assets/assets";
 import { RiPulseLine } from "react-icons/ri";
+import { AiFillHeart } from "react-icons/ai";
 import { UserData } from "../context/User";
 import toast from "react-hot-toast";
+import axios from "axios";
+import Loading from "../components/Loading";
 
 const PlayList = () => {
   const {
-    songs,
-    albums,
     selectedSong,
     isPlaying,
     playQueue,
   } = SongData();
   const { user, addToPlaylist } = UserData();
-  const albumTitleMap = useMemo(() => {
-    const map = new Map();
-    albums.forEach((album) => map.set(album._id, album.title));
-    return map;
-  }, [albums]);
 
   const [myPlaylist, setMyPlaylist] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [albumTitleMap, setAlbumTitleMap] = useState(new Map());
 
   useEffect(() => {
-    if (songs && user && Array.isArray(user.playlist)) {
-      const filteredSongs = songs.filter((e) =>
-        user.playlist.includes(e._id.toString())
-      );
-      setMyPlaylist(filteredSongs);
-    } else {
+    fetchPlaylistSongs();
+  }, []); // Only fetch once on mount
+
+  const fetchPlaylistSongs = async () => {
+    if (!user || !user.playlist || user.playlist.length === 0) {
       setMyPlaylist([]);
+      setLoading(false);
+      return;
     }
-  }, [songs, user]);
+
+    try {
+      setLoading(true);
+      // Fetch user's playlist songs from API
+      const { data } = await axios.get("/api/song/playlist");
+      
+      setMyPlaylist(data.songs || []);
+      
+      // Create album title map
+      const albumMap = new Map();
+      data.songs.forEach((song) => {
+        if (song.album && song.albumName) {
+          albumMap.set(song.album, song.albumName);
+        }
+      });
+      setAlbumTitleMap(albumMap);
+    } catch (error) {
+      console.error("Error fetching playlist songs:", error);
+      toast.error("Failed to load playlist");
+      setMyPlaylist([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const startPlaylistQueue = (songId) => {
     if (!myPlaylist.length) return;
     playQueue(myPlaylist, songId, "My Playlist");
   };
 
-  const savePlayListHandler = (id) => {
-    addToPlaylist(id);
+  const savePlayListHandler = async (id) => {
+    // Optimistically update UI
+    setMyPlaylist(prev => prev.filter(song => song._id !== id));
+    
+    try {
+      await addToPlaylist(id);
+    } catch (error) {
+      // Revert on error
+      fetchPlaylistSongs();
+    }
   };
 
   const handleShufflePlay = () => {
@@ -51,6 +81,10 @@ const PlayList = () => {
       myPlaylist[Math.floor(Math.random() * myPlaylist.length)];
     startPlaylistQueue(randomSong._id);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="px-2 md:px-0">
@@ -144,18 +178,14 @@ const PlayList = () => {
                           <p className="text-xs text-slate-400 truncate">{e.singer}</p>
                         </div>
                         <button
-                          className="p-2 rounded-full bg-green-500 shadow-lg flex-shrink-0"
+                          className="flex-shrink-0 hover:scale-110 transition-transform"
                           title="Remove from playlist"
                           onClick={(event) => {
                             event.stopPropagation();
                             savePlayListHandler(e._id);
                           }}
                         >
-                          <img 
-                            src="/src/assets/like.png" 
-                            alt="like" 
-                            className="w-4 h-4"
-                          />
+                          <AiFillHeart className="w-6 h-6 text-red-500" />
                         </button>
                       </div>
 
@@ -178,18 +208,14 @@ const PlayList = () => {
                       </p>
                       <div className="hidden md:flex justify-center">
                         <button
-                          className="p-2 rounded-full bg-green-500 shadow-lg"
+                          className="hover:scale-110 transition-transform"
                           title="Remove from playlist"
                           onClick={(event) => {
                             event.stopPropagation();
                             savePlayListHandler(e._id);
                           }}
                         >
-                          <img 
-                            src="/src/assets/like.png" 
-                            alt="like" 
-                            className="w-5 h-5"
-                          />
+                          <AiFillHeart className="w-6 h-6 text-red-500" />
                         </button>
                       </div>
                     </div>

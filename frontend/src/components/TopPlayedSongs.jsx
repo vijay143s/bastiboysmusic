@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { SongData } from "../context/Song";
+import { UserData } from "../context/User";
 import { FaShuffle, FaPlay, FaPause, FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import Loading from "./Loading";
 
 const TopPlayedSongs = () => {
   const { setSelectedSong, setIsPlaying, selectedSong, isPlaying, songs: allSongs } = SongData();
+  const { user, addToPlaylist } = UserData();
   const [topSongs, setTopSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
@@ -13,6 +16,21 @@ const TopPlayedSongs = () => {
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const limit = 20;
+
+  const isInPlaylist = (songId) => {
+    if (!user || !user.playlist) return false;
+    return user.playlist.includes(String(songId));
+  };
+
+  const handleAddToPlaylist = async (e, songId) => {
+    e.stopPropagation();
+    if (!user || !user._id) return;
+    try {
+      await addToPlaylist(songId);
+    } catch (error) {
+      console.error("Error adding to playlist:", error);
+    }
+  };
 
   const fetchTopPlayed = async (isLoadMore = false, shuffle = false) => {
     try {
@@ -144,13 +162,28 @@ const TopPlayedSongs = () => {
                         </div>
                       )}
                     </div>
-                    <h3 className="text-white font-semibold text-sm truncate group-hover:text-green-400 transition-colors">
-                      {song.title}
-                    </h3>
-                    <p className="text-gray-400 text-xs mt-1 truncate">{song.singer}</p>
-                    {song.albumName && (
-                      <p className="text-gray-500 text-xs mt-1 truncate">{song.albumName}</p>
-                    )}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-semibold text-sm truncate group-hover:text-green-400 transition-colors">
+                          {song.title}
+                        </h3>
+                        <p className="text-gray-400 text-xs mt-1 truncate">{song.singer}</p>
+                        {song.albumName && (
+                          <p className="text-gray-500 text-xs mt-1 truncate">{song.albumName}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => handleAddToPlaylist(e, song.id)}
+                        className="flex-shrink-0 hover:scale-110 transition-transform"
+                        title={isInPlaylist(song.id) ? "In Playlist" : "Add to Playlist"}
+                      >
+                        {isInPlaylist(song.id) ? (
+                          <AiFillHeart className="text-red-500" size={18} />
+                        ) : (
+                          <AiOutlineHeart className="text-gray-400 hover:text-red-500" size={18} />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 );
               })

@@ -427,4 +427,25 @@ module.exports = {
     const result = await getQueueSongsByYearBatch(limit, offset);
     res.json(result);
   }),
+
+  // Get playlist songs by user ID from auth token
+  getPlaylistSongs: TryCatch(async (req, res) => {
+    const userId = req.user.id;
+    
+    // Get user with playlist
+    const { getUserWithPlaylist } = require("../repositories/userRepository.js");
+    const user = await getUserWithPlaylist(userId);
+    
+    if (!user || !user.playlist || user.playlist.length === 0) {
+      return res.json({ songs: [] });
+    }
+
+    const songs = await fetchSongs();
+    const playlistSongs = songs.filter(song => 
+      user.playlist.includes(String(song.id))
+    );
+
+    res.json({ songs: playlistSongs.map(formatSong) });
+  }),
 };
+

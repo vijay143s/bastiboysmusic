@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { UserData } from "./User";
 
 const SongContext = createContext();
 
@@ -23,6 +24,32 @@ export const SongProvider = ({ children }) => {
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
   const [yearOffsets, setYearOffsets] = useState(new Map()); // Track offset for each year
   const [hasMoreInCurrentYear, setHasMoreInCurrentYear] = useState(true);
+
+  // Function to save last played song
+  const saveLastPlayedSong = async (songId) => {
+    try {
+      await axios.post("/api/user/last-played", { songId });
+    } catch (error) {
+      console.error("Error saving last played song:", error);
+    }
+  };
+
+  // Wrapper for setSelectedSong that also saves to backend
+  const setSelectedSongAndSave = (songId) => {
+    setSelectedSong(songId);
+    if (songId) {
+      saveLastPlayedSong(songId);
+    }
+  };
+
+  const { user } = UserData();
+
+  // Restore last played song on app load
+  useEffect(() => {
+    if (user && user.lastPlayedSongId && !selectedSong) {
+      setSelectedSong(user.lastPlayedSongId);
+    }
+  }, [user]);
 
   async function fetchSongs() {
     try {
@@ -300,7 +327,7 @@ export const SongProvider = ({ children }) => {
     setQueue(normalizedQueue);
     setQueueLabel(label);
     setQueueIndex(safeIndex);
-    setSelectedSong(normalizedQueue[safeIndex]._id);
+    setSelectedSongAndSave(normalizedQueue[safeIndex]._id);
     setIsPlaying(true);
   };
 
@@ -335,7 +362,7 @@ export const SongProvider = ({ children }) => {
     if (!queue.length) return;
     const nextIndex = queueIndex === 0 ? queue.length - 1 : queueIndex - 1;
     setQueueIndex(nextIndex);
-    setSelectedSong(queue[nextIndex]._id);
+    setSelectedSongAndSave(queue[nextIndex]._id);
     setIsPlaying(true);
   };
 
@@ -364,7 +391,7 @@ export const SongProvider = ({ children }) => {
         deleteSong,
         fetchSingleSong,
         song,
-        setSelectedSong,
+        setSelectedSong: setSelectedSongAndSave,
         isPlaying,
         setIsPlaying,
         selectedSong,

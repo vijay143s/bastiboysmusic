@@ -6,13 +6,14 @@ const mapUserRow = (row) => ({
   email: row.email,
   role: row.role,
   passwordHash: row.password_hash,
+  lastPlayedSongId: row.last_played_song_id,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
 
 const findUserByEmail = async (email) => {
   const [rows] = await pool.query(
-    `SELECT id, name, email, role, password_hash, created_at, updated_at
+    `SELECT id, name, email, role, password_hash, last_played_song_id, created_at, updated_at
      FROM users WHERE email = ? LIMIT 1`,
     [email]
   );
@@ -22,7 +23,7 @@ const findUserByEmail = async (email) => {
 
 const findUserById = async (id) => {
   const [rows] = await pool.query(
-    `SELECT id, name, email, role, password_hash, created_at, updated_at
+    `SELECT id, name, email, role, password_hash, last_played_song_id, created_at, updated_at
      FROM users WHERE id = ? LIMIT 1`,
     [id]
   );
@@ -116,6 +117,13 @@ const getAllUsersWithPlaylistSongs = async () => {
   return Array.from(playlistMap.values());
 };
 
+const updateLastPlayedSong = async (userId, songId) => {
+  await pool.query(
+    `UPDATE users SET last_played_song_id = ? WHERE id = ?`,
+    [songId, userId]
+  );
+};
+
 module.exports = {
   findUserByEmail,
   findUserById,
@@ -123,4 +131,5 @@ module.exports = {
   getUserPlaylistIds,
   getUserWithPlaylist,
   getAllUsersWithPlaylistSongs,
+  updateLastPlayedSong,
 };

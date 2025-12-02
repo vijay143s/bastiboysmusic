@@ -6,6 +6,7 @@ const {
   findUserByEmail,
   getUserWithPlaylist,
   getAllUsersWithPlaylistSongs,
+  updateLastPlayedSong,
 } = require("../repositories/userRepository.js");
 const {
   addSongToPlaylist,
@@ -23,6 +24,7 @@ const sanitizeUser = (userDoc) => {
     email: userDoc.email,
     role: userDoc.role,
     playlist: userDoc.playlist || [],
+    lastPlayedSongId: userDoc.lastPlayedSongId || null,
     createdAt: userDoc.createdAt,
     updatedAt: userDoc.updatedAt,
   };
@@ -142,18 +144,26 @@ const saveToPlaylist = TryCatch(async (req, res) => {
 
   if (alreadySaved) {
     await removeSongFromPlaylist(req.user.id, songId);
+    
+    // Get updated user data
+    const updatedUser = await getUserWithPlaylist(req.user.id);
 
     return res.json({
       success: true,
       message: "Removed from playlist",
+      user: sanitizeUser(updatedUser),
     });
   }
 
   await addSongToPlaylist(req.user.id, songId);
+  
+  // Get updated user data
+  const updatedUser = await getUserWithPlaylist(req.user.id);
 
   return res.json({
     success: true,
     message: "Added to playlist",
+    user: sanitizeUser(updatedUser),
   });
 });
 
@@ -180,6 +190,25 @@ const getAllCommunityPlaylists = TryCatch(async (req, res) => {
   res.json({ success: true, playlists });
 });
 
+const updateUserLastPlayedSong = TryCatch(async (req, res) => {
+  const { songId } = req.body;
+  const userId = req.user.id;
+
+  if (!songId) {
+    return res.status(400).json({
+      success: false,
+      message: "Song ID is required",
+    });
+  }
+
+  await updateLastPlayedSong(userId, songId);
+
+  res.json({
+    success: true,
+    message: "Last played song updated",
+  });
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -187,4 +216,5 @@ module.exports = {
   logoutUser,
   saveToPlaylist,
   getAllCommunityPlaylists,
+  updateUserLastPlayedSong,
 };

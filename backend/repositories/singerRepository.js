@@ -38,7 +38,7 @@ const getSongsBySinger = async (singer_name) => {
   const [rows] = await pool.query(
     `SELECT id, title
     FROM songs
-    WHERE singer = ? OR FIND_IN_SET(?, singer) > 0
+    WHERE (singer = ? OR FIND_IN_SET(?, singer) > 0) AND audio_url IS NOT NULL
     ORDER BY title`,
     [singer_name, singer_name]
   );

@@ -74,25 +74,58 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  async function logoutUser() {
+  async function logoutUser(navigate) {
     try {
       const { data } = await axios.get("/api/user/logout");
-
-      window.location.reload();
+      
+      // Clear user state without full page reload
+      setUser([]);
+      setIsAuth(false);
+      toast.success("Logged out successfully");
+      
+      if (navigate) {
+        navigate("/login");
+      }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   }
 
   async function addToPlaylist(id, options = {}) {
-    const { silent = false } = options;
+    const { silent = true } = options; // Silent by default
+    
+    // Optimistic update: update UI immediately
+    const songIdStr = String(id);
+    const isCurrentlyInPlaylist = user.playlist && user.playlist.includes(songIdStr);
+    
+    // Update user state optimistically
+    setUser(prevUser => ({
+      ...prevUser,
+      playlist: isCurrentlyInPlaylist
+        ? prevUser.playlist.filter(sid => sid !== songIdStr)
+        : [...(prevUser.playlist || []), songIdStr]
+    }));
+    
     try {
       const { data } = await axios.post("/api/user/song/" + id);
 
-      if (!silent) toast.success(data.message);
-      await fetchUser();
+      // Don't show toast notifications
+      
+      // Update with server response
+      if (data.user) {
+        setUser(data.user);
+      }
+      
       return data;
     } catch (error) {
+      // Revert optimistic update on error
+      setUser(prevUser => ({
+        ...prevUser,
+        playlist: isCurrentlyInPlaylist
+          ? [...(prevUser.playlist || []), songIdStr]
+          : prevUser.playlist.filter(sid => sid !== songIdStr)
+      }));
+      
       if (!silent && error.response?.data?.message) {
         toast.error(error.response.data.message);
       }
@@ -102,7 +135,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, []); // Only run once on mount
   return (
     <UserContext.Provider
       value={{

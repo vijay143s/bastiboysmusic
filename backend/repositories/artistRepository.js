@@ -66,7 +66,7 @@ const getAlbumsByArtist = async (artistId) => {
      FROM albums a 
      INNER JOIN artists ar ON a.id = ar.album_id 
      WHERE ar.artist_name = ? 
-     ORDER BY a.created_at DESC`,
+     ORDER BY a.year DESC, a.created_at DESC`,
     [artistName]
   );
   

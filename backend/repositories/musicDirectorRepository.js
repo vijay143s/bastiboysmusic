@@ -54,7 +54,7 @@ const getAlbumsByMusicDirectorName = async (directorName) => {
     `SELECT DISTINCT a.id, a.title, a.description, a.thumbnail_id, a.thumbnail_url, a.year, a.director, a.music_director, a.star_cast, a.created_at, a.updated_at
      FROM albums a 
      INNER JOIN music_directors md ON a.id = md.album_id 
-     WHERE md.director_name = ? ORDER BY a.created_at DESC`,
+     WHERE md.director_name = ? ORDER BY a.year DESC, a.created_at DESC`,
     [directorName]
   );
 

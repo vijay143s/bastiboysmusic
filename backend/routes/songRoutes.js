@@ -22,6 +22,7 @@ const {
   getTopYears,
   getAlbumsByYear,
   getQueueByYearBatch,
+  getPlaylistSongs,
 } = require("../controllers/songControllers.js");
 
 const router = express.Router();
@@ -36,6 +37,7 @@ router.post("/album/:id/musicdirector", isAuth, addMusicDirectorToAlbum);
 // Song routes
 router.post("/new", isAuth, uploadFile, addSong);
 router.get("/all", getAllSongs);
+router.get("/playlist", isAuth, getPlaylistSongs); // Get user's playlist songs
 router.get("/top-played", getTopPlayedSongs); // Top played songs with pagination and shuffle
 router.get("/queue", getQueueData); // Optimized endpoint for queue
 router.get("/queue/batch", getQueueByYearBatch); // Queue with year ordering and batch loading

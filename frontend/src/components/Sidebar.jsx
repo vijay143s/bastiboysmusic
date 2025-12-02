@@ -41,7 +41,7 @@ const Sidebar = () => {
   const libraryMenu = [
     {
       label: "My Playlist",
-      icon: assets.stack_icon,
+      icon: assets.plays_icon,
       path: "/playlist",
       subtitle: user?.name ? `Playlist • ${user.name}` : "Your saved songs",
     },
@@ -209,7 +209,7 @@ const Sidebar = () => {
               <button
                 className="w-full bg-green-500 text-black font-semibold px-4 py-3 rounded-2xl cursor-pointer hover:bg-green-400 transition-colors active:scale-95"
                 onClick={() => {
-                  logoutUser();
+                  logoutUser(navigate);
                   setIsOpen(false);
                 }}
               >
