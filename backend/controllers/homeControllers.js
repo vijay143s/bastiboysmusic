@@ -1,6 +1,7 @@
 const TryCatch = require("../utils/TryCatch.js");
 const {
   getLatestAlbums,
+  getLatestAlbumsSmart,
   getAlbumsPaginated,
   getAlbumsForSearch,
 } = require("../repositories/albumRepository.js");
@@ -47,6 +48,28 @@ const getLatestAlbumsByYear = TryCatch(async (req, res) => {
     message: "Latest albums retrieved successfully",
     data: albums.map(formatAlbum),
     count: albums.length,
+  });
+});
+
+// Smart Latest Albums (fetches from max year and previous year if max year != current year)
+const getLatestAlbumsSmart_Controller = TryCatch(async (req, res) => {
+  const limit = req.query.limit ? Number(req.query.limit) : 10;
+
+  if (Number.isNaN(limit)) {
+    return res.status(400).json({
+      message: "Invalid limit parameter",
+    });
+  }
+
+  const result = await getLatestAlbumsSmart(limit);
+
+  res.json({
+    message: "Latest albums retrieved successfully",
+    data: result.albums.map(formatAlbum),
+    maxYear: result.maxYear,
+    currentYear: result.currentYear,
+    years: result.years,
+    count: result.albums.length,
   });
 });
 
@@ -310,6 +333,7 @@ const getMusicDirectorsForSearchEndpoint = TryCatch(async (req, res) => {
 
 module.exports = {
   getLatestAlbumsByYear,
+  getLatestAlbumsSmart_Controller,
   getAllAlbumsPaginated,
   getTopArtistsSection,
   getAllArtistsPaginated,

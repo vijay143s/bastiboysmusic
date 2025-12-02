@@ -18,6 +18,11 @@ const {
   getQueueSongsByYear,
   findSongByIdForPlayer,
   searchSongs: searchSongsRepo,
+  incrementPlayCount,
+  getTopPlayedSongs: getTopPlayedSongsRepo,
+  getTopYears: getTopYearsRepo,
+  getAlbumsByYear: getAlbumsByYearRepo,
+  getQueueSongsByYearBatch,
 } = require("../repositories/songRepository.js");
 const {
   createArtist,
@@ -224,13 +229,14 @@ const getQueueByYear = TryCatch(async (req, res) => {
 });
 
 const searchSongs = TryCatch(async (req, res) => {
-  const { q: query, limit = 50, offset = 0 } = req.query;
+  const { q: query, limit = 50, offset = 0, year } = req.query;
   
   if (!query || query.trim().length === 0) {
     return res.json({ songs: [], total: 0, hasMore: false });
   }
 
-  const result = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset));
+  const yearFilter = year ? parseInt(year) : null;
+  const result = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset), yearFilter);
   res.json(result);
 });
 
@@ -283,6 +289,8 @@ const getSingleSong = TryCatch(async (req, res) => {
     return res.status(404).json({
       message: "Song not found",
     });
+
+  // Don't increment play count here - will be done by separate endpoint after 30% played
 
   res.json(song); // Return optimized song data directly
 });
@@ -375,4 +383,48 @@ module.exports = {
     });
   }),
   searchSongs,
+
+  // Play count update
+  updatePlayCount: TryCatch(async (req, res) => {
+    const { id } = req.params;
+    await incrementPlayCount(id);
+    res.json({ message: "Play count updated" });
+  }),
+
+  // Top played songs
+  getTopPlayedSongs: TryCatch(async (req, res) => {
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+    const shuffle = req.query.shuffle === 'true';
+
+    let result = await getTopPlayedSongsRepo(limit, offset);
+
+    // Shuffle if requested
+    if (shuffle && result.songs.length > 0) {
+      result.songs = result.songs.sort(() => Math.random() - 0.5);
+    }
+
+    res.json(result);
+  }),
+
+  // Top years
+  getTopYears: TryCatch(async (req, res) => {
+    const years = await getTopYearsRepo();
+    res.json({ years });
+  }),
+
+  // Albums by year
+  getAlbumsByYear: TryCatch(async (req, res) => {
+    const { year } = req.params;
+    const albums = await getAlbumsByYearRepo(parseInt(year));
+    res.json({ year: parseInt(year), albums });
+  }),
+
+  // Queue with year-based ordering and batch loading
+  getQueueByYearBatch: TryCatch(async (req, res) => {
+    const limit = parseInt(req.query.limit) || 1000;
+    const offset = parseInt(req.query.offset) || 0;
+    const result = await getQueueSongsByYearBatch(limit, offset);
+    res.json(result);
+  }),
 };

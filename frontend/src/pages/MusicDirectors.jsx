@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loading from "../components/Loading";
+import { FaArrowLeft } from "react-icons/fa";
 
 const MusicDirectorCard = ({ director, onClick }) => {
   return (
@@ -98,6 +99,14 @@ const MusicDirectors = () => {
 
   return (
     <div className="w-full px-4 md:px-6 py-4">
+      <button
+        onClick={() => navigate("/")}
+        className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors"
+      >
+        <FaArrowLeft />
+        <span>Back to Home</span>
+      </button>
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h1 className="text-2xl md:text-3xl font-bold text-white">
           All Music Directors

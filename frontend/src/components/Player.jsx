@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SongData } from "../context/Song";
 import { GrChapterNext, GrChapterPrevious } from "react-icons/gr";
 import { FaPause, FaPlay } from "react-icons/fa";
+import axios from "axios";
 
 const Player = () => {
   const {
@@ -20,8 +21,12 @@ const Player = () => {
     return album ? album.title : "Single";
   }, [song, albums]);
 
+  const [playCountUpdated, setPlayCountUpdated] = useState(false);
+  const playCountThreshold = 0.3; // 30% of song duration
+
   useEffect(() => {
     fetchSingleSong();
+    setPlayCountUpdated(false); // Reset when song changes
   }, [selectedSong]);
 
   const audioRef = useRef(null);
@@ -55,7 +60,16 @@ const Player = () => {
     };
 
     const handleTimeUpdate = () => {
-      setProgress(audio.currentTime || 0);
+      const currentTime = audio.currentTime || 0;
+      setProgress(currentTime);
+
+      // Update play count when 30% of song is played
+      if (!playCountUpdated && duration > 0 && currentTime >= duration * playCountThreshold) {
+        setPlayCountUpdated(true);
+        axios.post(`/api/song/${selectedSong}/play`).catch(err => {
+          console.error("Error updating play count:", err);
+        });
+      }
     };
 
     const handleEnded = () => {
@@ -71,7 +85,7 @@ const Player = () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [song, nextMusic]);
+  }, [song, nextMusic, duration, playCountUpdated, selectedSong]);
 
   const handleProgressChange = (e) => {
     const newTime = (e.target.value / 100) * duration;

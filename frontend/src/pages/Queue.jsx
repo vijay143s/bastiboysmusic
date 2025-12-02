@@ -12,18 +12,65 @@ const Queue = () => {
     queueLabel, 
     playQueue, 
     albums,
-    availableYears,
-    loadedYears,
-    isLoadingMore,
-    loadNextYearSongs,
-    hasMoreInCurrentYear,
-    currentYearIndex
   } = SongData();
   const { user, addToPlaylist } = UserData();
+  
+  // Queue batch loading state
+  const [queueSongs, setQueueSongs] = useState([]);
+  const [queueOffset, setQueueOffset] = useState(0);
+  const [hasMoreQueue, setHasMoreQueue] = useState(true);
+  const [loadingQueue, setLoadingQueue] = useState(false);
   
   // Search functionality
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  
+  // Load initial queue batch
+  useEffect(() => {
+    // Only load if queue is empty from context
+    if (!queue || queue.length === 0) {
+      loadQueueBatch(0, true);
+    } else {
+      // Use context queue if available
+      setQueueSongs(queue);
+    }
+  }, []);
+  
+  const loadQueueBatch = async (offset, isInitial = false) => {
+    if (loadingQueue) return;
+    
+    setLoadingQueue(true);
+    try {
+      const { data } = await axios.get(
+        `/api/song/queue/batch?limit=1000&offset=${offset}`
+      );
+      
+      const songs = data.songs || [];
+      
+      if (isInitial) {
+        setQueueSongs(songs);
+        // Also update context queue if it's empty
+        if (songs.length > 0 && (!queue || queue.length === 0)) {
+          playQueue(songs, songs[0]._id, "All Songs");
+        }
+      } else {
+        setQueueSongs(prev => [...prev, ...songs]);
+      }
+      
+      setHasMoreQueue(data.hasMore);
+      setQueueOffset(data.nextOffset || 0);
+    } catch (error) {
+      console.error("Error loading queue batch:", error);
+    } finally {
+      setLoadingQueue(false);
+    }
+  };
+  
+  const handleLoadMoreQueue = () => {
+    if (hasMoreQueue && !loadingQueue) {
+      loadQueueBatch(queueOffset);
+    }
+  };
   
   // Debounced search function
   const performSearch = useCallback(async (query) => {
@@ -36,7 +83,9 @@ const Queue = () => {
     
     setSearchLoading(true);
     try {
-      const { data } = await axios.get(`/api/song/search?q=${encodeURIComponent(query)}&limit=100`);
+      const { data } = await axios.get(
+        `/api/song/search?q=${encodeURIComponent(query)}&limit=100`
+      );
       setSearchResults(data.songs);
       setSearchTotal(data.total);
     } catch (error) {
@@ -77,28 +126,16 @@ const Queue = () => {
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedSong, setSelectedSong] = useState(null);
 
-  // Load More button handler
-  const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore) return;
-    
-    try {
-      const hasMore = await loadNextYearSongs();
-      console.log("✅ Load More result:", hasMore);
-      
-      if (!hasMore) {
-        console.log("🏁 No more songs available to load");
-      }
-    } catch (error) {
-      console.error("❌ Error loading more songs:", error);
-    }
-  }, [isLoadingMore, loadNextYearSongs]);
-
-  const nowPlaying = queue[queueIndex];
-  const upcoming = queue.slice(queueIndex + 1);
-  const previouslyPlayed = queue.slice(0, queueIndex).reverse();
+  // Use queueSongs instead of queue for display, with safe defaults
+  const displayQueue = Array.isArray(queueSongs) && queueSongs.length > 0 
+    ? queueSongs 
+    : (Array.isArray(queue) ? queue : []);
+  const nowPlaying = displayQueue[queueIndex];
+  const upcoming = displayQueue.slice(queueIndex + 1);
+  const previouslyPlayed = displayQueue.slice(0, queueIndex).reverse();
 
   const handlePlayFromQueue = (songId) => {
-    playQueue(queue, songId, queueLabel || "Queue");
+    playQueue(displayQueue, songId, queueLabel || "Queue");
   };
 
   const handlePlayFromSearch = (songId) => {
@@ -139,7 +176,7 @@ const Queue = () => {
   };
 
   const handlePlayNext = () => {
-    if (selectedSong) {
+    if (selectedSong && Array.isArray(queue)) {
       console.log("🎵 Adding to play next:", selectedSong.title, "at position", queueIndex + 1);
       // Add song to play next in the current queue
       const currentIndex = queueIndex;
@@ -153,7 +190,7 @@ const Queue = () => {
   };
 
   const handleAddToQueue = () => {
-    if (selectedSong) {
+    if (selectedSong && Array.isArray(queue)) {
       console.log("🎵 Adding to end of queue:", selectedSong.title, "queue length:", queue.length);
       // Add song to end of current queue
       const newQueue = [...queue, selectedSong];
@@ -257,7 +294,7 @@ const Queue = () => {
           <RiSearchLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg" />
           <input
             type="text"
-            placeholder="Search songs, artists, albums..."
+            placeholder="Search by song, artist, album, or year..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-[#161616] text-white placeholder-slate-400 pl-10 pr-10 py-3 rounded-lg border border-slate-700 focus:border-blue-500 focus:outline-none transition-colors"
@@ -275,6 +312,9 @@ const Queue = () => {
             </button>
           )}
         </div>
+        <p className="text-xs text-slate-500 mt-2">
+          Search across all songs by title, artist name, album name, or year (e.g., "2024")
+        </p>
       </div>
 
       {queue.length === 0 ? (
@@ -345,8 +385,8 @@ const Queue = () => {
             </>
           )}
 
-          {/* Loading indicator for infinite scroll */}
-          {isLoadingMore && (
+          {/* Loading indicator */}
+          {loadingQueue && (
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
               <span className="ml-3 text-slate-400">Loading more songs...</span>
@@ -354,14 +394,14 @@ const Queue = () => {
           )}
 
           {/* Load More Button - Only show when not searching */}
-          {!searchTerm && (hasMoreInCurrentYear || (availableYears && currentYearIndex + 1 < availableYears.length)) && (
+          {!searchTerm && hasMoreQueue && (
             <div className="flex justify-center py-6">
               <button
-                onClick={handleLoadMore}
-                disabled={isLoadingMore}
+                onClick={handleLoadMoreQueue}
+                disabled={loadingQueue}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg"
               >
-                {isLoadingMore ? (
+                {loadingQueue ? (
                   <>
                     <RiPulseLine className="animate-spin" />
                     Loading More Songs...
@@ -374,19 +414,12 @@ const Queue = () => {
           )}
 
           {/* Progress indicator */}
-          {availableYears.length > 0 && (
-            <div className="mt-6 px-4 py-2 bg-[#1a1a1a] rounded-lg">
-              <div className="text-xs text-slate-400 text-center">
-                {queue.length} songs loaded
-                {availableYears.length > 1 && (
-                  <> • Year {availableYears[currentYearIndex]} ({currentYearIndex + 1}/{availableYears.length})</>
-                )}
-                {!hasMoreInCurrentYear && currentYearIndex + 1 >= availableYears.length && (
-                  <> • All songs loaded</>
-                )}
-              </div>
+          <div className="mt-6 px-4 py-2 bg-[#1a1a1a] rounded-lg">
+            <div className="text-xs text-slate-400 text-center">
+              {queueSongs.length} songs loaded • Ordered by year (descending)
+              {!hasMoreQueue && <> • All songs loaded</>}
             </div>
-          )}
+          </div>
         </div>
       )}
       

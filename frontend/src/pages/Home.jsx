@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SongData } from "../context/Song";
 import HorizontalScroll from "../components/HorizontalScroll";
+import TopPlayedSongs from "../components/TopPlayedSongs";
+import LatestAlbums from "../components/LatestAlbums";
 import axios from "axios";
 
 const ArtistCard = ({ artist, onNavigate }) => {
@@ -94,7 +96,6 @@ const AlbumCard = ({ album, onNavigate }) => {
 
 const Home = () => {
   const navigate = useNavigate();
-  const [latestAlbums, setLatestAlbums] = useState([]);
   const [topArtists, setTopArtists] = useState([]);
   const [topSingers, setTopSingers] = useState([]);
   const [topDirectors, setTopDirectors] = useState([]);
@@ -116,14 +117,12 @@ const Home = () => {
     const fetchHomeSections = async () => {
       try {
         setLoading(true);
-        const [albumsRes, artistsRes, singersRes, directorsRes] = await Promise.all([
-          axios.get("/api/home/albums/latest?limit=10"),
+        const [artistsRes, singersRes, directorsRes] = await Promise.all([
           axios.get("/api/home/artists/top?limit=10"),
           axios.get("/api/home/singers/top?limit=10"),
           axios.get("/api/home/music-directors/top?limit=10"),
         ]);
 
-        setLatestAlbums(albumsRes.data.data);
         setTopArtists(artistsRes.data.data);
         setTopSingers(singersRes.data.data);
         setTopDirectors(directorsRes.data.data);
@@ -139,16 +138,11 @@ const Home = () => {
 
   return (
     <div className="px-2 md:px-6 py-4">
-      {/* Latest Albums 2025 */}
-      <HorizontalScroll
-        title="Latest Albums (2025)"
-        items={latestAlbums}
-        loading={loading}
-        renderItem={(album) => (
-          <AlbumCard album={album} onNavigate={handleCardClick} />
-        )}
-        onMoreClick={() => navigate("/albums")}
-      />
+      {/* Top Played Songs Section */}
+      <TopPlayedSongs />
+
+      {/* Latest Albums with Smart Logic */}
+      <LatestAlbums />
 
       {/* Top Artists */}
       <HorizontalScroll

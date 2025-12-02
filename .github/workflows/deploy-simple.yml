@@ -1,0 +1,58 @@
+name: Deploy to cPanel (FTP Only)
+
+on:
+  push:
+    branches:
+      - enhancements
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.3'
+
+      - name: Install backend dependencies
+        run: npm ci
+
+      - name: Install and build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Prepare deployment package
+        run: |
+          mkdir -p deploy
+          # Copy backend files
+          cp -r backend deploy/
+          # Move frontend/dist to backend/frontend/
+          mkdir -p deploy/backend/frontend
+          cp -r frontend/dist deploy/backend/frontend/
+          # Remove backend/frontend/dist if it exists
+          rm -rf deploy/backend/frontend/dist
+          # Copy package files
+          cp package.json package-lock.json deploy/
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy/
+          server-dir: /home/hrlabels/bbmusic.hrlabels.in/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env*
+            **/database/**
+            **/*.md

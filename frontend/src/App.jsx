@@ -17,6 +17,7 @@ import Artists from "./pages/Artists";
 import Singers from "./pages/Singers";
 import MusicDirectors from "./pages/MusicDirectors";
 import SearchResults from "./pages/SearchResults";
+import Years from "./pages/Years";
 
 const App = () => {
   const { loading, isAuth } = UserData();
@@ -34,6 +35,7 @@ const App = () => {
                 <Route path="/album/:id" element={<Album />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/queue" element={<Queue />} />
+                <Route path="/years" element={<Years />} />
                 <Route path="/community" element={<CommunityPlaylists />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/albums" element={<Albums />} />

@@ -1,35 +1,73 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import AlbumItem from "../components/AlbumItem";
 import Loading from "../components/Loading";
+import { FaArrowLeft } from "react-icons/fa";
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
   const [allAlbums, setAllAlbums] = useState([]);
+  const [yearFilteredAlbums, setYearFilteredAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredAlbums, setFilteredAlbums] = useState([]);
+  const navigate = useNavigate();
 
   const page = Number(searchParams.get("page")) || 1;
+  const yearsParam = searchParams.get("years");
+  const yearFilter = yearsParam ? yearsParam.split(",").map(y => parseInt(y.trim())) : null;
   const limit = 12;
 
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `/api/home/albums?page=${page}&limit=${limit}`
-        );
-        setAlbums(response.data.data);
-        setPagination(response.data.pagination);
         
-        // If it's the first page and no search, fetch minimal data for searching
-        if (page === 1 && !searchQuery) {
+        // If year filter is provided, fetch all albums and filter by year
+        if (yearFilter && yearFilter.length > 0) {
           const searchResponse = await axios.get(`/api/home/search/albums`);
-          setAllAlbums(searchResponse.data.data);
+          const allAlbumsData = searchResponse.data.data;
+          setAllAlbums(allAlbumsData);
+          
+          // Filter by years
+          const yearFiltered = allAlbumsData.filter(album => 
+            yearFilter.includes(album.year)
+          );
+          
+          // Store year-filtered albums for search
+          setYearFilteredAlbums(yearFiltered);
+          
+          // Apply pagination manually
+          const startIndex = (page - 1) * limit;
+          const endIndex = startIndex + limit;
+          const paginatedAlbums = yearFiltered.slice(startIndex, endIndex);
+          
+          setAlbums(paginatedAlbums);
+          setPagination({
+            page,
+            limit,
+            total: yearFiltered.length,
+            pages: Math.ceil(yearFiltered.length / limit)
+          });
+        } else {
+          // Normal pagination without year filter
+          const response = await axios.get(
+            `/api/home/albums?page=${page}&limit=${limit}`
+          );
+          setAlbums(response.data.data);
+          setPagination(response.data.pagination);
+          
+          // If it's the first page and no search, fetch minimal data for searching
+          if (page === 1 && !searchQuery) {
+            const searchResponse = await axios.get(`/api/home/search/albums`);
+            setAllAlbums(searchResponse.data.data);
+          }
+          
+          // Clear year filtered albums when no year filter
+          setYearFilteredAlbums([]);
         }
       } catch (error) {
         console.error("Failed to fetch albums:", error);
@@ -40,7 +78,7 @@ const Albums = () => {
     };
 
     fetchAlbums();
-  }, [page]);
+  }, [page, yearsParam]);
 
   // Filter albums based on search query
   useEffect(() => {
@@ -49,12 +87,15 @@ const Albums = () => {
       return;
     }
     
-    const filtered = allAlbums.filter(album => 
+    // Search in year-filtered albums if year filter exists, otherwise search in all albums
+    const searchSource = yearFilteredAlbums.length > 0 ? yearFilteredAlbums : allAlbums;
+    
+    const filtered = searchSource.filter(album => 
       album.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       album.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredAlbums(filtered);
-  }, [searchQuery, allAlbums]);
+  }, [searchQuery, allAlbums, yearFilteredAlbums]);
 
   const displayAlbums = searchQuery ? filteredAlbums : albums;
 
@@ -74,9 +115,21 @@ const Albums = () => {
 
   return (
     <div className="w-full px-4 md:px-6 py-4">
+      {yearFilter && yearFilter.length > 0 && (
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors"
+        >
+          <FaArrowLeft />
+          <span>Back to Home</span>
+        </button>
+      )}
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h1 className="text-2xl md:text-3xl font-bold text-white">
-          All Albums
+          {yearFilter && yearFilter.length > 0 
+            ? `Albums (${yearFilter.join(", ")})` 
+            : "All Albums"}
         </h1>
         
         <div className="relative">

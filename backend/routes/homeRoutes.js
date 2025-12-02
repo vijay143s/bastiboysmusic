@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   getLatestAlbumsByYear,
+  getLatestAlbumsSmart_Controller,
   getAllAlbumsPaginated,
   getTopArtistsSection,
   getAllArtistsPaginated,
@@ -22,6 +23,7 @@ const {
 const router = express.Router();
 
 // Latest Albums Routes
+router.get("/albums/latest-smart", getLatestAlbumsSmart_Controller);
 router.get("/albums/latest", getLatestAlbumsByYear);
 router.get("/albums/:albumId/songs", getSongsByAlbumId);
 router.get("/albums", getAllAlbumsPaginated);

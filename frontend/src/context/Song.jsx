@@ -14,6 +14,7 @@ export const SongProvider = ({ children }) => {
   const [queue, setQueue] = useState([]);
   const [queueIndex, setQueueIndex] = useState(0);
   const [queueLabel, setQueueLabel] = useState("All Songs");
+  const [onQueueEnd, setOnQueueEnd] = useState(null);
 
   // Year-based queue pagination state
   const [availableYears, setAvailableYears] = useState([]);
@@ -282,7 +283,8 @@ export const SongProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    initializeYearBasedQueue(); // Use year-based pagination instead of loading all songs
+    // Don't auto-load queue on mount - let individual pages decide what to load
+    // initializeYearBasedQueue(); 
     fetchAlbums();
   }, []);
 
@@ -309,7 +311,12 @@ export const SongProvider = ({ children }) => {
 
     if (queueIndex === queue.length - 1) {
       if (mode === "auto") {
-        setIsPlaying(false);
+        // Call onQueueEnd callback if it exists
+        if (onQueueEnd) {
+          onQueueEnd();
+        } else {
+          setIsPlaying(false);
+        }
         return;
       }
       setQueueIndex(0);
@@ -380,6 +387,7 @@ export const SongProvider = ({ children }) => {
         loadNextYearSongs,
         hasMoreInCurrentYear,
         currentYearIndex,
+        setOnQueueEnd,
       }}
     >
       {children}

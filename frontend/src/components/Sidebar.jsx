@@ -27,6 +27,11 @@ const Sidebar = () => {
       path: "/queue",
     },
     {
+      label: "Years",
+      icon: assets.stack_icon,
+      path: "/years",
+    },
+    {
       label: "Community",
       icon: assets.plus_icon,
       path: "/community",

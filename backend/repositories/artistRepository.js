@@ -41,24 +41,36 @@ const getArtistsByAlbum = async (albumId) => {
 
 
 const getAlbumsByArtist = async (artistId) => {
-  // First get the artist name for this ID
+  // Get the artist name for any artist_id that matches this artist
+  // This handles the case where MIN(artist_id) is used in listings
   const [artistRows] = await pool.query(
-    `SELECT artist_name FROM artists WHERE artist_id = ? LIMIT 1`,
-    [artistId]
+    `SELECT DISTINCT artist_name 
+     FROM artists 
+     WHERE artist_id = ? 
+        OR artist_name IN (SELECT artist_name FROM artists WHERE artist_id = ?) 
+     LIMIT 1`,
+    [artistId, artistId]
   );
   
-  if (!artistRows.length) return [];
+  if (!artistRows.length) {
+    console.log(`No artist found for artistId: ${artistId}`);
+    return [];
+  }
   
   const artistName = artistRows[0].artist_name;
+  console.log(`Found artist name: ${artistName} for artistId: ${artistId}`);
   
   // Then get all albums by this artist name
   const [rows] = await pool.query(
     `SELECT DISTINCT a.id, a.title, a.description, a.thumbnail_id, a.thumbnail_url, a.year, a.director, a.music_director, a.star_cast, a.created_at, a.updated_at
      FROM albums a 
      INNER JOIN artists ar ON a.id = ar.album_id 
-     WHERE ar.artist_name = ? ORDER BY a.created_at DESC`,
+     WHERE ar.artist_name = ? 
+     ORDER BY a.created_at DESC`,
     [artistName]
   );
+  
+  console.log(`Found ${rows.length} albums for artist: ${artistName}`);
 
   return rows.map(row => ({
     id: row.id,

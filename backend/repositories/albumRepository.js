@@ -47,7 +47,7 @@ const getAllAlbums = async () => {
 
 const getLatestAlbums = async (year, limit = 10) => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, thumbnail_id, thumbnail_url
+    `SELECT id, title, description, thumbnail_id, thumbnail_url, year
      FROM albums WHERE year = ? ORDER BY created_at DESC LIMIT ?`,
     [year, limit]
   );
@@ -56,11 +56,54 @@ const getLatestAlbums = async (year, limit = 10) => {
     id: row.id,
     title: row.title,
     description: row.description,
+    year: row.year,
     thumbnail: {
       id: row.thumbnail_id,
       url: row.thumbnail_url,
     },
   }));
+};
+
+// Get albums from max year and previous year (for Latest Albums section)
+const getLatestAlbumsSmart = async (limit = 10) => {
+  // Get the max year
+  const [maxYearResult] = await pool.query(
+    `SELECT MAX(year) as maxYear FROM albums WHERE year IS NOT NULL`
+  );
+  const maxYear = maxYearResult[0]?.maxYear;
+  
+  if (!maxYear) {
+    return { albums: [], maxYear: null, currentYear: new Date().getFullYear() };
+  }
+
+  const currentYear = new Date().getFullYear();
+  const yearsToFetch = maxYear === currentYear ? [maxYear] : [maxYear, maxYear - 1];
+
+  const [rows] = await pool.query(
+    `SELECT DISTINCT a.id, a.title, a.description, a.thumbnail_id, a.thumbnail_url, a.year
+     FROM albums a
+     INNER JOIN songs s ON a.id = s.album_id
+     WHERE a.year IN (?) AND s.audio_url IS NOT NULL
+     ORDER BY a.year DESC, a.created_at DESC 
+     LIMIT ?`,
+    [yearsToFetch, limit]
+  );
+
+  return {
+    albums: rows.map(row => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      year: row.year,
+      thumbnail: {
+        id: row.thumbnail_id,
+        url: row.thumbnail_url,
+      },
+    })),
+    maxYear,
+    currentYear,
+    years: yearsToFetch
+  };
 };
 
 const getAlbumsPaginated = async (page = 1, limit = 12) => {
@@ -99,13 +142,14 @@ const getAlbumsPaginated = async (page = 1, limit = 12) => {
 // Optimized search - returns only essential data for search functionality including thumbnails
 const getAlbumsForSearch = async () => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, thumbnail_id, thumbnail_url FROM albums ORDER BY title ASC`
+    `SELECT id, title, description, thumbnail_id, thumbnail_url, year FROM albums ORDER BY title ASC`
   );
 
   return rows.map(row => ({
     _id: row.id,
     title: row.title,
     description: row.description,
+    year: row.year,
     thumbnail: {
       id: row.thumbnail_id,
       url: row.thumbnail_url,
@@ -118,6 +162,7 @@ module.exports = {
   findAlbumById,
   getAllAlbums,
   getLatestAlbums,
+  getLatestAlbumsSmart,
   getAlbumsPaginated,
   getAlbumsForSearch,
 };
