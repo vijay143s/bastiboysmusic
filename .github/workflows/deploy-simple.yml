@@ -42,13 +42,13 @@ jobs:
           cp package.json package-lock.json deploy/
 
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: BBMusic/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/
-          server-dir: /home/hrlabels/
+          server-dir: /home/hrlabels/bbmusic.hrlabels.in/
           exclude: |
             **/.git*
             **/.git*/**
