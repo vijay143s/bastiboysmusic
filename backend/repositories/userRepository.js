@@ -74,11 +74,12 @@ const getAllUsersWithPlaylistSongs = async () => {
         s.audio_id AS song_audio_id,
         s.audio_url AS song_audio_url,
         s.album_id AS song_album_id,
-        COALESCE(COUNT(up.id) OVER (PARTITION BY u.id), 0) AS playlist_count
+        (SELECT COUNT(*) FROM user_playlists WHERE user_id = u.id) AS playlist_count
       FROM users u
       LEFT JOIN user_playlists up ON up.user_id = u.id
       LEFT JOIN songs s ON s.id = up.song_id
-      ORDER BY playlist_count DESC, up.created_at DESC`
+      WHERE (SELECT COUNT(*) FROM user_playlists WHERE user_id = u.id) > 0
+      ORDER BY playlist_count DESC, u.name ASC, up.created_at DESC`
   );
 
   const playlistMap = new Map();
