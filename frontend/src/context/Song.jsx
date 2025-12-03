@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { UserData } from "./User";
 
@@ -63,15 +63,26 @@ export const SongProvider = ({ children }) => {
     }
   };
 
-  // Restore last played song on app load
+  // Restore last queue and song from localStorage on app load
   useEffect(() => {
-    const lastPlayedId = normalizeSongId(user?.lastPlayedSongId);
-    if (lastPlayedId && !selectedSong && !queue.length) {
-      setSelectedSong(lastPlayedId);
-      // Don't auto-play on restore, let user manually play
-      // setIsPlaying(true);
+    try {
+      const savedQueue = localStorage.getItem('lastQueue');
+      if (savedQueue && !queue.length) {
+        const parsed = JSON.parse(savedQueue);
+        if (parsed.queue && Array.isArray(parsed.queue) && parsed.queue.length > 0) {
+          setQueue(parsed.queue);
+          setQueueIndex(parsed.queueIndex || 0);
+          setQueueLabel(parsed.queueLabel || 'Queue');
+          if (parsed.selectedSong) {
+            setSelectedSong(parsed.selectedSong);
+          }
+          // Don't auto-play on restore
+        }
+      }
+    } catch (error) {
+      console.error('Error restoring queue from localStorage:', error);
     }
-  }, [user?.lastPlayedSongId]);
+  }, []);
 
   async function fetchSongs() {
     try {
@@ -92,7 +103,9 @@ export const SongProvider = ({ children }) => {
         setQueue(data);
       }
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching songs:", error);
+      }
     }
   }
 
@@ -115,7 +128,9 @@ export const SongProvider = ({ children }) => {
         setQueue(data);
       }
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching queue songs:", error);
+      }
       // Fallback to regular fetch if queue endpoint fails
       await fetchSongs();
     }
@@ -128,7 +143,9 @@ export const SongProvider = ({ children }) => {
       setAvailableYears(data.years);
       return data.years;
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching available years:", error);
+      }
       return [];
     }
   }
@@ -158,7 +175,9 @@ export const SongProvider = ({ children }) => {
         total: data.total
       };
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error loading songs by year:", error);
+      }
       return {
         songsLoaded: 0,
         hasMore: false,
@@ -202,7 +221,9 @@ export const SongProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error initializing year-based queue:", error);
+      }
       // Fallback to old method
       await fetchQueueSongs();
     }
@@ -269,7 +290,7 @@ export const SongProvider = ({ children }) => {
       setDescription("");
       setFile(null);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to add album");
       setLoading(false);
     }
   }
@@ -294,7 +315,7 @@ export const SongProvider = ({ children }) => {
       setSinger("");
       setAlbum("");
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to add song");
       setLoading(false);
     }
   }
@@ -308,14 +329,14 @@ export const SongProvider = ({ children }) => {
       fetchSongs();
       setFile(null);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to add thumbnail");
       setLoading(false);
     }
   }
 
   const [albums, setAlbums] = useState([]);
 
-  async function fetchAlbums() {
+  const fetchAlbums = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/song/album/all");
 
@@ -324,7 +345,7 @@ export const SongProvider = ({ children }) => {
       console.error("Error fetching albums:", error);
       setAlbums([]);
     }
-  }
+  }, []);
 
   async function deleteSong(id) {
     try {
@@ -333,7 +354,7 @@ export const SongProvider = ({ children }) => {
       toast.success(data.message);
       fetchSongs();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to delete song");
     }
   }
 
@@ -341,7 +362,7 @@ export const SongProvider = ({ children }) => {
     // Don't auto-load queue on mount - let individual pages decide what to load
     // initializeYearBasedQueue(); 
     fetchAlbums();
-  }, []);
+  }, [fetchAlbums]);
 
   const playQueue = (collection = [], startSongId, label = "Queue") => {
     if (!collection.length) return;
@@ -376,6 +397,18 @@ export const SongProvider = ({ children }) => {
     if (nextSongId) {
       setSelectedSongAndSave(nextSongId);
       setIsPlaying(true);
+      
+      // Save queue and current state to localStorage
+      try {
+        localStorage.setItem('lastQueue', JSON.stringify({
+          queue: normalizedQueue,
+          queueIndex: safeIndex,
+          queueLabel: label,
+          selectedSong: nextSongId
+        }));
+      } catch (error) {
+        console.error('Error saving queue to localStorage:', error);
+      }
     }
   };
 
@@ -391,6 +424,18 @@ export const SongProvider = ({ children }) => {
     setQueueIndex(index);
     setSelectedSongAndSave(songId);
     setIsPlaying(true);
+    
+    // Save updated state to localStorage
+    try {
+      localStorage.setItem('lastQueue', JSON.stringify({
+        queue,
+        queueIndex: index,
+        queueLabel,
+        selectedSong: songId
+      }));
+    } catch (error) {
+      console.error('Error saving queue to localStorage:', error);
+    }
   };
 
   const loadDefaultQueue = async () => {
@@ -453,7 +498,9 @@ export const SongProvider = ({ children }) => {
       setAlbumSong(data.songs);
       setAlbumData(data.album);
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching album songs:", error);
+      }
     }
   }
   return (

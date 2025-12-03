@@ -232,12 +232,94 @@ const searchSongs = TryCatch(async (req, res) => {
   const { q: query, limit = 50, offset = 0, year } = req.query;
   
   if (!query || query.trim().length === 0) {
-    return res.json({ songs: [], total: 0, hasMore: false });
+    return res.json({ songs: [], albums: [], artists: [], total: 0 });
   }
 
   const yearFilter = year ? parseInt(year) : null;
-  const result = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset), yearFilter);
-  res.json(result);
+  const songsResult = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset), yearFilter);
+  
+  // Search albums
+  const { pool } = require('../database/db.js');
+  let albumQuery = `
+    SELECT DISTINCT a.id as _id, a.title, a.description, 
+           a.thumbnail_id as thumbnailId, a.thumbnail_url as thumbnailUrl,
+           a.year, a.director, a.music_director as musicDirector
+    FROM albums a
+    WHERE (a.title LIKE ? OR a.description LIKE ? OR a.director LIKE ? OR a.music_director LIKE ?)
+  `;
+  
+  const albumParams = [`%${query.trim()}%`, `%${query.trim()}%`, `%${query.trim()}%`, `%${query.trim()}%`];
+  
+  if (yearFilter) {
+    albumQuery += ' AND a.year = ?';
+    albumParams.push(yearFilter);
+  }
+  
+  albumQuery += ' ORDER BY a.year DESC LIMIT 50';
+  
+  const [albumRows] = await pool.execute(albumQuery, albumParams);
+  
+  const albums = albumRows.map(row => ({
+    _id: String(row._id),
+    title: row.title,
+    description: row.description,
+    thumbnail: row.thumbnailUrl ? { id: row.thumbnailId, url: row.thumbnailUrl } : null,
+    year: row.year,
+    director: row.director,
+    musicDirector: row.musicDirector
+  }));
+  
+  // Search artists
+  const artistQuery = `
+    SELECT DISTINCT ar.artist_name as artistName, ar.artist_id as artistId,
+           COUNT(DISTINCT ar.album_id) as albumCount
+    FROM artists ar
+    WHERE ar.artist_name LIKE ?
+    GROUP BY ar.artist_name, ar.artist_id
+    ORDER BY albumCount DESC
+    LIMIT 20
+  `;
+  
+  const [artistRows] = await pool.execute(artistQuery, [`%${query.trim()}%`]);
+  
+  const artists = artistRows.map(row => ({
+    artistId: row.artistId,
+    artistName: row.artistName,
+    albumCount: row.albumCount
+  }));
+  
+  // Search singers - optimized with single query
+  const singerQuery = `
+    SELECT si.singer_name as singerName, si.singer_id as singerId,
+           COUNT(DISTINCT s.id) as songCount
+    FROM singers si
+    LEFT JOIN songs s ON s.singer LIKE CONCAT('%', si.singer_name, '%')
+    WHERE si.singer_name LIKE ?
+    GROUP BY si.singer_name, si.singer_id
+    HAVING songCount > 0
+    ORDER BY songCount DESC
+    LIMIT 20
+  `;
+  
+  const [singerRows] = await pool.execute(singerQuery, [`%${query.trim()}%`]);
+  
+  const singers = singerRows.map(row => ({
+    singerId: row.singerId,
+    singerName: row.singerName,
+    songCount: row.songCount
+  }));
+  
+  res.json({
+    songs: songsResult.songs,
+    albums,
+    artists,
+    singers,
+    total: songsResult.total + albums.length + artists.length + singers.length,
+    songCount: songsResult.total,
+    albumCount: albums.length,
+    artistCount: artists.length,
+    singerCount: singers.length
+  });
 });
 
 const getAllSongsByAlbum = TryCatch(async (req, res) => {

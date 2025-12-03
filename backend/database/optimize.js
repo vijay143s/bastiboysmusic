@@ -1,8 +1,6 @@
 const { pool } = require('./db.js');
 
 async function optimizeDatabase() {
-  console.log('🚀 Starting database optimization...');
-  
   try {
     // Add performance indexes
     const indexes = [
@@ -24,17 +22,10 @@ async function optimizeDatabase() {
 
     for (const indexSQL of indexes) {
       await pool.query(indexSQL);
-      console.log('✅ Index created:', indexSQL.split(' ')[5]);
     }
-
-    console.log('🎉 Database optimization completed successfully!');
-    console.log('📊 Performance improvements:');
-    console.log('  - Search queries: ~3-4x faster');
-    console.log('  - Data transfer: ~50% reduction');
-    console.log('  - Memory usage: ~60% reduction');
     
   } catch (error) {
-    console.error('❌ Database optimization failed:', error.message);
+    throw error;
   }
 }
 

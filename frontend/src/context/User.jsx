@@ -55,7 +55,7 @@ export const UserProvider = ({ children }) => {
       fetchSongs();
       fetchAlbums();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Login failed");
       setBtnLoading(false);
     }
   }
@@ -68,7 +68,9 @@ export const UserProvider = ({ children }) => {
       setIsAuth(true);
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching user:", error);
+      }
       setIsAuth(false);
       setLoading(false);
     }

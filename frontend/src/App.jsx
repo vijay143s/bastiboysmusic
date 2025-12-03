@@ -42,8 +42,7 @@ const App = () => {
                 <Route path="/artists" element={<Artists />} />
                 <Route path="/singers" element={<Singers />} />
                 <Route path="/music-directors" element={<MusicDirectors />} />
-                <Route path="/results/:type/:id" element={<SearchResults />} />
-                <Route path="/results/:type/:name" element={<SearchResults />} />
+                <Route path="/results/:type/:idOrName" element={<SearchResults />} />
                 <Route path="/login" element={<Navigate to="/" replace />} />
                 <Route path="/register" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

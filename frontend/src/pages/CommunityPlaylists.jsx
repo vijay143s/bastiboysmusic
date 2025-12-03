@@ -35,10 +35,20 @@ const CommunityPlaylists = () => {
     return user.playlist.includes(String(songId));
   };
 
-  const handlePlayAll = (songs, ownerName) => {
+  const handlePlayAll = (songs, ownerName, shuffle = false) => {
     if (!songs.length) return;
     const label = ownerName ? `${ownerName}'s Playlist` : "Community Playlist";
-    playQueue(songs, songs[0]._id, label);
+    let songsToPlay = [...songs];
+    
+    if (shuffle) {
+      // Fisher-Yates shuffle algorithm
+      for (let i = songsToPlay.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [songsToPlay[i], songsToPlay[j]] = [songsToPlay[j], songsToPlay[i]];
+      }
+    }
+    
+    playQueue(songsToPlay, songsToPlay[0]._id, label);
   };
 
   const handlePlaySong = (songs, songId, ownerName) => {
@@ -174,11 +184,18 @@ const CommunityPlaylists = () => {
                       {isExpanded ? "Collapse" : "Expand"}
                     </button>
                     <button
-                      className="bg-green-500 text-black font-semibold px-3 md:px-5 py-2 rounded-full text-xs md:text-sm"
+                      className="bg-green-500 text-black font-semibold px-3 md:px-5 py-2 rounded-full text-xs md:text-sm hover:bg-green-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={playlist.totalSongs === 0}
-                      onClick={() => handlePlayAll(playlist.songs, playlist.user.name)}
+                      onClick={() => handlePlayAll(playlist.songs, playlist.user.name, false)}
                     >
                       Play All
+                    </button>
+                    <button
+                      className="bg-slate-700 text-white font-semibold px-3 md:px-5 py-2 rounded-full text-xs md:text-sm hover:bg-slate-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={playlist.totalSongs === 0}
+                      onClick={() => handlePlayAll(playlist.songs, playlist.user.name, true)}
+                    >
+                      Shuffle
                     </button>
                   </div>
                 </div>

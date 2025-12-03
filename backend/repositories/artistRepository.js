@@ -53,12 +53,10 @@ const getAlbumsByArtist = async (artistId) => {
   );
   
   if (!artistRows.length) {
-    console.log(`No artist found for artistId: ${artistId}`);
     return [];
   }
   
   const artistName = artistRows[0].artist_name;
-  console.log(`Found artist name: ${artistName} for artistId: ${artistId}`);
   
   // Then get all albums by this artist name
   const [rows] = await pool.query(
@@ -69,8 +67,6 @@ const getAlbumsByArtist = async (artistId) => {
      ORDER BY a.year DESC, a.created_at DESC`,
     [artistName]
   );
-  
-  console.log(`Found ${rows.length} albums for artist: ${artistName}`);
 
   return rows.map(row => ({
     id: row.id,

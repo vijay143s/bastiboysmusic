@@ -14,11 +14,6 @@ const {
   MYSQL_DATABASE,
 } = process.env;
 
-console.log("Database Configuration:");
-console.log(`  Host: ${MYSQL_HOST}`);
-console.log(`  Port: ${MYSQL_PORT}`);
-console.log(`  User: ${MYSQL_USER}`);
-
 const pool = mysql.createPool({
   host: MYSQL_HOST,
   port: Number(MYSQL_PORT),
@@ -32,22 +27,21 @@ const pool = mysql.createPool({
 
 const connectDb = async () => {
   try {
-    console.log(`Attempting to connect to MySQL at ${MYSQL_HOST}:${MYSQL_PORT}...`);
     const connection = await pool.getConnection();
     try {
       await connection.ping();
-      console.log("✓ MySQL connected successfully!");
     } finally {
       connection.release();
     }
   } catch (error) {
-    console.error("✗ MySQL connection error:");
-    console.error(`  Code: ${error.code}`);
-    console.error(`  Message: ${error.message}`);
-    console.error(`  Address: ${error.address || "N/A"}`);
-    console.error(`  Port: ${error.port || "N/A"}`);
     throw error;
   }
 };
 
-module.exports = { connectDb, pool };
+// Helper function to execute queries
+const execute = async (query, params) => {
+  const [rows] = await pool.execute(query, params);
+  return [rows];
+};
+
+module.exports = { connectDb, pool, execute };

@@ -62,7 +62,9 @@ const Admin = () => {
   };
 
   const deleteHandler = (id) => {
-    if (confirm("are you sure you want to delete this song")) {
+    // Use toast for confirmation instead of blocking confirm dialog
+    const shouldDelete = window.confirm("Are you sure you want to delete this song? This action cannot be undone.");
+    if (shouldDelete) {
       deleteSong(id);
     }
   };

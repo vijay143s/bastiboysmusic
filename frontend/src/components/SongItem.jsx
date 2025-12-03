@@ -34,7 +34,7 @@ const SongItem = ({ image, name, albumTitle, id }) => {
       onClick={handlePlay}
     >
       <div className="relative group">
-        <img src={image} className="rounded w-full aspect-square object-cover" alt="" />
+        <img src={image} className="rounded w-full aspect-square object-cover" alt={`${name} cover art`} />
         <button
           className={`absolute bottom-2 right-2 p-2 md:p-3 rounded-full transition-all duration-300 ${
             saved
@@ -45,12 +45,13 @@ const SongItem = ({ image, name, albumTitle, id }) => {
             e.stopPropagation();
             savetoPlaylistHandler();
           }}
+          title={saved ? "Remove from playlist" : "Add to playlist"}
         >
-          <img 
-            src="/src/assets/like.png" 
-            alt="like" 
-            className="w-4 h-4 md:w-5 md:h-5"
-          />
+          {saved ? (
+            <span className="text-white text-lg">♥</span>
+          ) : (
+            <span className="text-white text-lg">♡</span>
+          )}
         </button>
       </div>
       <div className="flex items-center gap-2 mt-2 mb-1">

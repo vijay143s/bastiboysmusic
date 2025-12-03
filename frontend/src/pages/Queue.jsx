@@ -6,73 +6,31 @@ import { RiSearchLine, RiCloseLine } from "react-icons/ri";
 import axios from "axios";
 
 const Queue = () => {
+  const isDev = process.env.NODE_ENV === 'development';
   const { 
     queue, 
     queueIndex, 
     queueLabel, 
     playQueue, 
     albums,
+    fetchSongs,
+    loadDefaultQueue,
   } = SongData();
   const { user, addToPlaylist } = UserData();
   
-  // Queue batch loading state
-  const [queueSongs, setQueueSongs] = useState([]);
-  const [queueOffset, setQueueOffset] = useState(0);
-  const [hasMoreQueue, setHasMoreQueue] = useState(true);
-  const [loadingQueue, setLoadingQueue] = useState(false);
-  
-  // Search functionality
+  // Search functionality state - must be declared before performSearch
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchTotal, setSearchTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Load initial queue batch
-  useEffect(() => {
-    // Only load if queue is empty from context
-    if (!queue || queue.length === 0) {
-      loadQueueBatch(0, true);
-    } else {
-      // Use context queue if available
-      setQueueSongs(queue);
-    }
-  }, []);
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedSong, setSelectedSong] = useState(null);
   
-  const loadQueueBatch = async (offset, isInitial = false) => {
-    if (loadingQueue) return;
-    
-    setLoadingQueue(true);
-    try {
-      const { data } = await axios.get(
-        `/api/song/queue/batch?limit=1000&offset=${offset}`
-      );
-      
-      const songs = data.songs || [];
-      
-      if (isInitial) {
-        setQueueSongs(songs);
-        // Also update context queue if it's empty
-        if (songs.length > 0 && (!queue || queue.length === 0)) {
-          playQueue(songs, songs[0]._id, "All Songs");
-        }
-      } else {
-        setQueueSongs(prev => [...prev, ...songs]);
-      }
-      
-      setHasMoreQueue(data.hasMore);
-      setQueueOffset(data.nextOffset || 0);
-    } catch (error) {
-      console.error("Error loading queue batch:", error);
-    } finally {
-      setLoadingQueue(false);
-    }
-  };
-  
-  const handleLoadMoreQueue = () => {
-    if (hasMoreQueue && !loadingQueue) {
-      loadQueueBatch(queueOffset);
-    }
-  };
-  
-  // Debounced search function
+  // Debounced search function - searches for songs only
   const performSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -86,10 +44,16 @@ const Queue = () => {
       const { data } = await axios.get(
         `/api/song/search?q=${encodeURIComponent(query)}&limit=100`
       );
-      setSearchResults(data.songs);
-      setSearchTotal(data.total);
+      
+      // Use only song results - albums are already included via song metadata
+      const songs = data.songs || [];
+      
+      setSearchResults(songs);
+      setSearchTotal(songs.length);
     } catch (error) {
-      console.error('Search error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Search error:', error);
+      }
       setSearchResults([]);
       setSearchTotal(0);
     } finally {
@@ -99,6 +63,12 @@ const Queue = () => {
   
   // Debounce search input
   useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      setSearchTotal(0);
+      return;
+    }
+    
     const timer = setTimeout(() => {
       performSearch(searchTerm);
     }, 300);
@@ -106,9 +76,34 @@ const Queue = () => {
     return () => clearTimeout(timer);
   }, [searchTerm, performSearch]);
 
+  // Load queue from user interactions and playlists on mount
+  useEffect(() => {
+    const initQueue = async () => {
+      if (!queue || queue.length === 0) {
+        try {
+          // Load queue from user interactions and all user playlists
+          const { data } = await axios.get('/api/interaction/queue?limit=50');
+          if (data.success && data.songs && data.songs.length > 0) {
+            playQueue(data.songs, data.songs[0]._id, 'Community Activity');
+          } else {
+            // Fallback to default queue if no interaction data
+            await loadDefaultQueue();
+          }
+        } catch (error) {
+          // Fallback to default queue on error
+          await loadDefaultQueue();
+        }
+      }
+      setIsLoading(false);
+    };
+    initQueue();
+  }, []);
+
   const albumTitleMap = useMemo(() => {
     const map = new Map();
-    albums.forEach((album) => map.set(album._id, album.title));
+    if (albums && Array.isArray(albums)) {
+      albums.forEach((album) => map.set(album._id, album.title));
+    }
     return map;
   }, [albums]);
 
@@ -117,19 +112,8 @@ const Queue = () => {
     return new Set(user.playlist);
   }, [user]);
 
-  // Search results state
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchTotal, setSearchTotal] = useState(0);
-  
-  // Context menu state
-  const [contextMenu, setContextMenu] = useState(null);
-  const [selectedSong, setSelectedSong] = useState(null);
-
-  // Use queueSongs instead of queue for display, with safe defaults
-  const displayQueue = Array.isArray(queueSongs) && queueSongs.length > 0 
-    ? queueSongs 
-    : (Array.isArray(queue) ? queue : []);
+  // Use queue from context with safe defaults
+  const displayQueue = Array.isArray(queue) ? queue : [];
   const nowPlaying = displayQueue[queueIndex];
   const upcoming = displayQueue.slice(queueIndex + 1);
   const previouslyPlayed = displayQueue.slice(0, queueIndex).reverse();
@@ -144,7 +128,6 @@ const Queue = () => {
 
   // Context menu handlers
   const handleContextMenu = (e, song) => {
-    console.log("🎵 Context menu triggered:", { song: song.title, x: e.clientX, y: e.clientY });
     e.preventDefault();
     e.stopPropagation();
     setSelectedSong(song);
@@ -157,19 +140,27 @@ const Queue = () => {
 
   const handlePlayNow = () => {
     if (selectedSong && searchResults.length > 0) {
-      console.log("🎵 Playing now:", selectedSong.title, "ID:", selectedSong._id);
-      console.log("🎵 Search results:", searchResults.map(s => ({id: s._id, title: s.title})));
+      if (isDev) {
+        console.log("🎵 Playing now:", selectedSong.title, "ID:", selectedSong._id);
+        console.log("🎵 Search results:", searchResults.map(s => ({ id: s._id, title: s.title })));
+      }
       // Ensure the selected song is in the search results
       const songExists = searchResults.find(s => s._id === selectedSong._id);
       if (songExists) {
         playQueue(searchResults, selectedSong._id, "Search Results");
-        console.log("✅ Song found and playing");
+        if (isDev) {
+          console.log("✅ Song found and playing");
+        }
       } else {
-        console.log("❌ Song not found in search results, playing anyway");
+        if (isDev) {
+          console.log("❌ Song not found in search results, playing anyway");
+        }
         playQueue(searchResults, selectedSong._id, "Search Results");
       }
     } else {
-      console.log("❌ No selected song or empty search results");
+      if (isDev) {
+        console.log("❌ No selected song or empty search results");
+      }
     }
     setContextMenu(null);
     setSelectedSong(null);
@@ -177,7 +168,9 @@ const Queue = () => {
 
   const handlePlayNext = () => {
     if (selectedSong && Array.isArray(queue)) {
-      console.log("🎵 Adding to play next:", selectedSong.title, "at position", queueIndex + 1);
+      if (isDev) {
+        console.log("🎵 Adding to play next:", selectedSong.title, "at position", queueIndex + 1);
+      }
       // Add song to play next in the current queue
       const currentIndex = queueIndex;
       const newQueue = [...queue];
@@ -191,7 +184,9 @@ const Queue = () => {
 
   const handleAddToQueue = () => {
     if (selectedSong && Array.isArray(queue)) {
-      console.log("🎵 Adding to end of queue:", selectedSong.title, "queue length:", queue.length);
+      if (isDev) {
+        console.log("🎵 Adding to end of queue:", selectedSong.title, "queue length:", queue.length);
+      }
       // Add song to end of current queue
       const newQueue = [...queue, selectedSong];
       // Update the queue but keep the current song playing
@@ -224,7 +219,6 @@ const Queue = () => {
         }`}
         onClick={(e) => {
           if (isFromSearch) {
-            console.log("🎵 Search result clicked:", song.title);
             handleContextMenu(e, song);
           } else {
             handlePlayFromQueue(song._id);
@@ -267,11 +261,11 @@ const Queue = () => {
               await addToPlaylist(song._id);
             }}
           >
-            <img 
-              src="/src/assets/like.png" 
-              alt="like" 
-              className="w-4 h-4 md:w-5 md:h-5"
-          />
+            {isSaved ? (
+              <span className="text-white text-lg">♥</span>
+            ) : (
+              <span className="text-white text-lg">♡</span>
+            )}
         </button>
       </div>
     </div>
@@ -280,11 +274,18 @@ const Queue = () => {
 
   return (
     <div className="py-4 md:py-8 space-y-6 md:space-y-8 px-2 md:px-0">
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mb-4"></div>
+          <p className="text-slate-400">Loading queue...</p>
+        </div>
+      ) : (
+        <>
       <header className="space-y-2">
         <p className="uppercase text-xs tracking-[0.2em] text-slate-400">Current Queue</p>
         <h1 className="text-2xl md:text-3xl font-bold">{queueLabel || "Queue"}</h1>
         <p className="text-sm md:text-base text-slate-400">
-          {searchTerm ? `${searchTotal} song${searchTotal === 1 ? '' : 's'} found` : `${queue.length} track${queue.length === 1 ? "" : "s"} queued`}
+          {searchTerm ? `${searchTotal} song${searchTotal === 1 ? '' : 's'} found` : `${queue?.length || 0} track${(queue?.length || 0) === 1 ? "" : "s"} queued`}
         </p>
       </header>
 
@@ -317,7 +318,7 @@ const Queue = () => {
         </p>
       </div>
 
-      {queue.length === 0 ? (
+      {!queue || queue.length === 0 ? (
         <div className="bg-[#161616] border border-dashed border-slate-700 rounded-xl p-6 md:p-10 text-center">
           <p className="text-lg md:text-xl font-semibold mb-2">Your queue is empty</p>
           <p className="text-sm md:text-base text-slate-400">
@@ -385,41 +386,7 @@ const Queue = () => {
             </>
           )}
 
-          {/* Loading indicator */}
-          {loadingQueue && (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
-              <span className="ml-3 text-slate-400">Loading more songs...</span>
-            </div>
-          )}
-
-          {/* Load More Button - Only show when not searching */}
-          {!searchTerm && hasMoreQueue && (
-            <div className="flex justify-center py-6">
-              <button
-                onClick={handleLoadMoreQueue}
-                disabled={loadingQueue}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg"
-              >
-                {loadingQueue ? (
-                  <>
-                    <RiPulseLine className="animate-spin" />
-                    Loading More Songs...
-                  </>
-                ) : (
-                  "Load More Songs"
-                )}
-              </button>
-            </div>
-          )}
-
-          {/* Progress indicator */}
-          <div className="mt-6 px-4 py-2 bg-[#1a1a1a] rounded-lg">
-            <div className="text-xs text-slate-400 text-center">
-              {queueSongs.length} songs loaded • Ordered by year (descending)
-              {!hasMoreQueue && <> • All songs loaded</>}
-            </div>
-          </div>
+          {/* TODO: Reintroduce paginated queue controls if needed */}
         </div>
       )}
       
@@ -457,8 +424,11 @@ const Queue = () => {
           </button>
         </div>
       )}
+      </>
+      )}
     </div>
   );
 };
+
 
 export default Queue;

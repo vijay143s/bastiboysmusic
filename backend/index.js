@@ -9,12 +9,6 @@ const cloudinary = require("cloudinary");
 const envPath = path.resolve(__dirname, ".env");
 dotenv.config({ path: envPath });
 
-// Debug: Log environment variables
-console.log("MySQL_HOST:", process.env.MYSQL_HOST);
-console.log("MySQL_PORT:", process.env.MYSQL_PORT);
-console.log("MySQL_USER:", process.env.MYSQL_USER);
-console.log("MySQL_DATABASE:", process.env.MYSQL_DATABASE);
-
 cloudinary.v2.config({
   cloud_name: process.env.Cloud_Name,
   api_key: process.env.Cloud_Api,
@@ -33,11 +27,13 @@ const port = Number(process.env.PORT) || 5000;
 const userRoutes = require("./routes/userRoutes.js");
 const songRoutes = require("./routes/songRoutes.js");
 const homeRoutes = require("./routes/homeRoutes.js");
+const interactionRoutes = require("./routes/interactionRoutes.js");
 
 //using routes
 app.use("/api/user", userRoutes);
 app.use("/api/song", songRoutes);
 app.use("/api/home", homeRoutes);
+app.use("/api/interaction", interactionRoutes);
 
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
@@ -47,6 +43,5 @@ app.get("*", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
   connectDb();
 });

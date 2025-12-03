@@ -283,10 +283,10 @@ const getTopYears = async () => {
       COUNT(s.id) as song_count
     FROM albums a
     LEFT JOIN songs s ON s.album_id = a.id
-    WHERE a.year IS NOT NULL
+    WHERE a.year IS NOT NULL and a.year >= 1990 and s.audio_url IS NOT NULL
     GROUP BY a.year
-    ORDER BY song_count DESC, album_count DESC
-    LIMIT 10
+    ORDER BY a.year DESC, song_count DESC, album_count DESC
+    
   `);
 
   return rows.map(row => ({
@@ -409,6 +409,7 @@ const getQueueSongsByYearBatch = async (limit = 1000, offset = 0) => {
 // Search songs across all fields
 const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
   const searchPattern = `%${searchTerm}%`;
+  const startsWithPattern = `${searchTerm}%`;
   
   try {
     // Build WHERE clause with enhanced search (title, description, singer, album name, year)
@@ -426,15 +427,26 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
       params.push(year);
     }
 
-    // Enhanced search query with album name and year search
+    // Enhanced search query with smart ordering:
+    // 1. Exact matches first
+    // 2. Starts with search term
+    // 3. Contains search term
     const searchQuery = `
       SELECT s.id as _id, s.title, s.description as artist, s.singer,
              s.thumbnail_url as thumbnail, s.audio_url as audio, s.album_id as album,
-             a.title as albumName, a.year, s.created_at as createdAt, s.updated_at as updatedAt
+             a.title as albumName, a.thumbnail_url as albumThumbnail, a.year, 
+             s.created_at as createdAt, s.updated_at as updatedAt,
+             CASE
+               WHEN LOWER(s.title) = LOWER(?) THEN 1
+               WHEN LOWER(s.title) LIKE LOWER(?) THEN 2
+               WHEN LOWER(s.singer) LIKE LOWER(?) THEN 3
+               WHEN LOWER(a.title) LIKE LOWER(?) THEN 4
+               ELSE 5
+             END as relevance
       FROM songs s 
       LEFT JOIN albums a ON s.album_id = a.id
       ${whereClause}
-      ORDER BY a.year DESC, s.created_at DESC
+      ORDER BY relevance ASC, a.year DESC, s.created_at DESC
       LIMIT ? OFFSET ?
     `;
     
@@ -446,7 +458,7 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
       ${whereClause}
     `;
     
-    const searchParams = [...params, limit, offset];
+    const searchParams = [searchTerm, startsWithPattern, startsWithPattern, startsWithPattern, ...params, limit, offset];
     const [rows] = await pool.execute(searchQuery, searchParams);
     
     const [totalResult] = await pool.execute(countQuery, params);
@@ -460,7 +472,6 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
       nextOffset: hasMore ? offset + limit : null
     };
   } catch (error) {
-    console.error('Search songs error:', error);
     throw error;
   }
 };

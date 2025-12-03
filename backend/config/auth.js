@@ -11,8 +11,6 @@ if (!process.env.Jwt_secret) {
 
   if (runningMode === "production") {
     throw new Error(message);
-  } else {
-    console.warn(message);
   }
 }
 

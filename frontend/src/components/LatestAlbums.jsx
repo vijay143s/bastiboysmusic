@@ -51,7 +51,9 @@ const LatestAlbums = () => {
     try {
       await addToPlaylist(songId);
     } catch (error) {
-      console.error("Error adding to playlist:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error adding to playlist:", error);
+      }
     }
   };
 
@@ -67,7 +69,9 @@ const LatestAlbums = () => {
       setCurrentLimit(limit);
       return data;
     } catch (error) {
-      console.error("Error fetching latest albums:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching latest albums:", error);
+      }
       setError("Failed to load latest albums");
       return null;
     } finally {
@@ -77,52 +81,64 @@ const LatestAlbums = () => {
 
   useEffect(() => {
     fetchLatestAlbums();
-  }, [fetchLatestAlbums]);
+  }, []); // Remove fetchLatestAlbums from dependencies
 
   // Set up callback for when queue ends to load more albums
   useEffect(() => {
-    setOnQueueEnd(() => async () => {
+    const handleQueueEnd = async () => {
       if (queueLabel !== "Latest Albums") return;
 
       const newLimit = currentLimit + 10;
-      const latestData = await fetchLatestAlbums(newLimit);
-      const updatedAlbums = latestData?.data || [];
-      const nextAlbums = updatedAlbums.slice(currentLimit);
+      try {
+        const { data } = await axios.get(`/api/home/albums/latest-smart?limit=${newLimit}`);
+        const updatedAlbums = data.data || [];
+        const nextAlbums = updatedAlbums.slice(currentLimit);
 
-      if (!nextAlbums.length) {
-        return;
-      }
-
-      const albumSongsPromises = nextAlbums.map(async (album) => {
-        try {
-          const { data } = await axios.get(`/api/home/albums/${album._id}/songs`);
-          return data.data || [];
-        } catch (error) {
-          console.error(`Error fetching songs for album ${album._id}:`, error);
-          return [];
+        if (!nextAlbums.length) {
+          return;
         }
-      });
 
-      const albumsWithSongs = await Promise.all(albumSongsPromises);
-      const newSongs = albumsWithSongs.flat();
+        const albumSongsPromises = nextAlbums.map(async (album) => {
+          try {
+            const { data } = await axios.get(`/api/home/albums/${album._id}/songs`);
+            return data.data || [];
+          } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error(`Error fetching songs for album ${album._id}:`, error);
+            }
+            return [];
+          }
+        });
 
-      if (!newSongs.length) {
-        return;
+        const albumsWithSongs = await Promise.all(albumSongsPromises);
+        const newSongs = albumsWithSongs.flat();
+
+        if (!newSongs.length) {
+          return;
+        }
+
+        const firstNewSongId = newSongs
+          .map((song) => song?._id || song?.id || song?.songId || song?.song_id)
+          .find(Boolean);
+
+        if (!firstNewSongId) return;
+
+        const combinedQueue = queue.length ? [...queue, ...newSongs] : newSongs;
+        playQueue(combinedQueue, String(firstNewSongId), "Latest Albums");
+        setCurrentLimit(newLimit);
+        setAlbums(updatedAlbums);
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error loading more albums:", error);
+        }
       }
+    };
 
-      const firstNewSongId = newSongs
-        .map((song) => song?._id || song?.id || song?.songId || song?.song_id)
-        .find(Boolean);
-
-      if (!firstNewSongId) return;
-
-      const combinedQueue = queue.length ? [...queue, ...newSongs] : newSongs;
-      playQueue(combinedQueue, String(firstNewSongId), "Latest Albums");
-    });
+    setOnQueueEnd(() => handleQueueEnd);
 
     // Clean up callback when component unmounts
     return () => setOnQueueEnd(null);
-  }, [currentLimit, fetchLatestAlbums, playQueue, queue, queueLabel, setOnQueueEnd]);
+  }, []); // Empty dependency array - set once on mount
 
   // Filter albums based on search query
   useEffect(() => {
@@ -151,13 +167,14 @@ const LatestAlbums = () => {
       try {
         setLoadingSongs((prev) => ({ ...prev, [albumId]: true }));
         const { data } = await axios.get(`/api/home/albums/${albumId}/songs`);
-        console.log(`Fetched ${data.data?.length || 0} songs for album ${albumId}:`, data.data);
         setAlbumSongs((prev) => ({
           ...prev,
           [albumId]: data.data || [],
         }));
       } catch (error) {
-        console.error(`Error fetching songs for album ${albumId}:`, error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`Error fetching songs for album ${albumId}:`, error);
+        }
       } finally {
         setLoadingSongs((prev) => ({ ...prev, [albumId]: false }));
       }
@@ -168,7 +185,9 @@ const LatestAlbums = () => {
     // Ensure we have a valid ID
     const normalizedId = resolveSongId(song);
     if (!normalizedId) {
-      console.error("Invalid song ID:", song);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Invalid song ID:", song);
+      }
       return;
     }
     

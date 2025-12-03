@@ -24,10 +24,22 @@ const Player = () => {
   const { user, addToPlaylist } = UserData();
   
   const albumTitle = useMemo(() => {
-    if (!song || !song.album) return "Single";
+    if (!song) return "Single";
+    // Use albumName from song data if available
+    if (song.albumName) return song.albumName;
+    if (!song.album || !albums) return "Single";
     const album = albums.find((albumItem) => albumItem._id === song.album);
     return album ? album.title : "Single";
   }, [song, albums]);
+  
+  const albumThumbnail = useMemo(() => {
+    if (!song) return null;
+    // Use albumThumbnail from song data if available
+    if (song.albumThumbnail) return song.albumThumbnail;
+    // Fallback to song thumbnail
+    if (song.thumbnail) return song.thumbnail.url;
+    return null;
+  }, [song]);
 
   const [playCountUpdated, setPlayCountUpdated] = useState(false);
   const playCountThreshold = 0.3; // 30% of song duration
@@ -40,17 +52,23 @@ const Player = () => {
   const handleAddToPlaylist = async (e) => {
     if (e) e.stopPropagation();
     if (!song || !song._id) {
-      console.error("No song selected");
+      if (process.env.NODE_ENV === 'development') {
+        console.error("No song selected");
+      }
       return;
     }
     if (!user || !user._id) {
-      console.error("User not authenticated");
+      if (process.env.NODE_ENV === 'development') {
+        console.error("User not authenticated");
+      }
       return;
     }
     try {
       await addToPlaylist(song._id, { silent: true });
     } catch (error) {
-      console.error("Error adding to playlist:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error adding to playlist:", error);
+      }
     }
   };
 
@@ -119,10 +137,12 @@ const Player = () => {
       setProgress(currentTime);
 
       // Update play count when 30% of song is played
-      if (!playCountUpdated && duration > 0 && currentTime >= duration * playCountThreshold) {
+      if (!playCountUpdated && audio.duration > 0 && currentTime >= audio.duration * playCountThreshold) {
         setPlayCountUpdated(true);
         axios.post(`/api/song/${selectedSong}/play`).catch(err => {
-          console.error("Error updating play count:", err);
+          if (process.env.NODE_ENV === 'development') {
+            console.error("Error updating play count:", err);
+          }
         });
       }
     };
@@ -140,7 +160,7 @@ const Player = () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [song, nextMusic, duration, playCountUpdated, selectedSong]);
+  }, [song, nextMusic, playCountUpdated, selectedSong]); // Removed duration from dependencies
 
   const handleProgressChange = (e) => {
     if (!audioRef.current) return;
@@ -165,9 +185,27 @@ const Player = () => {
           {song && song.audio && (
             <>
               {isPlaying ? (
-                <audio ref={audioRef} src={song.audio.url} autoPlay />
+                <audio 
+                  ref={audioRef} 
+                  src={song.audio.url} 
+                  autoPlay
+                  onError={(e) => {
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error("Audio playback error:", e);
+                    }
+                    setIsPlaying(false);
+                  }}
+                />
               ) : (
-                <audio ref={audioRef} src={song.audio.url} />
+                <audio 
+                  ref={audioRef} 
+                  src={song.audio.url}
+                  onError={(e) => {
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error("Audio load error:", e);
+                    }
+                  }}
+                />
               )}
             </>
           )}
@@ -177,12 +215,10 @@ const Player = () => {
             <div className="flex items-center gap-2 mb-2">
               <img
                 src={
-                  song.thumbnail
-                    ? song.thumbnail.url
-                    : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23333'/%3E%3C/svg%3E"
+                  albumThumbnail || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23333'/%3E%3C/svg%3E"
                 }
                 className="w-10 h-10 rounded"
-                alt=""
+                alt={`${song.title} album cover`}
               />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-white truncate">{song.title}</p>
@@ -251,12 +287,10 @@ const Player = () => {
             <div className="flex items-center gap-4 w-1/4">
               <img
                 src={
-                  song.thumbnail
-                    ? song.thumbnail.url
-                    : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23333'/%3E%3C/svg%3E"
+                  albumThumbnail || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23333'/%3E%3C/svg%3E"
                 }
                 className="w-12 h-12 rounded"
-                alt=""
+                alt={`${song.title} album cover`}
               />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{song.title}</p>

@@ -9,7 +9,7 @@ import { RiPulseLine } from "react-icons/ri";
 import { assets } from "../assets/assets";
 
 const SearchResults = () => {
-  const { type, id, name } = useParams();
+  const { type, idOrName } = useParams();
   const navigate = useNavigate();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +20,10 @@ const SearchResults = () => {
   const { playQueue, selectedSong, isPlaying } = SongData();
   const { addToPlaylist, user } = UserData();
   const playlistIds = Array.isArray(user?.playlist) ? user.playlist : [];
+
+  // Determine if idOrName is an ID (numeric) or name (string)
+  const id = !isNaN(idOrName) ? idOrName : null;
+  const name = isNaN(idOrName) ? decodeURIComponent(idOrName) : null;
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -139,13 +143,13 @@ const SearchResults = () => {
           setArtistData(artistInfo);
           setTitle(`Albums by ${artistName}`);
         } else if (type === "singer") {
-          finalName = decodeURIComponent(id);
+          finalName = name || decodeURIComponent(idOrName);
           response = await axios.get(
             `/api/home/singers/${encodeURIComponent(finalName)}/songs`
           );
           setTitle(`Songs by ${finalName}`);
         } else if (type === "director") {
-          finalName = decodeURIComponent(id);
+          finalName = name || decodeURIComponent(idOrName);
           response = await axios.get(
             `/api/home/music-directors/${encodeURIComponent(finalName)}/albums`
           );
@@ -161,7 +165,9 @@ const SearchResults = () => {
               directorName = director.directorName;
             }
           } catch (err) {
-            console.log("Could not fetch director details");
+            if (process.env.NODE_ENV === 'development') {
+              console.log("Could not fetch director details");
+            }
           }
           
           const directorInfo = {
@@ -172,9 +178,17 @@ const SearchResults = () => {
           setTitle(`Albums by Music Director ${directorName}`);
         }
 
-        setResults(response?.data?.data || []);
+        const responseData = response?.data?.data || response?.data || [];
+        setResults(Array.isArray(responseData) ? responseData : []);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`${type} results:`, responseData);
+        }
       } catch (error) {
-        console.error("Failed to fetch results:", error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Failed to fetch results:", error);
+          console.error("Error details:", error.response?.data);
+        }
         setResults([]);
       } finally {
         setLoading(false);
@@ -182,7 +196,7 @@ const SearchResults = () => {
     };
 
     fetchResults();
-  }, [type, id, name]);
+  }, [type, idOrName]);
 
   const startSongQueue = (songId) => {
     if (!results || results.length === 0) return;
@@ -327,8 +341,17 @@ const SearchResults = () => {
           )}
         </div>
       ) : (
-        <div className="text-gray-400 text-center py-12">
-          No {type === "artist" || type === "director" ? "albums" : "songs"} found
+        <div className="bg-[#1b1b1b] rounded-lg p-12 text-center">
+          <div className="text-6xl mb-4">🎵</div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            No {type === "artist" || type === "director" ? "albums" : "songs"} found
+          </h3>
+          <p className="text-gray-400">
+            {type === "artist" && "This artist doesn't have any albums yet."}
+            {type === "singer" && "No songs found for this singer."}
+            {type === "director" && "This music director doesn't have any albums yet."}
+            {type === "album" && "This album doesn't have any songs."}
+          </p>
         </div>
       )}
     </div>

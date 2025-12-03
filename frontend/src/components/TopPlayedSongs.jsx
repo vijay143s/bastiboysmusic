@@ -40,7 +40,9 @@ const TopPlayedSongs = () => {
     try {
       await addToPlaylist(songId);
     } catch (error) {
-      console.error("Error adding to playlist:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error adding to playlist:", error);
+      }
     }
   };
 
@@ -62,7 +64,9 @@ const TopPlayedSongs = () => {
       setHasMore(data.hasMore);
       setOffset(data.nextOffset || 0);
     } catch (error) {
-      console.error("Error fetching top played songs:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching top played songs:", error);
+      }
       setError("Failed to load top played songs");
     } finally {
       setLoading(false);
@@ -90,7 +94,9 @@ const TopPlayedSongs = () => {
   const handleSongClick = async (song) => {
     const normalizedId = resolveSongId(song);
     if (!normalizedId) {
-      console.error("Invalid song id", song);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Invalid song id", song);
+      }
       return;
     }
 

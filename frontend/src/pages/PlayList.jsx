@@ -47,7 +47,9 @@ const PlayList = () => {
       });
       setAlbumTitleMap(albumMap);
     } catch (error) {
-      console.error("Error fetching playlist songs:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching playlist songs:", error);
+      }
       toast.error("Failed to load playlist");
       setMyPlaylist([]);
     } finally {
@@ -94,7 +96,7 @@ const PlayList = () => {
           <img
             src={myPlaylist[0].thumbnail.url}
             className="w-40 md:w-48 rounded"
-            alt=""
+            alt="Playlist cover"
           />
         ) : (
           <div className="w-40 md:w-48 aspect-square bg-[#333] rounded"></div>
