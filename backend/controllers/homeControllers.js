@@ -302,12 +302,20 @@ const getAlbumsForSearchEndpoint = TryCatch(async (req, res) => {
 });
 
 const getArtistsForSearchEndpoint = TryCatch(async (req, res) => {
-  const artists = await getArtistsForSearch();
+  const q = req.query.q ? String(req.query.q) : null;
+  const limit = req.query.limit ? Number(req.query.limit) : null;
+
+  if (limit !== null && (Number.isNaN(limit) || limit < 1)) {
+    return res.status(400).json({ message: "Invalid limit parameter" });
+  }
+
+  const artists = await getArtistsForSearch(q, limit);
   
   res.json({
     message: "Artists for search retrieved successfully",
     data: artists,
     count: artists.length,
+    query: q || undefined,
   });
 });
 

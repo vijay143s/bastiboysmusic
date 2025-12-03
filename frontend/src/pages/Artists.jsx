@@ -33,6 +33,7 @@ const Artists = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredArtists, setFilteredArtists] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleArtistClick = (artistId) => {
@@ -68,18 +69,39 @@ const Artists = () => {
     fetchArtists();
   }, [page]);
 
-  // Filter artists based on search query
+  // Debounced search via API for artists (relevance-ordered)
   useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
     if (!searchQuery) {
       setFilteredArtists([]);
-      return;
+      setSearchLoading(false);
+      return () => controller.abort();
     }
-    
-    const filtered = allArtists.filter(artist => 
-      artist.artistName?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredArtists(filtered);
-  }, [searchQuery, allArtists]);
+
+    setSearchLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const resp = await axios.get(`/api/home/search/artists`, {
+          params: { q: searchQuery, limit: 50 },
+          signal,
+        });
+        setFilteredArtists(resp.data.data || []);
+      } catch (e) {
+        if (!axios.isCancel(e)) {
+          console.error("Artist search failed:", e);
+          setFilteredArtists([]);
+        }
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 250);
+
+    return () => {
+      clearTimeout(t);
+      controller.abort();
+    };
+  }, [searchQuery]);
 
   const displayArtists = searchQuery ? filteredArtists : artists;
 
@@ -131,6 +153,10 @@ const Artists = () => {
         </div>
       </div>
 
+      {searchLoading && (
+        <div className="text-gray-400 text-center py-4">Searching artists…</div>
+      )}
+
       {displayArtists.length > 0 ? (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
@@ -139,7 +165,7 @@ const Artists = () => {
             ))}
           </div>
           
-          {searchQuery && (
+          {searchQuery && !searchLoading && (
             <div className="text-center text-gray-400 mb-4">
               Found {filteredArtists.length} artist{filteredArtists.length !== 1 ? 's' : ''} matching "{searchQuery}"
             </div>

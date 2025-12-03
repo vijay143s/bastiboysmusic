@@ -86,8 +86,12 @@ const Search = () => {
 
     if (user) {
       try {
-        const recRes = await axios.get("/api/interaction/recommendations?limit=10");
-        setRecommendations(recRes.data.recommendations || []);
+        const recRes = await axios.get("/api/interaction/recommendations?limit=20");
+        const recs = (recRes.data.recommendations || []).map((s) => {
+          const id = s._id ?? s.id ?? s.songId ?? s.song_id;
+          return id ? { ...s, _id: String(id) } : s;
+        });
+        setRecommendations(recs);
         
         const statsRes = await axios.get("/api/interaction/stats");
         setRecentSearches(statsRes.data.stats?.recentSearches || []);
@@ -225,8 +229,38 @@ const Search = () => {
   }, [songs, albums, normalizedQuery, yearFilter, apiSearchResults]);
 
   const handlePlaySong = async (id, sourceList) => {
-    const listToUse = sourceList && sourceList.length ? sourceList : songs;
-    const label = sourceList ? "Search Results" : "All Songs";
+    // Prefer the explicit source list if provided (recommendations/trending/search results)
+    let listToUse = Array.isArray(sourceList) && sourceList.length ? sourceList : null;
+    let label = "All Songs";
+
+    // If no explicit list, derive from current UI context
+    if (!listToUse) {
+      // When searching, use the active tab's matches
+      if (normalizedQuery || yearFilter) {
+        if (searchType === "songs") {
+          listToUse = songMatches;
+          label = "Search Results";
+        } else if (searchType === "albums") {
+          // Albums map to songs via album click; keep fallback minimal
+          listToUse = songMatches;
+          label = "Search Results";
+        } else {
+          listToUse = songMatches;
+          label = "Search Results";
+        }
+      }
+    }
+
+    // Final fallback to global songs only if still missing
+    if (!listToUse || !listToUse.length) {
+      listToUse = songs;
+      label = "All Songs";
+    }
+
+    // Specific labels for known sections
+    if (sourceList === recommendations) label = "Recommendations";
+    if (sourceList === trending) label = "Trending";
+
     playQueue(listToUse, id, label);
 
     // Track search click

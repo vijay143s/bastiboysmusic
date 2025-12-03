@@ -154,7 +154,32 @@ const getArtistsPaginated = async (page = 1, limit = 12) => {
 };
 
 // Optimized search - returns only essential data for search functionality
-const getArtistsForSearch = async () => {
+// Supports optional query and limit with relevance ordering
+const getArtistsForSearch = async (query = null, limit = null) => {
+  if (query && typeof query === 'string' && query.trim().length > 0) {
+    const q = `%${query.trim()}%`;
+    const [rows] = await pool.query(
+      `SELECT MIN(artist_id) as artist_id, artist_name,
+              CASE 
+                WHEN LOWER(artist_name) = LOWER(?) THEN 0
+                WHEN LOWER(artist_name) LIKE LOWER(CONCAT(?, '%')) THEN 1
+                WHEN LOWER(artist_name) LIKE LOWER(?) THEN 2
+                ELSE 3
+              END AS relevance
+       FROM artists 
+       WHERE artist_name LIKE ?
+       GROUP BY artist_name 
+       ORDER BY relevance ASC, artist_name ASC
+       ${limit ? 'LIMIT ?' : ''}`,
+      limit ? [query.trim(), query.trim(), q, q, limit] : [query.trim(), query.trim(), q, q]
+    );
+
+    return rows.map(row => ({
+      artistId: row.artist_id,
+      artistName: row.artist_name,
+    }));
+  }
+
   const [rows] = await pool.query(
     `SELECT MIN(artist_id) as artist_id, artist_name 
      FROM artists GROUP BY artist_name ORDER BY artist_name ASC`

@@ -218,17 +218,8 @@ exports.getListeningStats = TryCatch(async (req, res) => {
     [userId]
   );
 
-  const [topSongs] = await execute(
-    `SELECT s.id, s.title, s.singer, a.title as albumName, COUNT(*) as plays
-    FROM user_listening_history ulh
-    INNER JOIN songs s ON ulh.song_id = s.id
-    LEFT JOIN albums a ON s.album_id = a.id
-    WHERE ulh.user_id = ?
-    GROUP BY s.id
-    ORDER BY plays DESC
-    LIMIT 10`,
-    [userId]
-  );
+  // Do not include song lists here to keep payload light
+  // If needed, a separate endpoint can provide detailed top songs
 
   const [recentSearches] = await execute(
     `SELECT DISTINCT search_query, MAX(created_at) as last_search
@@ -245,7 +236,6 @@ exports.getListeningStats = TryCatch(async (req, res) => {
     stats: {
       totalPlays: totalPlays[0]?.count || 0,
       totalListeningTime: Math.floor((totalTime[0]?.total_seconds || 0) / 60), // in minutes
-      topSongs,
       recentSearches: recentSearches.map(s => s.search_query)
     }
   });
