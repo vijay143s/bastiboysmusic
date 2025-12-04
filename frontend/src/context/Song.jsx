@@ -510,13 +510,31 @@ export const SongProvider = ({ children }) => {
 
     if (queueIndex >= lastIndex) {
       if (mode === "auto") {
+        // Check if we're in an album queue and should transition to main queue
+        if (queueLabel.includes("Queue") && queueLabel !== "All Songs" && queueLabel !== "Latest Albums") {
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Album queue "${queueLabel}" finished, transitioning to default queue`);
+          }
+          // Load default queue when album finishes
+          await loadDefaultQueue();
+          return;
+        }
+        
         if (onQueueEnd) {
           const maybePromise = onQueueEnd();
           if (maybePromise && typeof maybePromise.then === "function") {
             maybePromise.catch((error) => console.error("Queue end handler failed", error));
           }
         } else {
-          setIsPlaying(false);
+          // For regular queues, transition to default queue instead of stopping
+          if (queueLabel !== "All Songs") {
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`Queue "${queueLabel}" finished, transitioning to default queue`);
+            }
+            await loadDefaultQueue();
+          } else {
+            setIsPlaying(false);
+          }
         }
       } else {
         jumpToIndex(0);

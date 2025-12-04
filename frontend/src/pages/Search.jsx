@@ -261,7 +261,18 @@ const Search = () => {
     if (sourceList === recommendations) label = "Recommendations";
     if (sourceList === trending) label = "Trending";
 
-    playQueue(listToUse, id, label);
+    // Ensure we have the correct ID format - normalize to string and handle both id and _id
+    const normalizedId = String(id);
+    
+    // Debug log to check what's being passed
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Playing song with ID:', normalizedId);
+      console.log('From list:', label);
+      console.log('List length:', listToUse.length);
+      console.log('Song exists in list:', listToUse.some(s => String(s._id || s.id) === normalizedId));
+    }
+
+    playQueue(listToUse, normalizedId, label);
 
     // Track search click
     if (query.trim()) {
@@ -288,11 +299,13 @@ const Search = () => {
   };
 
   // Render horizontal song card for trending/recommendations
-  const renderHorizontalCard = (song, sourceList) => (
+  const renderHorizontalCard = (song, sourceList) => {
+    const songId = song._id || song.id;
+    return (
     <div
-      key={song._id}
+      key={songId}
       className="flex-shrink-0 w-40 md:w-48 bg-[#181818] hover:bg-[#282828] rounded-lg p-3 transition-all cursor-pointer group"
-      onClick={() => handlePlaySong(song._id, sourceList)}
+      onClick={() => handlePlaySong(songId, sourceList)}
     >
       <div className="relative mb-3">
         <img
@@ -304,7 +317,7 @@ const Search = () => {
           className="absolute bottom-2 right-2 bg-green-500 hover:bg-green-400 text-black rounded-full p-3 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all shadow-lg"
           onClick={(e) => {
             e.stopPropagation();
-            handlePlaySong(song._id, sourceList);
+            handlePlaySong(songId, sourceList);
           }}
         >
           <FaPlay className="text-sm" />
@@ -317,7 +330,8 @@ const Search = () => {
         </p>
       </div>
     </div>
-  );
+    );
+  };
 
   // Render song card
   const renderSongCard = (song, sourceList) => (

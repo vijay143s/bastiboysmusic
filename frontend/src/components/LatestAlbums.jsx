@@ -95,6 +95,20 @@ const LatestAlbums = () => {
         const nextAlbums = updatedAlbums.slice(currentLimit);
 
         if (!nextAlbums.length) {
+          // If no more albums available, transition to default queue
+          if (process.env.NODE_ENV === 'development') {
+            console.log("No more latest albums available, transitioning to default queue");
+          }
+          try {
+            const { data } = await axios.get("/api/song/queue");
+            if (data && data.length > 0) {
+              playQueue(data, data[0]._id || data[0].id, "All Songs");
+            }
+          } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error("Failed to load default queue:", error);
+            }
+          }
           return;
         }
 
@@ -121,7 +135,23 @@ const LatestAlbums = () => {
           .map((song) => song?._id || song?.id || song?.songId || song?.song_id)
           .find(Boolean);
 
-        if (!firstNewSongId) return;
+        if (!firstNewSongId) {
+          // If no valid songs found, transition to default queue
+          if (process.env.NODE_ENV === 'development') {
+            console.log("No valid songs found in new albums, transitioning to default queue");
+          }
+          try {
+            const { data } = await axios.get("/api/song/queue");
+            if (data && data.length > 0) {
+              playQueue(data, data[0]._id || data[0].id, "All Songs");
+            }
+          } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error("Failed to load default queue:", error);
+            }
+          }
+          return;
+        }
 
         const combinedQueue = queue.length ? [...queue, ...newSongs] : newSongs;
         playQueue(combinedQueue, String(firstNewSongId), "Latest Albums");
