@@ -11,7 +11,9 @@ const mapSongRow = (row) => ({
   },
   audio: {
     id: row.audio_id,
-    url: row.audio_url,
+    // Priority: stream_url (pre-generated for pagalworldmusic.com) > audio_url directly
+    // stream_url is NULL for non-pagalworldmusic.com URLs, so we use audio_url directly
+    url: row.stream_url || row.audio_url,
   },
   albumId: row.album_id,
   createdAt: row.created_at,
@@ -55,7 +57,7 @@ const updateSongThumbnail = async (songId, thumbnail) => {
 
 const getAllSongs = async () => {
   const [rows] = await pool.query(
-    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.stream_url, s.album_id, s.created_at, s.updated_at
      FROM songs s
      LEFT JOIN albums a ON s.album_id = a.id
      WHERE s.audio_url IS NOT NULL 
@@ -65,9 +67,35 @@ const getAllSongs = async () => {
   return rows.map(mapSongRow);
 };
 
+// Optimized: Get playlist songs directly from DB instead of fetching all songs
+const getPlaylistSongs = async (playlistIds) => {
+  if (!playlistIds || playlistIds.length === 0) {
+    return [];
+  }
+
+  // Convert all IDs to numbers for comparison
+  const ids = playlistIds.map(id => Number(id)).filter(id => !isNaN(id));
+  
+  if (ids.length === 0) {
+    return [];
+  }
+
+  // Create placeholders for SQL IN clause
+  const placeholders = ids.map(() => '?').join(',');
+  
+  const [rows] = await pool.query(
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.stream_url, s.album_id, s.created_at, s.updated_at
+     FROM songs s
+     WHERE s.id IN (${placeholders}) AND s.audio_url IS NOT NULL`,
+    ids
+  );
+
+  return rows.map(mapSongRow);
+};
+
 const getSongsByAlbum = async (albumId) => {
   const [rows] = await pool.query(
-    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.stream_url, s.album_id, s.created_at, s.updated_at
      FROM songs s
      LEFT JOIN albums a ON s.album_id = a.id
      WHERE s.album_id = ? AND s.audio_url IS NOT NULL 
@@ -80,7 +108,7 @@ const getSongsByAlbum = async (albumId) => {
 
 const findSongById = async (id) => {
   const [rows] = await pool.query(
-    `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, album_id, created_at, updated_at
+    `SELECT id, title, description, singer, thumbnail_id, thumbnail_url, audio_id, audio_url, stream_url, album_id, created_at, updated_at
      FROM songs WHERE id = ? LIMIT 1`,
     [id]
   );
@@ -94,7 +122,7 @@ const deleteSongById = async (id) => {
 
 const getSongsBySinger = async (singerName) => {
   const [rows] = await pool.query(
-    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.album_id, s.created_at, s.updated_at
+    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.stream_url, s.album_id, s.created_at, s.updated_at
      FROM songs s
      LEFT JOIN albums a ON s.album_id = a.id
      WHERE (s.singer = ? OR FIND_IN_SET(?, s.singer) > 0) AND s.audio_url IS NOT NULL 
@@ -113,6 +141,8 @@ const getQueueSongs = async () => {
       s.title, 
       s.singer,
       s.thumbnail_url,
+      s.audio_url,
+      s.stream_url,
       s.album_id,
       a.title as album_name
     FROM songs s
@@ -127,6 +157,9 @@ const getQueueSongs = async () => {
     singer: row.singer,
     thumbnail: {
       url: row.thumbnail_url
+    },
+    audio: {
+      url: row.stream_url || row.audio_url
     },
     album: row.album_id, // Keep the album ID for compatibility
     albumName: row.album_name // Add album name directly
@@ -152,6 +185,8 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
       s.title, 
       s.singer,
       s.thumbnail_url,
+      s.audio_url,
+      s.stream_url,
       s.album_id,
       s.created_at,
       a.title as album_name,
@@ -181,6 +216,9 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
       thumbnail: {
         url: row.thumbnail_url
       },
+      audio: {
+        url: row.stream_url || row.audio_url
+      },
       album: row.album_id,
       albumName: row.album_name,
       createdAt: row.created_at
@@ -201,6 +239,7 @@ const findSongByIdForPlayer = async (id) => {
       s.singer,
       s.thumbnail_url,
       s.audio_url,
+      s.stream_url,
       s.album_id
     FROM songs s
     WHERE s.id = ? LIMIT 1
@@ -218,7 +257,8 @@ const findSongByIdForPlayer = async (id) => {
       url: row.thumbnail_url
     },
     audio: {
-      url: row.audio_url
+      // Use stream_url (pre-generated proxy for Pagal World) OR audio_url directly (for other domains)
+      url: row.stream_url || row.audio_url
     },
     album: String(row.album_id)
   };
@@ -494,4 +534,5 @@ module.exports = {
   getTopYears,
   getAlbumsByYear,
   getQueueSongsByYearBatch,
+  getPlaylistSongs,
 };

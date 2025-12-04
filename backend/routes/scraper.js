@@ -14,6 +14,40 @@ const initSocketManager = (io) => {
   socketManager = new SocketManager(io);
 };
 
+const attachServiceListeners = (service) => {
+  if (!service) return;
+
+  service.on('log', (message) => {
+    if (socketManager) {
+      socketManager.broadcastLog(message);
+    }
+  });
+
+  service.on('stats', (stats) => {
+    if (socketManager) {
+      socketManager.broadcastStats(stats);
+    }
+  });
+
+  service.on('progress', (progress) => {
+    if (socketManager) {
+      socketManager.broadcastProgress(progress);
+    }
+  });
+
+  service.on('error', (error) => {
+    if (socketManager) {
+      socketManager.broadcastError(error);
+    }
+  });
+
+  service.on('complete', (code) => {
+    if (socketManager) {
+      socketManager.broadcastComplete(code);
+    }
+  });
+};
+
 // POST /api/scrape/start
 router.post('/start', async (req, res) => {
   try {
@@ -65,35 +99,7 @@ router.post('/start', async (req, res) => {
     scraperService = new PythonScraperService();
 
     // Set up event listeners for real-time updates
-    scraperService.on('log', (message) => {
-      if (socketManager) {
-        socketManager.broadcastLog(message);
-      }
-    });
-
-    scraperService.on('stats', (stats) => {
-      if (socketManager) {
-        socketManager.broadcastStats(stats);
-      }
-    });
-
-    scraperService.on('progress', (progress) => {
-      if (socketManager) {
-        socketManager.broadcastProgress(progress);
-      }
-    });
-
-    scraperService.on('error', (error) => {
-      if (socketManager) {
-        socketManager.broadcastError(error);
-      }
-    });
-
-    scraperService.on('complete', (code) => {
-      if (socketManager) {
-        socketManager.broadcastComplete(code);
-      }
-    });
+    attachServiceListeners(scraperService);
 
     // Start scraping
     const options = {
@@ -124,6 +130,66 @@ router.post('/start', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to start scraping',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/scrape/pagalworld
+router.post('/pagalworld', async (req, res) => {
+  try {
+    if (scraperService && scraperService.isRunning) {
+      return res.status(400).json({
+        success: false,
+        message: 'Another scraping process is already running'
+      });
+    }
+
+    const {
+      articleUrl,
+      executeSql = true,
+      sqlOutput = 'sql_output/pagalworld',
+      timeout = 45
+    } = req.body;
+
+    if (!articleUrl) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pagalworld album URL is required'
+      });
+    }
+
+    scraperService = new PythonScraperService();
+    attachServiceListeners(scraperService);
+
+    const scriptPath = path.join(__dirname, '../python-scripts/pagalworld_scraper.py');
+    const args = ['--url', articleUrl];
+
+    if (sqlOutput) {
+      args.push('--sql-output', sqlOutput);
+    }
+
+    if (executeSql) {
+      args.push('--execute-sql');
+    }
+
+    if (timeout) {
+      args.push('--timeout', timeout.toString());
+    }
+
+    scraperService.startPythonScript(scriptPath, args);
+
+    res.json({
+      success: true,
+      message: 'Pagalworld scraping started successfully',
+      options: { articleUrl, executeSql, sqlOutput, timeout }
+    });
+
+  } catch (error) {
+    console.error('Error starting Pagalworld scraper:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to start Pagalworld scraping',
       error: error.message
     });
   }
@@ -178,40 +244,7 @@ router.get('/status', (req, res) => {
   }
 });
 
-// GET /api/scrape/logs (Server-Sent Events)
-router.get('/logs', (req, res) => {
-  // Set headers for Server-Sent Events
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Cache-Control'
-  });
-
-  // Send initial connection message
-  res.write('data: {"type": "connected", "message": "Connected to logs"}\n\n');
-
-  // Add client to socket manager for real-time updates
-  if (socketManager) {
-    const clientId = Date.now().toString();
-    socketManager.addSSEClient(clientId, res);
-
-    // Handle client disconnect
-    req.on('close', () => {
-      socketManager.removeSSEClient(clientId);
-    });
-  }
-
-  // Keep connection alive
-  const heartbeat = setInterval(() => {
-    res.write('data: {"type": "heartbeat"}\n\n');
-  }, 30000);
-
-  req.on('close', () => {
-    clearInterval(heartbeat);
-  });
-});
+// SSE endpoint removed - using polling approach instead
 
 // GET /api/scrape/results/:format
 router.get('/results/:format', (req, res) => {
@@ -308,6 +341,164 @@ router.get('/download/:type', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to download file',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/scrape/logs - Read logs from file
+router.get('/logs', async (req, res) => {
+  try {
+    const { lines = 100, offset = 0 } = req.query;
+    const logFile = path.join(__dirname, '../python-scripts/logs/ingestion.log');
+    
+    if (!fs.existsSync(logFile)) {
+      return res.json({
+        success: true,
+        logs: [],
+        stats: { albums: 0, songs: 0, errors: 0 },
+        hasMore: false
+      });
+    }
+
+    const fileContent = fs.readFileSync(logFile, 'utf8');
+    const allLines = fileContent.split('\n').filter(line => line.trim() !== '');
+    
+    // Get the requested slice of lines
+    const startIndex = Math.max(0, allLines.length - lines - offset);
+    const endIndex = allLines.length - offset;
+    const requestedLines = allLines.slice(startIndex, endIndex);
+    
+    // Parse logs and extract statistics
+    const logs = requestedLines.map(line => {
+      const timestampMatch = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})/);
+      const levelMatch = line.match(/ - (\w+) - /);
+      
+      return {
+        timestamp: timestampMatch ? new Date(timestampMatch[1]).toLocaleTimeString() : new Date().toLocaleTimeString(),
+        message: line,
+        level: levelMatch ? levelMatch[1].toLowerCase() : 'info'
+      };
+    });
+
+    // Extract statistics from the logs
+    const stats = { albums: 0, songs: 0, errors: 0 };
+    const fullContent = allLines.join('\n');
+    
+    // Look for statistics patterns
+    const albumMatch = fullContent.match(/Albums: (\d+)/g);
+    const songMatch = fullContent.match(/Songs: (\d+)/g);
+    const errorLines = allLines.filter(line => line.includes('ERROR') || line.includes('Exception'));
+    
+    if (albumMatch) {
+      const lastAlbumMatch = albumMatch[albumMatch.length - 1];
+      stats.albums = parseInt(lastAlbumMatch.match(/(\d+)/)[1]) || 0;
+    }
+    
+    if (songMatch) {
+      const lastSongMatch = songMatch[songMatch.length - 1];
+      stats.songs = parseInt(lastSongMatch.match(/(\d+)/)[1]) || 0;
+    }
+    
+    stats.errors = errorLines.length;
+
+    res.json({
+      success: true,
+      logs,
+      stats,
+      hasMore: startIndex > 0,
+      totalLines: allLines.length
+    });
+    
+  } catch (error) {
+    console.error('Error reading logs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to read logs',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/scrape/clear-logs - Clear the log file
+router.post('/clear-logs', async (req, res) => {
+  try {
+    const logFile = path.join(__dirname, '../python-scripts/logs/ingestion.log');
+    
+    // Clear the log file
+    fs.writeFileSync(logFile, '', 'utf8');
+    
+    res.json({
+      success: true,
+      message: 'Logs cleared successfully'
+    });
+    
+  } catch (error) {
+    console.error('Error clearing logs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to clear logs',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/scrape/remove-duplicates
+router.post('/remove-duplicates', async (req, res) => {
+  try {
+    const { dryRun = true } = req.body;
+    
+    if (scraperService && scraperService.isRunning) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cannot remove duplicates while scraping is running' 
+      });
+    }
+
+    // Create new Python service for duplicate removal
+    const duplicateService = new PythonScraperService();
+    
+    // Set up event listeners for real-time updates
+    duplicateService.on('log', (message) => {
+      if (socketManager) {
+        socketManager.broadcastLog(message);
+      }
+    });
+
+    duplicateService.on('error', (error) => {
+      if (socketManager) {
+        socketManager.broadcastError(error);
+      }
+    });
+
+    duplicateService.on('complete', (code) => {
+      if (socketManager) {
+        socketManager.broadcastComplete(code);
+      }
+    });
+
+    // Start duplicate removal
+    const scriptPath = path.join(__dirname, '../python-scripts/remove_duplicates.py');
+    const args = [];
+    
+    if (dryRun) {
+      args.push('--dry-run');
+    }
+
+    // Start the Python script
+    duplicateService.startPythonScript(scriptPath, args);
+
+    res.json({
+      success: true,
+      message: dryRun ? 'Duplicate analysis started (dry run)' : 'Duplicate removal started',
+      dryRun
+    });
+
+  } catch (error) {
+    console.error('Error starting duplicate removal:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to start duplicate removal',
       error: error.message
     });
   }

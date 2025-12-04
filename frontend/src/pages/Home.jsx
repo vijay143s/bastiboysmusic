@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SongData } from "../context/Song";
+import { useLanguage } from "../context/Language";
 import HorizontalScroll from "../components/HorizontalScroll";
 import TopPlayedSongs from "../components/TopPlayedSongs";
 import LatestAlbums from "../components/LatestAlbums";
 import { FaCalendarAlt } from "react-icons/fa";
 import axios from "axios";
+import { 
+  useAlbumsByLanguage, 
+  useAvailableYearsByLanguage,
+  useAllSongsByLanguage 
+} from "../lib/useLanguageContent";
 
 const ArtistCard = ({ artist, onNavigate }) => {
   return (
@@ -100,10 +106,16 @@ const AlbumCard = ({ album, onNavigate }) => {
 
 const Home = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  
+  // Fetch language-specific content
+  const { albums: languageAlbums, loading: albumsLoading } = useAlbumsByLanguage(10, 1);
+  const { years, loading: yearsLoading } = useAvailableYearsByLanguage();
+  const { songs: allSongs, loading: songsLoading } = useAllSongsByLanguage();
+
   const [topArtists, setTopArtists] = useState([]);
   const [topSingers, setTopSingers] = useState([]);
   const [topDirectors, setTopDirectors] = useState([]);
-  const [topYears, setTopYears] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const handleCardClick = (type, id, name) => {
@@ -119,31 +131,53 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const fetchHomeSections = async () => {
+    const fetchArtistsAndSingers = async () => {
       try {
         setLoading(true);
-        const [artistsRes, singersRes, directorsRes, yearsRes] = await Promise.all([
-          axios.get("/api/home/artists/top?limit=10"),
-          axios.get("/api/home/singers/top?limit=10"),
-          axios.get("/api/home/music-directors/top?limit=10"),
-          axios.get("/api/song/years/top"),
-        ]);
+        
+        // Get unique artists, singers, directors from language-specific songs
+        const artistSet = new Set();
+        const singerSet = new Set();
+        const directorSet = new Set();
 
-        setTopArtists(artistsRes.data.data);
-        setTopSingers(singersRes.data.data);
-        setTopDirectors(directorsRes.data.data);
-        setTopYears((yearsRes.data.years || []).sort((a, b) => b.year - a.year));
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error("Failed to fetch home sections:", error);
+        allSongs.forEach(song => {
+          if (song.singer) {
+            singerSet.add(song.singer);
+          }
+        });
+
+        // Fetch artist and director info from API
+        try {
+          const artistsRes = await axios.get("/api/home/artists/top?limit=10");
+          setTopArtists(artistsRes.data.data || []);
+        } catch (e) {
+          console.log("Artists fetch optional");
         }
+
+        try {
+          const singersRes = await axios.get("/api/home/singers/top?limit=10");
+          setTopSingers(singersRes.data.data || []);
+        } catch (e) {
+          console.log("Singers fetch optional");
+        }
+
+        try {
+          const directorsRes = await axios.get("/api/home/music-directors/top?limit=10");
+          setTopDirectors(directorsRes.data.data || []);
+        } catch (e) {
+          console.log("Directors fetch optional");
+        }
+      } catch (error) {
+        console.error("Failed to fetch artists/singers:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHomeSections();
-  }, []);
+    if (allSongs.length > 0) {
+      fetchArtistsAndSingers();
+    }
+  }, [allSongs, language]);
 
   return (
     <div className="px-2 md:px-6 py-4">
@@ -189,7 +223,7 @@ const Home = () => {
       {/* Years Section - Mobile Only */}
       <div className="block md:hidden">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Browse by Year</h2>
+          <h2 className="text-xl font-bold">Browse by Year ({language.toUpperCase()})</h2>
           <button
             onClick={() => navigate("/years")}
             className="text-sm text-green-400 hover:text-green-300 transition-colors"
@@ -198,22 +232,19 @@ const Home = () => {
           </button>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          {loading ? (
+          {yearsLoading ? (
             Array(6).fill(0).map((_, i) => (
               <div key={i} className="bg-[#1a1a1a] rounded-lg h-24 animate-pulse"></div>
             ))
           ) : (
-            topYears.slice(0, 6).map((yearData) => (
+            years.slice(0, 6).map((year) => (
               <button
-                key={yearData.year}
-                onClick={() => navigate(`/years?year=${yearData.year}`)}
+                key={year}
+                onClick={() => navigate(`/years?year=${year}`)}
                 className="bg-gradient-to-br from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 rounded-lg p-4 transition-all group"
               >
                 <FaCalendarAlt className="text-green-500 text-2xl mb-2 mx-auto" />
-                <p className="text-white font-bold text-center">{yearData.year}</p>
-                <p className="text-xs text-gray-400 text-center mt-1">
-                  {yearData.album_count} album{yearData.album_count !== 1 ? 's' : ''}
-                </p>
+                <p className="text-white font-bold text-center">{year}</p>
               </button>
             ))
           )}

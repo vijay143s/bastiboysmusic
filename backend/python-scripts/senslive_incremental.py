@@ -30,6 +30,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Dict, List
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urlparse, urljoin
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -193,10 +194,10 @@ def _maybe_decompress(resp: requests.Response) -> bytes | None:
         return body
     if "br" in encoding:
         try:
-            import brotlicffi as brotli
+            import brotlicffi as brotli  # type: ignore[import]
         except ImportError:
             try:
-                import brotli
+                import brotli  # type: ignore[import]
             except ImportError:
                 return None
         try:
@@ -768,8 +769,12 @@ class SQLDataCollector:
         if not album_name:
             return
         
-        # Clean and parse year
-        year_str = album_details.get('year', '').strip()
+        # Clean and parse year (handle int or str)
+        year_raw = album_details.get('year', '')
+        if isinstance(year_raw, int):
+            year_str = str(year_raw)
+        else:
+            year_str = (year_raw or '').strip()
         year_int = clean_year(year_str)
         
         # Add album (deduplicate by album_name)
@@ -780,7 +785,8 @@ class SQLDataCollector:
                 'director': clean_string(album_details.get('director', '')),
                 'music_director': clean_string(album_details.get('music_director', '')),
                 'star_cast': clean_string(album_details.get('star_cast', '')),
-                'thumbnail_url': thumbnail_url
+                'thumbnail_url': thumbnail_url,
+                'language': clean_string(album_details.get('language', ''))
             }
         
         # Add artists from star_cast
@@ -876,7 +882,7 @@ class SQLDataCollector:
                 if not batch:
                     continue
                 
-                f.write("INSERT IGNORE INTO albums (title, year, director, music_director, star_cast, thumbnail_url) VALUES\n")
+                f.write("INSERT IGNORE INTO albums (title, year, director, music_director, star_cast, thumbnail_url, language) VALUES\n")
                 
                 values = []
                 for album_name, album_data in batch:
@@ -886,7 +892,8 @@ class SQLDataCollector:
                     music_director = self._escape_sql_string(album_data['music_director'])
                     star_cast = self._escape_sql_string(album_data['star_cast'])
                     thumbnail_url = self._escape_sql_string(album_data['thumbnail_url'])
-                    values.append(f"({title}, {year}, {director}, {music_director}, {star_cast}, {thumbnail_url})")
+                    language = self._escape_sql_string(album_data.get('language', ''))
+                    values.append(f"({title}, {year}, {director}, {music_director}, {star_cast}, {thumbnail_url}, {language})")
                 
                 f.write(",\n".join(values))
                 f.write(";\n\n")
@@ -1259,6 +1266,282 @@ def scrape_article_with_date(article_url: str, timeout: int = DEFAULT_TIMEOUT, m
         return {'error': str(e), 'url': article_url}
 
 
+def fetch_pagalworld_track_audio(session: requests.Session, track_url: str, timeout: int) -> str:
+    """Fetch direct audio URL from a Pagalworld track page."""
+    try:
+        headers = build_headers(track_url, "gzip, deflate")
+        resp = session.get(track_url, headers=headers, timeout=timeout)
+        resp.raise_for_status()
+        track_soup = BeautifulSoup(resp.content, 'html.parser')
+
+        # Try 1: Look for contentUrl in JSON-LD scripts
+        for script in track_soup.find_all('script', type='application/ld+json'):
+            try:
+                data = json.loads(script.string)
+            except (TypeError, json.JSONDecodeError):
+                continue
+
+            candidates: list[dict[str, Any]] = []
+            if isinstance(data, dict):
+                candidates = [data]
+            elif isinstance(data, list):
+                candidates = [item for item in data if isinstance(item, dict)]
+
+            for item in candidates:
+                content_url = item.get('contentUrl')
+                if not content_url and item.get('@type') == 'MusicRecording':
+                    audio_obj = item.get('audio')
+                    if isinstance(audio_obj, dict):
+                        content_url = audio_obj.get('contentUrl')
+                if content_url:
+                    logger.debug(f"Found audio URL via JSON-LD contentUrl: {content_url}")
+                    return content_url
+
+        # Try 2: Look for audio element source tag
+        audio_tags = track_soup.find_all('audio')
+        for audio_tag in audio_tags:
+            source_tag = audio_tag.find('source')
+            if source_tag and source_tag.get('src'):
+                audio_url = source_tag.get('src')
+                logger.debug(f"Found audio URL via audio/source tag: {audio_url}")
+                return urljoin(track_url, audio_url)
+
+        # Try 3: Look for download links with common patterns
+        download_patterns = [
+            'a[download]',
+            'a[href*="download"]',
+            'a[href*=".mp3"]',
+            'a[href*=".m4a"]',
+            'a[href*=".flac"]'
+        ]
+        for pattern in download_patterns:
+            download_link = track_soup.select_one(pattern)
+            if download_link and download_link.get('href'):
+                audio_url = download_link['href']
+                if not audio_url.startswith('http'):
+                    audio_url = urljoin(track_url, audio_url)
+                logger.debug(f"Found audio URL via download link ({pattern}): {audio_url}")
+                return audio_url
+
+        # Try 4: Look in data attributes or hidden divs
+        for div in track_soup.find_all('div', class_=lambda x: x and 'download' in x.lower()):
+            link = div.find('a', href=True)
+            if link and link.get('href'):
+                audio_url = link['href']
+                if not audio_url.startswith('http'):
+                    audio_url = urljoin(track_url, audio_url)
+                logger.debug(f"Found audio URL in download div: {audio_url}")
+                return audio_url
+
+        logger.debug(f"No audio URL found for track {track_url}")
+    except Exception as e:
+        logger.debug(f"Error fetching audio URL from {track_url}: {e}")
+    return ''
+
+
+def scrape_pagalworld_album(article_url: str, timeout: int = DEFAULT_TIMEOUT) -> dict[str, Any]:
+    """Scrape album & tracks from pagalworldmusic.com pages."""
+    logger.info("Detected Pagalworld album. Using specialized parser.")
+    session = create_session()
+    headers = build_headers(article_url, "gzip, deflate")
+    resp = session.get(article_url, headers=headers, timeout=timeout)
+    resp.raise_for_status()
+    soup = BeautifulSoup(resp.content, 'html.parser')
+
+    album_name = ''
+    breadcrumb = soup.select('ol.breadcrumb li span[itemprop="name"]')
+    if breadcrumb:
+        album_name = breadcrumb[-1].get_text(strip=True)
+    if not album_name:
+        heading = soup.select_one('.head h1')
+        album_name = clean_string(heading.get_text()) if heading else ''
+    album_name = clean_string(album_name)
+
+    thumbnail_url = ''
+    first_image = soup.select_one('div.track img.track-image')
+    if first_image and first_image.get('src'):
+        thumbnail_url = urljoin(article_url, first_image['src'])
+
+    tracks = soup.select('div.track[itemscope][itemtype*="MusicRecording"]')
+    songs: list[dict[str, Any]] = []
+    unique_artists = set()
+    release_year = None
+
+    logger.info(f"Found {len(tracks)} tracks to process")
+
+    for idx, track in enumerate(tracks, start=1):
+        title_el = track.select_one('.track-title')
+        track_title = clean_string(title_el.get_text()) if title_el else ''
+
+        artist_el = track.select_one('.track-info .small-text')
+        singer_name = clean_string(artist_el.get_text()) if artist_el else ''
+        if singer_name:
+            unique_artists.add(singer_name)
+
+        track_link = track.select_one('a.track-link')
+        audio_url = ''
+        track_thumbnail_url = thumbnail_url  # Default to album thumbnail
+        
+        if track_link and track_link.get('href'):
+            track_page_url = urljoin(article_url, track_link['href'])
+            logger.info(f"[{idx}/{len(tracks)}] Fetching audio for: {track_title}")
+            audio_url = fetch_pagalworld_track_audio(session, track_page_url, timeout)
+            if audio_url:
+                logger.info(f"  ✓ Audio URL found: {audio_url[:60]}...")
+            else:
+                logger.warning(f"  ✗ No audio URL found for this track")
+
+        ld_script = track.find_next_sibling('script', attrs={'type': 'application/ld+json'})
+        if ld_script:
+            try:
+                ld_data = json.loads(ld_script.string)
+                if isinstance(ld_data, dict):
+                    # Extract track-level thumbnail image from JSON-LD
+                    track_image = ld_data.get('image')
+                    if track_image:
+                        if isinstance(track_image, str):
+                            track_thumbnail_url = track_image
+                        elif isinstance(track_image, dict):
+                            track_thumbnail_url = track_image.get('url') or thumbnail_url
+                        logger.info(f"  ✓ Track thumbnail: {track_thumbnail_url[:60]}...")
+                    
+                    # Extract year from datePublished if not already set
+                    if not release_year:
+                        date_published = ld_data.get('datePublished')
+                        if date_published:
+                            year_val = clean_year(date_published)
+                            if year_val:
+                                release_year = year_val
+            except (TypeError, json.JSONDecodeError):
+                pass
+
+        song_entry = {
+            'album_name': album_name,
+            'title': track_title,
+            'singer': singer_name,
+            'thumbnail_url': track_thumbnail_url,
+            'audio_url': audio_url,
+            'links': [{'url': audio_url}] if audio_url else []
+        }
+        songs.append(song_entry)
+
+    album_artists_str = ', '.join(sorted(unique_artists)) if unique_artists else ''
+    album_details = {
+        'album_name': album_name,
+        'music_director': album_artists_str,
+        'director': '',
+        'star_cast': album_artists_str,
+        'year': release_year,
+        'thumbnail_url': thumbnail_url
+    }
+
+    return {
+        'url': article_url,
+        'album_details': album_details,
+        'thumbnail_url': thumbnail_url,
+        'songs': songs
+    }
+
+
+def check_existing_single_article_records(album_name: str, album_year: str, songs: list[dict]) -> dict[str, Any]:
+    """Check database for existing albums/songs matching scraped single-article data."""
+    from db_utils import get_db_connection
+
+    conflicts: dict[str, Any] = {'albums': [], 'songs': []}
+    if isinstance(album_year, int):
+        year = album_year
+    else:
+        year = clean_year((album_year or '').strip())
+
+    if not album_name:
+        logger.warning("Cannot check album duplicates without album name")
+        return conflicts
+
+    logger.info("Checking database for existing records that match this article...")
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+
+            # Album-level conflicts by title + year
+            cursor.execute(
+                """
+                SELECT id, title, thumbnail_url, year, created_at
+                FROM albums
+                WHERE title = %s
+                  AND COALESCE(year, 0) = COALESCE(%s, 0)
+                ORDER BY id ASC
+                """,
+                (album_name, year)
+            )
+            conflicts['albums'] = cursor.fetchall()
+            album_id = None
+            if conflicts['albums']:
+                album_id = conflicts['albums'][0]['id']
+
+            # Song-level conflicts by title + album
+            duplicate_songs = []
+            for song in songs:
+                song_title = clean_string(song.get('title', ''))
+                if not song_title or not album_id:
+                    continue
+
+                cursor.execute(
+                    """
+                    SELECT id, title, audio_url, album_id
+                    FROM songs
+                    WHERE title = %s AND album_id  = %s
+                    LIMIT 5
+                    """,
+                    (song_title, album_id)
+                )
+                matches = cursor.fetchall()
+                if matches:
+                    duplicate_songs.append({
+                        'song': song,
+                        'matches': matches
+                    })
+
+            conflicts['songs'] = duplicate_songs
+            cursor.close()
+
+    except Exception as err:
+        logger.error(f"Error checking existing records: {err}")
+
+    albums_found = len(conflicts['albums'])
+    songs_found = sum(len(item['matches']) for item in conflicts['songs'])
+
+    if albums_found:
+        logger.info(f"Found {albums_found} existing album record(s) with the same title and year:")
+        for record in conflicts['albums'][:5]:
+            logger.info(
+                "  Album ID %s • Year %s • Thumb %s",
+                record['id'],
+                record.get('year') or 'N/A',
+                record.get('thumbnail_url', '')
+            )
+    else:
+        logger.info("No matching albums found for this title + thumbnail combination")
+
+    if songs_found:
+        logger.info(f"Found {songs_found} matching song record(s) with identical title + album:")
+        for entry in conflicts['songs']:
+            song = entry['song']
+            links = song.get('links') or []
+            audio_url = ''
+            if links and isinstance(links, list):
+                first_link = links[0] or {}
+                if isinstance(first_link, dict):
+                    audio_url = first_link.get('url', '') or ''
+            logger.info(f"  Song '{song.get('title', '')}' ({audio_url or 'no audio URL'})")
+            for match in entry['matches']:
+                logger.info(f"    → Existing song ID {match['id']} (album_id={match['album_id']})")
+    else:
+        logger.info("No matching songs found for title + audio URL pairs")
+
+    return conflicts
+
+
 def run_single_article(
     article_url: str,
     sql_output: Path = Path('sql_output'),
@@ -1277,7 +1560,11 @@ def run_single_article(
     
     # Scrape the article without date filtering
     logger.info("Scraping article...")
-    article_result = scrape_article_details(article_url, timeout=timeout)
+    domain = urlparse(article_url).netloc.lower()
+    if 'pagalworldmusic.com' in domain:
+        article_result = scrape_pagalworld_album(article_url, timeout=timeout)
+    else:
+        article_result = scrape_article_details(article_url, timeout=timeout)
     
     if not article_result or 'error' in article_result:
         logger.error(f"Failed to scrape article: {article_result.get('error', 'Unknown error')}")
@@ -1286,7 +1573,7 @@ def run_single_article(
     # Extract data
     album_details = article_result.get('album_details', {})
     album_name = album_details.get('album_name', '')
-    
+    album_year = ''
     # If album_name not found in details, try to extract from page title
     if not album_name:
         try:
@@ -1298,10 +1585,12 @@ def run_single_article(
             
             # Try to get from h1.entry-title
             title_tag = soup.find('h1', class_='entry-title')
+            
             if title_tag:
                 title_text = title_tag.get_text().strip()
                 # Remove year in parentheses if present: "Album Name (2015)" -> "Album Name"
                 import re
+                album_name, album_year = extract_album_year_from_title(title_text)
                 album_name = re.sub(r'\s*\(\d{4}\)\s*$', '', title_text).strip()
                 if album_name:
                     album_details['album_name'] = album_name
@@ -1314,13 +1603,66 @@ def run_single_article(
         album_name = album_details.get('album_name', 'Unknown')
     
     songs = article_result.get('songs', [])
+    thumbnail_url = article_result.get('thumbnail_url', '')
+    album_year = album_details.get('year', '') or ''
     
     logger.info(f"Album: {album_name}")
     logger.info(f"Songs found: {len(songs)}")
+
+    conflicts = check_existing_single_article_records(album_name, str(album_year) if album_year else '', songs)
+    conflict_count = len(conflicts['albums']) + sum(len(item['matches']) for item in conflicts['songs'])
+    if conflict_count:
+        logger.info("Conflicting records detected. Skipping SQL generation and database inserts for this article.")
+        logger.info("Resolve duplicates (delete/update) before rerunning single-article ingestion if needed.")
+        logger.info("Single article check completed with conflicts present.")
+        return
+    else:
+        logger.info("No existing duplicates detected. Continuing with SQL generation for visibility.")
     
     # Create collector and add data
     collector = SQLDataCollector(incremental_mode=True)
     collector.add_article_data(article_result)
+
+    # Verbose detail dump for single-article runs
+    if collector.albums:
+        logger.info("Album Details:")
+        for album in collector.albums.values():
+            logger.info(
+                "  • %s (Year: %s)",
+                album.get('title', 'Unknown'),
+                album.get('year') or 'N/A'
+            )
+            logger.info("      Director: %s", album.get('director') or 'N/A')
+            logger.info("      Music Director: %s", album.get('music_director') or 'N/A')
+            logger.info("      Star Cast: %s", album.get('star_cast') or 'N/A')
+            logger.info("      Thumbnail: %s", album.get('thumbnail_url') or 'N/A')
+
+    if collector.songs:
+        logger.info("Song Details:")
+        for idx, song in enumerate(collector.songs, start=1):
+            logger.info(
+                "  %d. %s — Singers: %s",
+                idx,
+                song.get('title', 'Unknown'),
+                song.get('singer') or 'N/A'
+            )
+            if song.get('audio_url'):
+                logger.info("       Audio: %s", song['audio_url'])
+
+    if collector.artists:
+        logger.info("Artists:")
+        for artist_name, album_name in sorted(collector.artists):
+            logger.info("  • %s (Album: %s)", artist_name, album_name)
+
+    if collector.singers:
+        logger.info("Singers:")
+        for singer_name in sorted(collector.singers):
+            logger.info("  • %s", singer_name)
+
+    if collector.music_directors:
+        logger.info("Music Directors:")
+        for director_name, album_name in sorted(collector.music_directors):
+            logger.info("  • %s (Album: %s)", director_name, album_name)
     
     # Generate SQL files
     sql_output.mkdir(parents=True, exist_ok=True)

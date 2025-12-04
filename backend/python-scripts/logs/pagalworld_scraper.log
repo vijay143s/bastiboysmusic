@@ -1,0 +1,798 @@
+2025-12-04 20:21:00,889 - __main__ - INFO - Testing database connection...
+2025-12-04 20:21:01,450 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:21:01,450 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:21:01,450 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:21:03,213 - db_utils - INFO - Database connection established
+2025-12-04 20:21:03,847 - db_utils - INFO - Database connection closed
+2025-12-04 20:21:03,847 - __main__ - INFO - ✅ Database connection OK
+
+2025-12-04 20:21:03,863 - __main__ - INFO - ======================================================================
+2025-12-04 20:21:03,866 - __main__ - INFO - 🚀 FULL LOAD: HINDI
+2025-12-04 20:21:03,866 - __main__ - INFO -    ⚠️  Will DELETE all HINDI data before reloading
+2025-12-04 20:21:03,866 - __main__ - INFO -    📄 Scraping 1 page(s)
+2025-12-04 20:21:03,866 - __main__ - INFO - ======================================================================
+2025-12-04 20:21:03,866 - __main__ - INFO - 
+📥 Scraping hindi (1 pages)...
+2025-12-04 20:21:03,866 - __main__ - INFO - 📄 Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:24:08,363 - __main__ - INFO - Testing database connection...
+2025-12-04 20:24:08,836 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:24:08,836 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:24:08,836 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:24:10,498 - db_utils - INFO - Database connection established
+2025-12-04 20:24:11,115 - db_utils - INFO - Database connection closed
+2025-12-04 20:24:11,115 - __main__ - INFO - ✅ Database connection OK
+
+2025-12-04 20:24:11,115 - __main__ - INFO - ======================================================================
+2025-12-04 20:24:11,115 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:24:11,115 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:24:11,115 - __main__ - INFO -    [PAGES] Scraping 2 page(s)
+2025-12-04 20:24:11,115 - __main__ - INFO - ======================================================================
+2025-12-04 20:24:11,115 - __main__ - INFO - 
+[SCRAPING] hindi (2 pages)...
+2025-12-04 20:24:11,115 - __main__ - INFO - 📄 Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:24:11,747 - __main__ - INFO -    Found 20 items
+2025-12-04 20:24:12,747 - __main__ - INFO - 📄 Scraping HINDI page 2: https://pagalworldmusic.com/language/hindi?page=2
+2025-12-04 20:24:21,556 - __main__ - INFO -    Found 0 items
+2025-12-04 20:24:21,556 - __main__ - INFO -    No items found on page 2, stopping
+2025-12-04 20:24:21,556 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:24:21,556 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:24:21,556 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:24:26,647 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:24:32,288 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:24:34,556 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:24:42,097 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:24:46,414 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:24:46,424 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:24:46,424 - __main__ - INFO - ✅ SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:24:46,424 - __main__ - INFO - ======================================================================
+2025-12-04 20:24:46,424 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:24:46,424 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:24:46,426 - __main__ - INFO -   Albums: 5
+2025-12-04 20:24:46,426 - __main__ - INFO -   Songs: 27
+2025-12-04 20:24:46,426 - __main__ - INFO -   Singers: 0
+2025-12-04 20:24:46,426 - __main__ - INFO -   Artists: 0
+2025-12-04 20:24:46,427 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:24:46,427 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:24:46,428 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:24:46,428 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:24:48,941 - db_utils - INFO - Database connection established
+2025-12-04 20:24:48,942 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:24:50,730 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:24:50,731 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:24:51,786 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:24:51,786 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:24:52,712 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:24:52,713 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:24:53,328 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:24:53,328 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:24:53,965 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:24:53,965 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:24:54,589 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:24:54,791 - db_utils - INFO - Database connection closed
+2025-12-04 20:24:54,792 - __main__ - INFO - Execution result: ✅ Success
+2025-12-04 20:24:54,792 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:24:54,793 - __main__ - INFO - ✅ FULL LOAD COMPLETE
+2025-12-04 20:24:54,793 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:26:56,527 - __main__ - INFO - Testing database connection...
+2025-12-04 20:26:56,978 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:26:56,979 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:26:56,982 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:26:58,625 - db_utils - INFO - Database connection established
+2025-12-04 20:26:59,274 - db_utils - INFO - Database connection closed
+2025-12-04 20:26:59,274 - __main__ - INFO - ✅ Database connection OK
+
+2025-12-04 20:26:59,289 - __main__ - INFO - ======================================================================
+2025-12-04 20:26:59,291 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:26:59,291 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:26:59,291 - __main__ - INFO -    [PAGES] Scraping 2 page(s)
+2025-12-04 20:26:59,291 - __main__ - INFO - ======================================================================
+2025-12-04 20:26:59,291 - __main__ - INFO - 
+[SCRAPING] hindi (2 pages)...
+2025-12-04 20:26:59,291 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:26:59,927 - __main__ - INFO -    Found 20 items
+2025-12-04 20:27:00,937 - __main__ - INFO - [PAGE] Scraping HINDI page 2: https://pagalworldmusic.com/language/hindi/2
+2025-12-04 20:27:01,324 - __main__ - INFO -    Found 20 items
+2025-12-04 20:27:02,337 - __main__ - INFO - Found 40 items total
+
+2025-12-04 20:27:02,339 - __main__ - INFO - 📀 Processing 10 albums...
+2025-12-04 20:27:02,340 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:27:09,953 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:27:17,515 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:27:20,599 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:27:31,861 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:27:37,576 - __main__ - INFO -    → De De Pyaar De 2
+2025-12-04 20:27:44,105 - __main__ - INFO -    → Baramulla Original Motion Picture Soundtrack
+2025-12-04 20:28:20,733 - __main__ - INFO - Testing database connection...
+2025-12-04 20:28:21,187 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:28:21,187 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:28:21,187 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:28:23,165 - db_utils - INFO - Database connection established
+2025-12-04 20:28:23,803 - db_utils - INFO - Database connection closed
+2025-12-04 20:28:23,803 - __main__ - INFO - ✅ Database connection OK
+
+2025-12-04 20:28:23,811 - __main__ - INFO - ======================================================================
+2025-12-04 20:28:23,811 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:28:23,811 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:28:23,811 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:28:23,811 - __main__ - INFO - ======================================================================
+2025-12-04 20:28:23,811 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:28:23,812 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:28:24,373 - __main__ - INFO -    Found 20 items
+2025-12-04 20:28:25,377 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:28:25,377 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:28:25,378 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:28:32,957 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:28:40,522 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:28:45,669 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:28:56,967 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:29:02,312 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:29:02,322 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:29:02,322 - __main__ - INFO - ✅ SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:29:02,322 - __main__ - INFO - ======================================================================
+2025-12-04 20:29:02,322 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:29:02,322 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:29:02,322 - __main__ - INFO -   Albums: 5
+2025-12-04 20:29:02,322 - __main__ - INFO -   Songs: 27
+2025-12-04 20:29:02,322 - __main__ - INFO -   Singers: 0
+2025-12-04 20:29:02,322 - __main__ - INFO -   Artists: 0
+2025-12-04 20:29:02,322 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:29:02,322 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:29:02,322 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:29:02,322 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:29:08,384 - db_utils - INFO - Database connection established
+2025-12-04 20:29:08,384 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:29:09,814 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:29:09,814 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:29:10,824 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:29:10,824 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:29:11,394 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:29:11,394 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:29:11,997 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:29:11,998 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:29:12,588 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:29:12,588 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:29:13,810 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:29:14,010 - db_utils - INFO - Database connection closed
+2025-12-04 20:29:14,011 - __main__ - INFO - Execution result: ✅ Success
+2025-12-04 20:29:14,012 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:29:14,012 - __main__ - INFO - ✅ FULL LOAD COMPLETE
+2025-12-04 20:29:14,013 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:31:03,307 - __main__ - INFO - Testing database connection...
+2025-12-04 20:31:03,825 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:31:03,825 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:31:03,825 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:31:05,643 - db_utils - INFO - Database connection established
+2025-12-04 20:31:06,310 - db_utils - INFO - Database connection closed
+2025-12-04 20:31:06,310 - __main__ - INFO - [OK] Database connection OK
+
+2025-12-04 20:31:06,310 - __main__ - INFO - ======================================================================
+2025-12-04 20:31:06,310 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:31:06,310 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:31:06,310 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:31:06,310 - __main__ - INFO - ======================================================================
+2025-12-04 20:31:06,310 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:31:06,310 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:31:06,924 - __main__ - INFO -    Found 20 items
+2025-12-04 20:31:07,934 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:31:07,934 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:31:07,934 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:31:15,439 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:31:23,232 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:31:26,280 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:31:37,030 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:31:42,297 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:31:42,302 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:31:42,302 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:31:42,302 - __main__ - INFO - ======================================================================
+2025-12-04 20:31:42,302 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:31:42,302 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:31:42,302 - __main__ - INFO -   Albums: 5
+2025-12-04 20:31:42,302 - __main__ - INFO -   Songs: 27
+2025-12-04 20:31:42,302 - __main__ - INFO -   Singers: 0
+2025-12-04 20:31:42,302 - __main__ - INFO -   Artists: 0
+2025-12-04 20:31:42,302 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:31:42,302 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:31:42,302 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:31:42,302 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:31:45,251 - db_utils - INFO - Database connection established
+2025-12-04 20:31:45,251 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:31:46,859 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:31:46,859 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:31:47,910 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:31:47,910 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:31:48,576 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:31:48,581 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:31:49,209 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:31:49,209 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:31:49,878 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:31:49,878 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:31:50,792 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:31:51,008 - db_utils - INFO - Database connection closed
+2025-12-04 20:31:51,008 - __main__ - INFO - Execution result: [OK] Success
+2025-12-04 20:31:51,008 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:31:51,008 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 20:31:51,008 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:35:26,053 - __main__ - INFO - Testing database connection...
+2025-12-04 20:35:26,503 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:35:26,503 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:35:26,503 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:35:28,169 - db_utils - INFO - Database connection established
+2025-12-04 20:35:28,757 - db_utils - INFO - Database connection closed
+2025-12-04 20:35:28,757 - __main__ - INFO - [OK] Database connection OK
+
+2025-12-04 20:35:28,757 - __main__ - INFO - ======================================================================
+2025-12-04 20:35:28,757 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:35:28,757 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:35:28,757 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:35:28,757 - __main__ - INFO - ======================================================================
+2025-12-04 20:35:28,757 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:35:28,757 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:35:29,687 - __main__ - INFO -    Found 20 items
+2025-12-04 20:35:30,699 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:35:30,699 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:35:30,702 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:35:38,463 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:35:46,275 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:35:49,341 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:36:00,975 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:36:06,256 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:36:06,257 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:36:06,257 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:36:06,257 - __main__ - INFO - ======================================================================
+2025-12-04 20:36:06,257 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:36:06,257 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:36:06,257 - __main__ - INFO -   Albums: 5
+2025-12-04 20:36:06,257 - __main__ - INFO -   Songs: 27
+2025-12-04 20:36:06,257 - __main__ - INFO -   Singers: 0
+2025-12-04 20:36:06,257 - __main__ - INFO -   Artists: 0
+2025-12-04 20:36:06,257 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:36:06,257 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:36:06,257 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:36:06,257 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:36:08,243 - db_utils - INFO - Database connection established
+2025-12-04 20:36:08,243 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:36:10,274 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:36:10,274 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:36:11,289 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:36:11,289 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:36:11,874 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:36:11,874 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:36:12,738 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:36:12,738 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:36:13,307 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:36:13,307 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:36:13,897 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:36:14,085 - db_utils - INFO - Database connection closed
+2025-12-04 20:36:14,085 - __main__ - INFO - Execution result: [OK] Success
+2025-12-04 20:36:14,085 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:36:14,085 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 20:36:14,085 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:37:36,673 - __main__ - INFO - Testing database connection...
+2025-12-04 20:37:37,157 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:37:37,157 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:37:37,157 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:37:39,466 - db_utils - INFO - Database connection established
+2025-12-04 20:37:40,098 - db_utils - INFO - Database connection closed
+2025-12-04 20:37:40,099 - __main__ - INFO - [OK] Database connection OK
+
+2025-12-04 20:37:40,099 - __main__ - INFO - ======================================================================
+2025-12-04 20:37:40,099 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:37:40,099 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:37:40,099 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:37:40,099 - __main__ - INFO - ======================================================================
+2025-12-04 20:37:40,100 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:37:40,100 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:37:40,807 - __main__ - INFO -    Found 20 items
+2025-12-04 20:37:41,822 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:37:41,822 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:37:41,826 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:37:49,984 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:37:57,500 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:38:00,581 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:38:11,378 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:38:16,912 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:38:16,913 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:38:16,913 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:38:16,913 - __main__ - INFO - ======================================================================
+2025-12-04 20:38:16,913 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:38:16,913 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:38:16,913 - __main__ - INFO -   Albums: 5
+2025-12-04 20:38:16,913 - __main__ - INFO -   Songs: 27
+2025-12-04 20:38:16,913 - __main__ - INFO -   Singers: 0
+2025-12-04 20:38:16,913 - __main__ - INFO -   Artists: 0
+2025-12-04 20:38:16,913 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:38:16,913 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:38:16,913 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:38:16,913 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:38:19,600 - db_utils - INFO - Database connection established
+2025-12-04 20:38:19,600 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:38:21,124 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:38:21,124 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:38:22,844 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:38:22,844 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:38:23,830 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:38:23,830 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:38:24,491 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:38:24,491 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:38:25,134 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:38:25,134 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:38:26,475 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:38:26,696 - db_utils - INFO - Database connection closed
+2025-12-04 20:38:26,696 - __main__ - INFO - Execution result: [OK] Success
+2025-12-04 20:38:26,696 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:38:26,696 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 20:38:26,696 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:42:26,154 - __main__ - INFO - Testing database connection...
+2025-12-04 20:42:26,594 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:42:26,594 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:42:26,594 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:42:28,098 - db_utils - INFO - Database connection established
+2025-12-04 20:42:28,670 - db_utils - INFO - Database connection closed
+2025-12-04 20:42:28,671 - __main__ - INFO - [OK] Database connection OK
+
+2025-12-04 20:42:28,671 - __main__ - INFO - ======================================================================
+2025-12-04 20:42:28,671 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:42:28,671 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:42:28,672 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:42:28,672 - __main__ - INFO - ======================================================================
+2025-12-04 20:42:28,672 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:42:28,672 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:42:29,219 - __main__ - INFO -    Found 20 items
+2025-12-04 20:42:30,224 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:42:30,224 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:42:30,225 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:42:37,755 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:42:45,279 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:42:48,365 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:42:59,235 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:43:04,605 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:43:04,613 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:43:04,613 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:43:04,613 - __main__ - INFO - ======================================================================
+2025-12-04 20:43:04,615 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:43:04,615 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:43:04,615 - __main__ - INFO -   Albums: 5
+2025-12-04 20:43:04,615 - __main__ - INFO -   Songs: 27
+2025-12-04 20:43:04,615 - __main__ - INFO -   Singers: 0
+2025-12-04 20:43:04,616 - __main__ - INFO -   Artists: 0
+2025-12-04 20:43:04,616 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:43:04,617 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:43:04,618 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:43:04,619 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:43:06,669 - db_utils - INFO - Database connection established
+2025-12-04 20:43:06,669 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:43:08,331 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:43:08,331 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:43:09,340 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:43:09,340 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:43:09,949 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:43:09,949 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:43:10,567 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:43:10,567 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:43:11,204 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:43:11,224 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:43:11,855 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:43:12,049 - db_utils - INFO - Database connection closed
+2025-12-04 20:43:12,049 - __main__ - INFO - Execution result: [OK] Success
+2025-12-04 20:43:12,049 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:43:12,049 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 20:43:12,049 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:45:24,736 - __main__ - INFO - Testing database connection...
+2025-12-04 20:45:25,191 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 20:45:25,191 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 20:45:25,191 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 20:45:27,146 - db_utils - INFO - Database connection established
+2025-12-04 20:45:28,419 - db_utils - INFO - Database connection closed
+2025-12-04 20:45:28,419 - __main__ - INFO - [OK] Database connection OK
+
+2025-12-04 20:45:28,419 - __main__ - INFO - ======================================================================
+2025-12-04 20:45:28,419 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:45:28,419 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:45:28,419 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:45:28,419 - __main__ - INFO - ======================================================================
+2025-12-04 20:45:28,419 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:45:28,419 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:45:29,065 - __main__ - INFO -    Found 20 items
+2025-12-04 20:45:30,096 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:45:30,097 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:45:30,097 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:45:35,125 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:45:40,457 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:45:42,675 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:45:50,839 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:45:54,685 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:45:54,778 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:45:54,778 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:45:54,779 - __main__ - INFO - ======================================================================
+2025-12-04 20:45:54,779 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:45:54,781 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:45:54,785 - __main__ - INFO -   Albums: 5
+2025-12-04 20:45:54,785 - __main__ - INFO -   Songs: 27
+2025-12-04 20:45:54,787 - __main__ - INFO -   Singers: 0
+2025-12-04 20:45:54,787 - __main__ - INFO -   Artists: 0
+2025-12-04 20:45:54,787 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:45:54,789 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:45:54,790 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:45:54,791 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 20:45:57,439 - db_utils - INFO - Database connection established
+2025-12-04 20:45:57,439 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 20:45:59,217 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 20:45:59,217 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 20:45:59,889 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 20:45:59,889 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 20:46:00,570 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 20:46:00,570 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 20:46:01,220 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 20:46:01,220 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 20:46:01,870 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 20:46:01,870 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 20:46:02,779 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 20:46:03,001 - db_utils - INFO - Database connection closed
+2025-12-04 20:46:03,001 - __main__ - INFO - Execution result: [OK] Success
+2025-12-04 20:46:03,002 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:46:03,002 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 20:46:03,002 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:49:45,985 - __main__ - INFO - ======================================================================
+2025-12-04 20:49:45,985 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 20:49:45,985 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 20:49:45,985 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 20:49:45,985 - __main__ - INFO - ======================================================================
+2025-12-04 20:49:45,985 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 20:49:45,985 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 20:49:49,015 - __main__ - INFO -    Found 20 items
+2025-12-04 20:49:50,025 - __main__ - INFO - Found 20 items total
+
+2025-12-04 20:49:50,026 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 20:49:50,026 - __main__ - INFO -    → Dhurandhar
+2025-12-04 20:49:56,734 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 20:50:04,803 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 20:50:08,448 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 20:50:20,417 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 20:50:26,664 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 20:50:26,672 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:50:26,672 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 20:50:26,672 - __main__ - INFO - ======================================================================
+2025-12-04 20:50:26,672 - __main__ - INFO -   Language: HINDI
+2025-12-04 20:50:26,672 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 20:50:26,673 - __main__ - INFO -   Albums: 5
+2025-12-04 20:50:26,673 - __main__ - INFO -   Songs: 27
+2025-12-04 20:50:26,673 - __main__ - INFO -   Singers: 0
+2025-12-04 20:50:26,673 - __main__ - INFO -   Artists: 0
+2025-12-04 20:50:26,673 - __main__ - INFO -   Music Directors: 0
+2025-12-04 20:50:26,675 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 20:50:26,675 - __main__ - INFO - ======================================================================
+
+2025-12-04 20:50:26,675 - __main__ - INFO - 
+======================================================================
+2025-12-04 20:50:26,675 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 20:50:26,675 - __main__ - INFO - ======================================================================
+
+2025-12-04 21:01:51,310 - __main__ - INFO - ======================================================================
+2025-12-04 21:01:51,310 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 21:01:51,310 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 21:01:51,310 - __main__ - INFO -    [PAGES] Scraping 1 page(s)
+2025-12-04 21:01:51,310 - __main__ - INFO - ======================================================================
+2025-12-04 21:01:51,310 - __main__ - INFO - 
+[SCRAPING] hindi (1 pages)...
+2025-12-04 21:01:51,310 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 21:01:52,059 - __main__ - INFO -    Found 20 items
+2025-12-04 21:01:53,070 - __main__ - INFO - Found 20 items total
+
+2025-12-04 21:01:53,070 - __main__ - INFO - 📀 Processing 5 albums...
+2025-12-04 21:01:53,070 - __main__ - INFO -    → Dhurandhar
+2025-12-04 21:01:59,225 - __main__ - INFO -    → De De Pyaar De 2 Deluxe Album
+2025-12-04 21:02:05,584 - __main__ - INFO -    → Ek Deewane Ki Deewaniyat
+2025-12-04 21:02:08,037 - __main__ - INFO -    → Tere Ishk Mein
+2025-12-04 21:02:16,207 - __main__ - INFO -    → 120 Bahadur Original Motion Picture Soundtrack
+2025-12-04 21:02:20,613 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 21:02:20,629 - __main__ - INFO - 
+======================================================================
+2025-12-04 21:02:20,631 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 21:02:20,631 - __main__ - INFO - ======================================================================
+2025-12-04 21:02:20,631 - __main__ - INFO -   Language: HINDI
+2025-12-04 21:02:20,631 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 21:02:20,631 - __main__ - INFO -   Albums: 5
+2025-12-04 21:02:20,631 - __main__ - INFO -   Songs: 27
+2025-12-04 21:02:20,631 - __main__ - INFO -   Singers: 0
+2025-12-04 21:02:20,631 - __main__ - INFO -   Artists: 0
+2025-12-04 21:02:20,631 - __main__ - INFO -   Music Directors: 0
+2025-12-04 21:02:20,633 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 21:02:20,633 - __main__ - INFO - ======================================================================
+
+2025-12-04 21:02:20,634 - __main__ - INFO - 
+======================================================================
+2025-12-04 21:02:20,634 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 21:02:20,634 - __main__ - INFO - ======================================================================
+
+2025-12-04 23:20:27,012 - __main__ - INFO - Testing database connection...
+2025-12-04 23:20:27,634 - mysql.connector - INFO - package: mysql.connector.plugins
+2025-12-04 23:20:27,634 - mysql.connector - INFO - plugin_name: mysql_native_password
+2025-12-04 23:20:27,634 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
+2025-12-04 23:20:29,726 - db_utils - INFO - Database connection established
+2025-12-04 23:20:30,453 - db_utils - INFO - Database connection closed
+2025-12-04 23:20:30,453 - __main__ - INFO - [OK] Database connection OK
+
+2025-12-04 23:20:30,453 - __main__ - INFO - ======================================================================
+2025-12-04 23:20:30,453 - __main__ - INFO - [FULL LOAD] HINDI
+2025-12-04 23:20:30,454 - __main__ - INFO -    [DELETE] Will DELETE all HINDI data before reloading
+2025-12-04 23:20:30,454 - __main__ - INFO -    [PAGES] Scraping ALL pages (pagination)
+2025-12-04 23:20:30,454 - __main__ - INFO - ======================================================================
+2025-12-04 23:20:30,454 - __main__ - INFO - 
+[SCRAPING] hindi (all pages)...
+2025-12-04 23:20:30,454 - __main__ - INFO - [PAGE] Scraping HINDI page 1: https://pagalworldmusic.com/language/hindi
+2025-12-04 23:20:31,177 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:32,180 - __main__ - INFO - [PAGE] Scraping HINDI page 2: https://pagalworldmusic.com/language/hindi/2
+2025-12-04 23:20:32,537 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:33,548 - __main__ - INFO - [PAGE] Scraping HINDI page 3: https://pagalworldmusic.com/language/hindi/3
+2025-12-04 23:20:34,171 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:35,179 - __main__ - INFO - [PAGE] Scraping HINDI page 4: https://pagalworldmusic.com/language/hindi/4
+2025-12-04 23:20:35,629 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:36,648 - __main__ - INFO - [PAGE] Scraping HINDI page 5: https://pagalworldmusic.com/language/hindi/5
+2025-12-04 23:20:54,298 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:55,304 - __main__ - INFO - [PAGE] Scraping HINDI page 6: https://pagalworldmusic.com/language/hindi/6
+2025-12-04 23:20:55,657 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:56,662 - __main__ - INFO - [PAGE] Scraping HINDI page 7: https://pagalworldmusic.com/language/hindi/7
+2025-12-04 23:20:57,012 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:58,023 - __main__ - INFO - [PAGE] Scraping HINDI page 8: https://pagalworldmusic.com/language/hindi/8
+2025-12-04 23:20:58,373 - __main__ - INFO -    Found 20 items
+2025-12-04 23:20:59,382 - __main__ - INFO - [PAGE] Scraping HINDI page 9: https://pagalworldmusic.com/language/hindi/9
+2025-12-04 23:20:59,724 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:00,740 - __main__ - INFO - [PAGE] Scraping HINDI page 10: https://pagalworldmusic.com/language/hindi/10
+2025-12-04 23:21:01,096 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:02,104 - __main__ - INFO - [PAGE] Scraping HINDI page 11: https://pagalworldmusic.com/language/hindi/11
+2025-12-04 23:21:02,459 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:03,472 - __main__ - INFO - [PAGE] Scraping HINDI page 12: https://pagalworldmusic.com/language/hindi/12
+2025-12-04 23:21:20,801 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:21,813 - __main__ - INFO - [PAGE] Scraping HINDI page 13: https://pagalworldmusic.com/language/hindi/13
+2025-12-04 23:21:22,170 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:23,180 - __main__ - INFO - [PAGE] Scraping HINDI page 14: https://pagalworldmusic.com/language/hindi/14
+2025-12-04 23:21:23,536 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:24,540 - __main__ - INFO - [PAGE] Scraping HINDI page 15: https://pagalworldmusic.com/language/hindi/15
+2025-12-04 23:21:24,913 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:25,917 - __main__ - INFO - [PAGE] Scraping HINDI page 16: https://pagalworldmusic.com/language/hindi/16
+2025-12-04 23:21:45,679 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:46,690 - __main__ - INFO - [PAGE] Scraping HINDI page 17: https://pagalworldmusic.com/language/hindi/17
+2025-12-04 23:21:47,057 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:48,069 - __main__ - INFO - [PAGE] Scraping HINDI page 18: https://pagalworldmusic.com/language/hindi/18
+2025-12-04 23:21:48,460 - __main__ - INFO -    Found 20 items
+2025-12-04 23:21:49,472 - __main__ - INFO - [PAGE] Scraping HINDI page 19: https://pagalworldmusic.com/language/hindi/19
+2025-12-04 23:22:12,282 - __main__ - INFO -    Found 20 items
+2025-12-04 23:22:13,292 - __main__ - INFO - [PAGE] Scraping HINDI page 20: https://pagalworldmusic.com/language/hindi/20
+2025-12-04 23:22:34,860 - __main__ - INFO -    Found 20 items
+2025-12-04 23:22:35,864 - __main__ - INFO - [PAGE] Scraping HINDI page 21: https://pagalworldmusic.com/language/hindi/21
+2025-12-04 23:22:36,244 - __main__ - INFO -    Found 20 items
+2025-12-04 23:22:37,251 - __main__ - INFO - [PAGE] Scraping HINDI page 22: https://pagalworldmusic.com/language/hindi/22
+2025-12-04 23:22:37,619 - __main__ - INFO -    Found 20 items
+2025-12-04 23:22:38,635 - __main__ - INFO - [PAGE] Scraping HINDI page 23: https://pagalworldmusic.com/language/hindi/23
+2025-12-04 23:23:04,512 - __main__ - INFO -    Found 20 items
+2025-12-04 23:23:05,526 - __main__ - INFO - [PAGE] Scraping HINDI page 24: https://pagalworldmusic.com/language/hindi/24
+2025-12-04 23:23:35,229 - __main__ - INFO -    Found 20 items
+2025-12-04 23:23:36,238 - __main__ - INFO - [PAGE] Scraping HINDI page 25: https://pagalworldmusic.com/language/hindi/25
+2025-12-04 23:23:36,590 - __main__ - INFO -    Found 20 items
+2025-12-04 23:23:37,601 - __main__ - INFO - [PAGE] Scraping HINDI page 26: https://pagalworldmusic.com/language/hindi/26
+2025-12-04 23:24:07,609 - __main__ - ERROR - Error scraping page 26: HTTPSConnectionPool(host='pagalworldmusic.com', port=443): Read timed out. (read timeout=30)
+2025-12-04 23:24:07,610 - __main__ - INFO - Found 500 items total
+
+2025-12-04 23:24:07,610 - __main__ - INFO - 📀 Processing 169 albums...
+2025-12-04 23:24:07,610 - __main__ - INFO - 🔄 Fetching 169 album details with 10 parallel workers...
+2025-12-04 23:24:09,092 - __main__ - INFO -    [OK] (5/169) Fetched album details
+2025-12-04 23:24:09,823 - __main__ - INFO -    [OK] (10/169) Fetched album details
+2025-12-04 23:24:10,239 - __main__ - INFO -    [OK] (15/169) Fetched album details
+2025-12-04 23:24:10,656 - __main__ - INFO -    [OK] (20/169) Fetched album details
+2025-12-04 23:24:11,050 - __main__ - INFO -    [OK] (25/169) Fetched album details
+2025-12-04 23:24:11,475 - __main__ - INFO -    [OK] (30/169) Fetched album details
+2025-12-04 23:24:11,841 - __main__ - INFO -    [OK] (35/169) Fetched album details
+2025-12-04 23:24:12,457 - __main__ - INFO -    [OK] (40/169) Fetched album details
+2025-12-04 23:24:12,672 - __main__ - INFO -    [OK] (45/169) Fetched album details
+2025-12-04 23:24:13,251 - __main__ - INFO -    [OK] (50/169) Fetched album details
+2025-12-04 23:24:13,518 - __main__ - INFO -    [OK] (55/169) Fetched album details
+2025-12-04 23:24:14,135 - __main__ - INFO -    [OK] (60/169) Fetched album details
+2025-12-04 23:24:14,330 - __main__ - INFO -    [OK] (65/169) Fetched album details
+2025-12-04 23:24:14,942 - __main__ - INFO -    [OK] (70/169) Fetched album details
+2025-12-04 23:24:15,255 - __main__ - INFO -    [OK] (75/169) Fetched album details
+2025-12-04 23:24:15,906 - __main__ - INFO -    [OK] (80/169) Fetched album details
+2025-12-04 23:24:16,153 - __main__ - INFO -    [OK] (85/169) Fetched album details
+2025-12-04 23:24:16,770 - __main__ - INFO -    [OK] (90/169) Fetched album details
+2025-12-04 23:24:17,031 - __main__ - INFO -    [OK] (95/169) Fetched album details
+2025-12-04 23:24:17,589 - __main__ - INFO -    [OK] (100/169) Fetched album details
+2025-12-04 23:24:17,823 - __main__ - INFO -    [OK] (105/169) Fetched album details
+2025-12-04 23:24:18,483 - __main__ - INFO -    [OK] (110/169) Fetched album details
+2025-12-04 23:24:18,778 - __main__ - INFO -    [OK] (115/169) Fetched album details
+2025-12-04 23:24:19,330 - __main__ - INFO -    [OK] (120/169) Fetched album details
+2025-12-04 23:24:19,821 - __main__ - INFO -    [OK] (125/169) Fetched album details
+2025-12-04 23:24:20,250 - __main__ - INFO -    [OK] (130/169) Fetched album details
+2025-12-04 23:24:20,755 - __main__ - INFO -    [OK] (135/169) Fetched album details
+2025-12-04 23:24:21,092 - __main__ - INFO -    [OK] (140/169) Fetched album details
+2025-12-04 23:24:21,794 - __main__ - INFO -    [OK] (145/169) Fetched album details
+2025-12-04 23:24:21,936 - __main__ - INFO -    [OK] (150/169) Fetched album details
+2025-12-04 23:24:22,652 - __main__ - INFO -    [OK] (155/169) Fetched album details
+2025-12-04 23:24:23,145 - __main__ - INFO -    [OK] (160/169) Fetched album details
+2025-12-04 23:24:23,602 - __main__ - INFO -    [OK] (165/169) Fetched album details
+2025-12-04 23:24:23,852 - __main__ - INFO -    [OK] (169/169) Fetched album details
+2025-12-04 23:24:23,854 - __main__ - INFO - 🎵 Found 757 songs to process
+2025-12-04 23:24:23,854 - __main__ - INFO - 🎵 Fetching 757 song details with 15 parallel workers...
+2025-12-04 23:24:24,969 - __main__ - INFO -    [OK] (10/757) Fetched song details
+2025-12-04 23:24:25,110 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:24:25,151 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:24:25,176 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:24:25,544 - __main__ - INFO -    [OK] (20/757) Fetched song details
+2025-12-04 23:24:26,102 - __main__ - INFO -    [OK] (30/757) Fetched song details
+2025-12-04 23:24:26,819 - __main__ - INFO -    [OK] (40/757) Fetched song details
+2025-12-04 23:24:27,253 - __main__ - INFO -    [OK] (50/757) Fetched song details
+2025-12-04 23:24:27,954 - __main__ - INFO -    [OK] (60/757) Fetched song details
+2025-12-04 23:24:28,690 - __main__ - INFO -    [OK] (70/757) Fetched song details
+2025-12-04 23:24:29,300 - __main__ - INFO -    [OK] (80/757) Fetched song details
+2025-12-04 23:24:29,946 - __main__ - INFO -    [OK] (90/757) Fetched song details
+2025-12-04 23:24:30,501 - __main__ - INFO -    [OK] (100/757) Fetched song details
+2025-12-04 23:24:31,349 - __main__ - INFO -    [OK] (110/757) Fetched song details
+2025-12-04 23:24:31,838 - __main__ - INFO -    [OK] (120/757) Fetched song details
+2025-12-04 23:24:32,617 - __main__ - INFO -    [OK] (130/757) Fetched song details
+2025-12-04 23:24:33,234 - __main__ - INFO -    [OK] (140/757) Fetched song details
+2025-12-04 23:24:33,836 - __main__ - INFO -    [OK] (150/757) Fetched song details
+2025-12-04 23:24:34,640 - __main__ - INFO -    [OK] (160/757) Fetched song details
+2025-12-04 23:24:35,146 - __main__ - INFO -    [OK] (170/757) Fetched song details
+2025-12-04 23:24:35,846 - __main__ - INFO -    [OK] (180/757) Fetched song details
+2025-12-04 23:24:36,423 - __main__ - INFO -    [OK] (190/757) Fetched song details
+2025-12-04 23:24:37,215 - __main__ - INFO -    [OK] (200/757) Fetched song details
+2025-12-04 23:24:37,982 - __main__ - INFO -    [OK] (210/757) Fetched song details
+2025-12-04 23:24:38,513 - __main__ - INFO -    [OK] (220/757) Fetched song details
+2025-12-04 23:24:39,233 - __main__ - INFO -    [OK] (230/757) Fetched song details
+2025-12-04 23:24:39,967 - __main__ - INFO -    [OK] (240/757) Fetched song details
+2025-12-04 23:24:40,714 - __main__ - INFO -    [OK] (250/757) Fetched song details
+2025-12-04 23:24:41,397 - __main__ - INFO -    [OK] (260/757) Fetched song details
+2025-12-04 23:24:42,164 - __main__ - INFO -    [OK] (270/757) Fetched song details
+2025-12-04 23:24:42,686 - __main__ - INFO -    [OK] (280/757) Fetched song details
+2025-12-04 23:24:43,394 - __main__ - INFO -    [OK] (290/757) Fetched song details
+2025-12-04 23:24:44,198 - __main__ - INFO -    [OK] (300/757) Fetched song details
+2025-12-04 23:24:44,846 - __main__ - INFO -    [OK] (310/757) Fetched song details
+2025-12-04 23:24:45,796 - __main__ - INFO -    [OK] (320/757) Fetched song details
+2025-12-04 23:24:46,469 - __main__ - INFO -    [OK] (330/757) Fetched song details
+2025-12-04 23:24:47,251 - __main__ - INFO -    [OK] (340/757) Fetched song details
+2025-12-04 23:24:47,932 - __main__ - INFO -    [OK] (350/757) Fetched song details
+2025-12-04 23:24:48,730 - __main__ - INFO -    [OK] (360/757) Fetched song details
+2025-12-04 23:24:49,210 - __main__ - INFO -    [OK] (370/757) Fetched song details
+2025-12-04 23:24:50,160 - __main__ - INFO -    [OK] (380/757) Fetched song details
+2025-12-04 23:24:50,834 - __main__ - INFO -    [OK] (390/757) Fetched song details
+2025-12-04 23:24:51,596 - __main__ - INFO -    [OK] (400/757) Fetched song details
+2025-12-04 23:24:52,267 - __main__ - INFO -    [OK] (410/757) Fetched song details
+2025-12-04 23:24:52,768 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:24:52,960 - __main__ - INFO -    [OK] (420/757) Fetched song details
+2025-12-04 23:24:53,699 - __main__ - INFO -    [OK] (430/757) Fetched song details
+2025-12-04 23:24:54,494 - __main__ - INFO -    [OK] (440/757) Fetched song details
+2025-12-04 23:24:55,061 - __main__ - INFO -    [OK] (450/757) Fetched song details
+2025-12-04 23:24:55,942 - __main__ - INFO -    [OK] (460/757) Fetched song details
+2025-12-04 23:24:56,742 - __main__ - INFO -    [OK] (470/757) Fetched song details
+2025-12-04 23:24:57,297 - __main__ - INFO -    [OK] (480/757) Fetched song details
+2025-12-04 23:24:58,193 - __main__ - INFO -    [OK] (490/757) Fetched song details
+2025-12-04 23:24:58,997 - __main__ - INFO -    [OK] (500/757) Fetched song details
+2025-12-04 23:24:59,875 - __main__ - INFO -    [OK] (510/757) Fetched song details
+2025-12-04 23:25:00,607 - __main__ - INFO -    [OK] (520/757) Fetched song details
+2025-12-04 23:25:01,376 - __main__ - INFO -    [OK] (530/757) Fetched song details
+2025-12-04 23:25:01,473 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:01,494 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:01,880 - __main__ - INFO -    [OK] (540/757) Fetched song details
+2025-12-04 23:25:02,778 - __main__ - INFO -    [OK] (550/757) Fetched song details
+2025-12-04 23:25:03,157 - __main__ - INFO -    [OK] (560/757) Fetched song details
+2025-12-04 23:25:03,959 - __main__ - INFO -    [OK] (570/757) Fetched song details
+2025-12-04 23:25:04,834 - __main__ - INFO -    [OK] (580/757) Fetched song details
+2025-12-04 23:25:05,572 - __main__ - INFO -    [OK] (590/757) Fetched song details
+2025-12-04 23:25:06,424 - __main__ - INFO -    [OK] (600/757) Fetched song details
+2025-12-04 23:25:07,228 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:07,275 - __main__ - INFO -    [OK] (610/757) Fetched song details
+2025-12-04 23:25:07,692 - __main__ - INFO -    [OK] (620/757) Fetched song details
+2025-12-04 23:25:08,506 - __main__ - INFO -    [OK] (630/757) Fetched song details
+2025-12-04 23:25:09,220 - __main__ - INFO -    [OK] (640/757) Fetched song details
+2025-12-04 23:25:09,871 - __main__ - INFO -    [OK] (650/757) Fetched song details
+2025-12-04 23:25:10,637 - __main__ - INFO -    [OK] (660/757) Fetched song details
+2025-12-04 23:25:11,620 - __main__ - INFO -    [OK] (670/757) Fetched song details
+2025-12-04 23:25:11,893 - __main__ - INFO -    [OK] (680/757) Fetched song details
+2025-12-04 23:25:12,651 - __main__ - INFO -    [OK] (690/757) Fetched song details
+2025-12-04 23:25:13,437 - __main__ - INFO -    [OK] (700/757) Fetched song details
+2025-12-04 23:25:14,235 - __main__ - INFO -    [OK] (710/757) Fetched song details
+2025-12-04 23:25:14,741 - __main__ - INFO -    [OK] (720/757) Fetched song details
+2025-12-04 23:25:15,521 - __main__ - INFO -    [OK] (730/757) Fetched song details
+2025-12-04 23:25:16,184 - __main__ - INFO -    [OK] (740/757) Fetched song details
+2025-12-04 23:25:16,663 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:16,724 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:16,782 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:16,902 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: pagalworldmusic.com. Connection pool size: 10
+2025-12-04 23:25:17,018 - __main__ - INFO -    [OK] (750/757) Fetched song details
+2025-12-04 23:25:17,426 - __main__ - INFO -    [OK] (757/757) Fetched song details
+2025-12-04 23:25:17,432 - __main__ - INFO - 
+📊 Generating SQL with DELETE for hindi...
+2025-12-04 23:25:17,473 - __main__ - INFO - 
+======================================================================
+2025-12-04 23:25:17,474 - __main__ - INFO - [OK] SQL FILES GENERATED (WITH DELETE)
+2025-12-04 23:25:17,474 - __main__ - INFO - ======================================================================
+2025-12-04 23:25:17,474 - __main__ - INFO -   Language: HINDI
+2025-12-04 23:25:17,474 - __main__ - INFO -   Delete: Existing hindi albums and songs
+2025-12-04 23:25:17,475 - __main__ - INFO -   Albums: 167
+2025-12-04 23:25:17,475 - __main__ - INFO -   Songs: 757
+2025-12-04 23:25:17,475 - __main__ - INFO -   Singers: 0
+2025-12-04 23:25:17,475 - __main__ - INFO -   Artists: 0
+2025-12-04 23:25:17,475 - __main__ - INFO -   Music Directors: 0
+2025-12-04 23:25:17,476 - __main__ - INFO -   Output Directory: C:\Users\WZIFSRH\Documents\landingg-extract\bastiboysmusic\backend\python-scripts\sql_output
+2025-12-04 23:25:17,476 - __main__ - INFO - ======================================================================
+
+2025-12-04 23:25:17,477 - __main__ - INFO - 
+💾 Executing SQL...
+2025-12-04 23:25:20,152 - db_utils - INFO - Database connection established
+2025-12-04 23:25:20,152 - db_utils - INFO - Processing: sql_output\00_delete_language.sql
+2025-12-04 23:25:22,561 - db_utils - INFO - Successfully executed sql_output\00_delete_language.sql
+2025-12-04 23:25:22,561 - db_utils - INFO - Processing: sql_output\albums.sql
+2025-12-04 23:25:25,002 - db_utils - INFO - Successfully executed sql_output\albums.sql
+2025-12-04 23:25:25,016 - db_utils - INFO - Processing: sql_output\artists.sql
+2025-12-04 23:25:25,821 - db_utils - INFO - Successfully executed sql_output\artists.sql
+2025-12-04 23:25:25,821 - db_utils - INFO - Processing: sql_output\music_directors.sql
+2025-12-04 23:25:26,562 - db_utils - INFO - Successfully executed sql_output\music_directors.sql
+2025-12-04 23:25:26,562 - db_utils - INFO - Processing: sql_output\singers.sql
+2025-12-04 23:25:27,344 - db_utils - INFO - Successfully executed sql_output\singers.sql
+2025-12-04 23:25:27,344 - db_utils - INFO - Processing: sql_output\songs.sql
+2025-12-04 23:25:33,276 - db_utils - INFO - Successfully executed sql_output\songs.sql
+2025-12-04 23:25:33,566 - db_utils - INFO - Database connection closed
+2025-12-04 23:25:33,566 - __main__ - INFO - Execution result: [OK] Success
+2025-12-04 23:25:33,567 - __main__ - ERROR - ❌ Error updating song thumbnails: '_GeneratorContextManager' object has no attribute 'cursor'
+2025-12-04 23:25:33,567 - __main__ - INFO - 
+======================================================================
+2025-12-04 23:25:33,567 - __main__ - INFO - [OK] FULL LOAD COMPLETE
+2025-12-04 23:25:33,567 - __main__ - INFO - ======================================================================
+

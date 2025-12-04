@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS albums (
     director VARCHAR(255),
     music_director VARCHAR(255),
     star_cast TEXT,
+    language VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS songs (
     thumbnail_url VARCHAR(500),
     audio_id INT,
     audio_url VARCHAR(500),
+    stream_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE

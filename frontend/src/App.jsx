@@ -18,6 +18,8 @@ import Singers from "./pages/Singers";
 import MusicDirectors from "./pages/MusicDirectors";
 import SearchResults from "./pages/SearchResults";
 import Years from "./pages/Years";
+import ScraperDashboard from "./pages/ScraperDashboard";
+import DatabaseQueryPage from "./pages/DatabaseQueryPage";
 
 const App = () => {
   const { loading, isAuth } = UserData();
@@ -38,6 +40,8 @@ const App = () => {
                 <Route path="/years" element={<Years />} />
                 <Route path="/community" element={<CommunityPlaylists />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/database-admin" element={<DatabaseQueryPage />} />
+                <Route path="/scraper" element={<ScraperDashboard />} />
                 <Route path="/albums" element={<Albums />} />
                 <Route path="/artists" element={<Artists />} />
                 <Route path="/singers" element={<Singers />} />

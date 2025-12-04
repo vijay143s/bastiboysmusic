@@ -1,0 +1,2 @@
+-- Artists INSERT statements
+

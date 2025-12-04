@@ -516,16 +516,16 @@ module.exports = {
     
     // Get user with playlist
     const { getUserWithPlaylist } = require("../repositories/userRepository.js");
+    const { getPlaylistSongs: fetchPlaylistSongs } = require("../repositories/songRepository.js");
+    
     const user = await getUserWithPlaylist(userId);
     
     if (!user || !user.playlist || user.playlist.length === 0) {
       return res.json({ songs: [] });
     }
 
-    const songs = await fetchSongs();
-    const playlistSongs = songs.filter(song => 
-      user.playlist.includes(String(song.id))
-    );
+    // Optimized: Fetch only playlist songs directly from DB
+    const playlistSongs = await fetchPlaylistSongs(user.playlist);
 
     res.json({ songs: playlistSongs.map(formatSong) });
   }),

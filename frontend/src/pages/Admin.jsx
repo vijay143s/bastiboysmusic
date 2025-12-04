@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { UserData } from "../context/User";
 import { Link, useNavigate } from "react-router-dom";
 import { SongData } from "../context/Song";
-import { MdDelete, MdEdit, MdStar, MdStarBorder, MdAnalytics, MdPeople, MdLibraryMusic, MdActivity, MdSettings, MdHealthAndSafety } from "react-icons/md";
+import { MdDelete, MdEdit, MdStar, MdStarBorder, MdAnalytics, MdPeople, MdLibraryMusic, MdBarChart, MdSettings, MdMonitorHeart, MdStorage } from "react-icons/md";
 import "../components/AdminDashboard.css";
 
 const Admin = () => {
@@ -245,8 +245,8 @@ const Admin = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400">Total Users</p>
-                  <p className="text-2xl font-bold">{dashboardStats.users.total}</p>
-                  <p className="text-xs text-green-400">+{dashboardStats.users.recent} today</p>
+                  <p className="text-2xl font-bold">{dashboardStats?.users?.total || 0}</p>
+                  <p className="text-xs text-green-400">+{dashboardStats?.users?.recent || 0} today</p>
                 </div>
                 <MdPeople className="text-3xl text-blue-500" />
               </div>
@@ -256,8 +256,8 @@ const Admin = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400">Total Songs</p>
-                  <p className="text-2xl font-bold">{dashboardStats.songs.total}</p>
-                  <p className="text-xs text-green-400">+{dashboardStats.songs.recent} today</p>
+                  <p className="text-2xl font-bold">{dashboardStats?.songs?.total || 0}</p>
+                  <p className="text-xs text-green-400">+{dashboardStats?.songs?.recent || 0} today</p>
                 </div>
                 <MdLibraryMusic className="text-3xl text-green-500" />
               </div>
@@ -267,7 +267,7 @@ const Admin = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400">Total Albums</p>
-                  <p className="text-2xl font-bold">{dashboardStats.albums.total}</p>
+                  <p className="text-2xl font-bold">{dashboardStats?.albums?.total || 0}</p>
                 </div>
                 <MdLibraryMusic className="text-3xl text-purple-500" />
               </div>
@@ -277,9 +277,9 @@ const Admin = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400">Total Plays</p>
-                  <p className="text-2xl font-bold">{dashboardStats.plays.total.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">{dashboardStats?.plays?.total?.toLocaleString() || '0'}</p>
                 </div>
-                <MdActivity className="text-3xl text-yellow-500" />
+                <MdBarChart className="text-3xl text-yellow-500" />
               </div>
             </div>
           </div>
@@ -288,7 +288,7 @@ const Admin = () => {
           <div className="bg-[#181818] p-6 rounded-lg">
             <h3 className="text-xl font-bold mb-4">Top Played Songs</h3>
             <div className="space-y-3">
-              {dashboardStats.topSongsToday.map((song, index) => (
+              {dashboardStats?.topSongsToday?.length > 0 ? dashboardStats.topSongsToday.map((song, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-[#212121] rounded">
                   <div>
                     <p className="font-medium">{song.title}</p>
@@ -298,7 +298,11 @@ const Admin = () => {
                     {song.play_count} plays
                   </span>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center text-gray-400 py-8">
+                  <p>No song plays recorded yet</p>
+                </div>
+              )}
             </div>
           </div>
         </>
@@ -633,7 +637,7 @@ const Admin = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-[#212121] p-4 rounded">
               <div className="flex items-center gap-2 mb-2">
-                <MdHealthAndSafety className={`text-xl ${systemHealth.database === 'healthy' ? 'text-green-500' : 'text-red-500'}`} />
+                <MdMonitorHeart className={`text-xl ${systemHealth.database === 'healthy' ? 'text-green-500' : 'text-red-500'}`} />
                 <span className="font-medium">Database</span>
               </div>
               <p className={`text-sm ${systemHealth.database === 'healthy' ? 'text-green-400' : 'text-red-400'}`}>
@@ -656,7 +660,7 @@ const Admin = () => {
 
             <div className="bg-[#212121] p-4 rounded">
               <div className="flex items-center gap-2 mb-2">
-                <MdActivity className="text-xl text-yellow-500" />
+                <MdBarChart className="text-xl text-yellow-500" />
                 <span className="font-medium">Issues</span>
               </div>
               {systemHealth.issues?.map((issue, index) => (
@@ -707,7 +711,7 @@ const Admin = () => {
               { id: 'dashboard', label: 'Dashboard', icon: MdAnalytics },
               { id: 'content', label: 'Content Management', icon: MdLibraryMusic },
               { id: 'analytics', label: 'Analytics', icon: MdPeople },
-              { id: 'system', label: 'System Health', icon: MdHealthAndSafety }
+              { id: 'system', label: 'System Health', icon: MdMonitorHeart }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -722,6 +726,14 @@ const Admin = () => {
                 {tab.label}
               </button>
             ))}
+            <Link
+              to="/database-admin"
+              className="flex items-center gap-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors border-transparent text-gray-400 hover:text-white hover:border-blue-500"
+              title="Database Admin Panel"
+            >
+              <MdStorage className="text-lg" />
+              Database Admin
+            </Link>
           </nav>
         </div>
       </div>

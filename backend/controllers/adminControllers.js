@@ -15,9 +15,9 @@ const getDashboardStats = TryCatch(async (req, res) => {
     db.execute("SELECT COUNT(*) as total_users FROM users"),
     db.execute("SELECT COUNT(*) as total_songs FROM songs"),
     db.execute("SELECT COUNT(*) as total_albums FROM albums"),
-    db.execute("SELECT COUNT(DISTINCT name) as total_artists FROM artists"),
-    db.execute("SELECT COUNT(DISTINCT name) as total_singers FROM singers"),
-    db.execute("SELECT COUNT(DISTINCT name) as total_music_directors FROM music_directors"),
+    db.execute("SELECT COUNT(DISTINCT artist_name) as total_artists FROM artists"),
+    db.execute("SELECT COUNT(DISTINCT singer_name) as total_singers FROM singers"),
+    db.execute("SELECT COUNT(DISTINCT director_name) as total_music_directors FROM music_directors"),
     db.execute("SELECT IFNULL(SUM(play_count), 0) as total_plays FROM songs"),
   ]);
 

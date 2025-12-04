@@ -1,0 +1,602 @@
+2025-12-04 19:09:41,729 - INFO - 
+======================================================================
+2025-12-04 19:09:41,731 - INFO - PAGAL WORLD EXTENDED SCRAPER - MAXIMUM FIELDS
+2025-12-04 19:09:41,731 - INFO - ======================================================================
+
+2025-12-04 19:09:41,731 - INFO - Starting scrape for 4 languages
+
+2025-12-04 19:09:41,731 - INFO - 
+======================================================================
+2025-12-04 19:09:41,732 - INFO - SCRAPING: Hindi (hindi)
+2025-12-04 19:09:41,733 - INFO - ======================================================================
+2025-12-04 19:09:41,733 - INFO - URL: https://pagalworldmusic.com/language/hindi
+
+2025-12-04 19:09:42,360 - INFO - Status: 200
+2025-12-04 19:09:42,409 - INFO - Found 20 track containers
+
+2025-12-04 19:09:43,013 - INFO -   [Album] Dhurandhar
+2025-12-04 19:09:43,843 - INFO -   [Song] Tu Meri Main Tera Main Tera Tu Meri Titl
+2025-12-04 19:09:44,940 - INFO -   [Song] Chal Musafir From Gustaakh Ishq
+2025-12-04 19:09:45,896 - INFO -   [Song] Hey Penne
+2025-12-04 19:09:46,709 - INFO -   [Song] Ishq Jalakar Karvaan From Dhurandhar
+2025-12-04 19:09:47,520 - INFO -   [Song] Rebel Saab From The Rajasaab Hindi
+2025-12-04 19:09:48,398 - INFO -   [Song] He Dil Pagal Pagal Hogaya From Chimera
+2025-12-04 19:09:49,063 - INFO -   [Album] De De Pyaar De 2 Deluxe Album
+2025-12-04 19:09:49,674 - INFO -   [Album] Ek Deewane Ki Deewaniyat
+2025-12-04 19:09:50,559 - INFO -   [Song] One In Crore From Mastiii 4
+2025-12-04 19:09:51,398 - INFO -   [Song] The Thaandavam From Akhanda 2 Thaandavam
+2025-12-04 19:09:52,288 - INFO -   [Song] Mehndi Laagi
+2025-12-04 19:09:53,146 - INFO -   [Song] Nobody Came
+2025-12-04 19:09:53,819 - INFO -   [Album] Tere Ishk Mein
+2025-12-04 19:09:54,726 - INFO -   [Song] They Call Him KING King Theme From King
+2025-12-04 19:09:55,520 - INFO -   [Song] Sundara From Non Violence
+2025-12-04 19:09:56,377 - INFO -   [Song] Aakhri Salaam From De De Pyaar De 2
+2025-12-04 19:09:57,201 - INFO -   [Song] Rasiya Balama From Mastiii 4
+2025-12-04 19:09:57,724 - INFO -   [Album] 120 Bahadur Original Motion Picture Soun
+2025-12-04 19:09:58,501 - INFO -   [Song] Chikiri Chikiri From Peddi Hindi
+2025-12-04 19:09:58,501 - INFO - 
+======================================================================
+2025-12-04 19:09:58,502 - INFO - SUMMARY for Hindi
+2025-12-04 19:09:58,502 - INFO -   Albums found: 5
+2025-12-04 19:09:58,502 - INFO -   Songs found: 15
+2025-12-04 19:09:58,502 - INFO - ======================================================================
+
+2025-12-04 19:10:00,509 - INFO - 
+======================================================================
+2025-12-04 19:10:00,510 - INFO - SCRAPING: Marathi (marathi)
+2025-12-04 19:10:00,512 - INFO - ======================================================================
+2025-12-04 19:10:00,512 - INFO - URL: https://pagalworldmusic.com/language/marathi
+
+2025-12-04 19:10:01,115 - INFO - Status: 200
+2025-12-04 19:10:01,133 - INFO - Found 20 track containers
+
+2025-12-04 19:10:01,990 - INFO -   [Song] Aye Chedva From Kairee
+2025-12-04 19:10:03,051 - INFO -   [Song] Zat Pat Pata Pat
+2025-12-04 19:10:04,127 - INFO -   [Song] Sur Tech Chedata From Asa Mee Ashi Mee
+2025-12-04 19:10:04,968 - INFO -   [Song] Kshanbhar
+2025-12-04 19:10:05,787 - INFO -   [Song] Porancha Ranga Original Soundtrack From 
+2025-12-04 19:10:06,649 - INFO -   [Song] Malhari From Gondhal
+2025-12-04 19:10:07,469 - INFO -   [Song] Narali Pophlichya Baga From Kairee
+2025-12-04 19:10:08,303 - INFO -   [Song] PROUD
+2025-12-04 19:10:09,216 - INFO -   [Song] Ho Aai From Uttar
+2025-12-04 19:10:09,797 - INFO -   [Album] Antarrashtriya
+2025-12-04 19:10:10,600 - INFO -   [Song] Dream Wali Girl
+2025-12-04 19:10:11,835 - INFO -   [Song] Lover
+2025-12-04 19:10:12,628 - INFO -   [Song] Chandwa Nabhatla
+2025-12-04 19:10:13,434 - INFO -   [Song] 96
+2025-12-04 19:10:14,263 - INFO -   [Song] Raanjai
+2025-12-04 19:10:15,093 - INFO -   [Song] Ishkacha Utara
+2025-12-04 19:10:15,962 - INFO -   [Song] Haldi Kunkvala Yayach Ha From Smart Sunb
+2025-12-04 19:10:16,818 - INFO -   [Song] Tuzyasathi Kaay Pan
+2025-12-04 19:10:18,150 - INFO -   [Song] Tiraki Najar
+2025-12-04 19:10:19,268 - INFO -   [Song] Avatarli Tarka
+2025-12-04 19:10:19,270 - INFO - 
+======================================================================
+2025-12-04 19:10:19,271 - INFO - SUMMARY for Marathi
+2025-12-04 19:10:19,271 - INFO -   Albums found: 1
+2025-12-04 19:10:19,272 - INFO -   Songs found: 19
+2025-12-04 19:10:19,272 - INFO - ======================================================================
+
+2025-12-04 19:10:21,274 - INFO - 
+======================================================================
+2025-12-04 19:10:21,275 - INFO - SCRAPING: Tamil (tamil)
+2025-12-04 19:10:21,277 - INFO - ======================================================================
+2025-12-04 19:10:21,277 - INFO - URL: https://pagalworldmusic.com/language/tamil
+
+2025-12-04 19:10:21,853 - INFO - Status: 200
+2025-12-04 19:10:21,904 - INFO - Found 20 track containers
+
+2025-12-04 19:10:22,542 - INFO -   [Album] Tere Ishk Mein Tamil
+2025-12-04 19:10:23,392 - INFO -   [Song] Pattuma From Love Insurance Kompany
+2025-12-04 19:10:24,729 - INFO -   [Song] Aalapikkey Ummak From Vaa Vaathiyaar
+2025-12-04 19:10:25,552 - INFO -   [Song] Mannichiru From Sirai
+2025-12-04 19:10:26,412 - INFO -   [Song] Vasthara From Kombuseevi
+2025-12-04 19:10:27,040 - INFO -   [Album] Revolver Rita Original Motion Picture So
+2025-12-04 19:10:27,867 - INFO -   [Song] Manasu Valikithu From Pookie Original Mo
+2025-12-04 19:10:29,715 - INFO -   [Song] Noodhana Noodhana From Niram
+2025-12-04 19:10:30,631 - INFO -   [Song] Emkoney From Draupathi 2
+2025-12-04 19:10:31,219 - INFO -   [Album] Theeyavar Kulai Nadunga Original Motion 
+2025-12-04 19:10:32,083 - INFO -   [Song] Ratnamala From Parasakthi Tamil
+2025-12-04 19:10:32,906 - INFO -   [Song] Dashamakan Title Promo Tamil
+2025-12-04 19:10:33,990 - INFO -   [Song] Vetri Veerane From Mask
+2025-12-04 19:10:34,848 - INFO -   [Song] Kandara Kolli From Retta Thala
+2025-12-04 19:10:35,665 - INFO -   [Song] Pretty Baby From BIKERTamil
+2025-12-04 19:10:36,644 - INFO -   [Song] Rebel Saab From The Rajasaab Tamil
+2025-12-04 19:10:37,602 - INFO -   [Album] Mangai
+2025-12-04 19:10:38,430 - INFO -   [Song] Storm The Moonwalk Theme From Moon Walk
+2025-12-04 19:10:39,324 - INFO -   [Song] Esa Kaaththa From My Lord
+2025-12-04 19:10:40,148 - INFO -   [Song] Karmugil Kannazhago From KaanthaTamil
+2025-12-04 19:10:40,148 - INFO - 
+======================================================================
+2025-12-04 19:10:40,150 - INFO - SUMMARY for Tamil
+2025-12-04 19:10:40,150 - INFO -   Albums found: 4
+2025-12-04 19:10:40,151 - INFO -   Songs found: 16
+2025-12-04 19:10:40,151 - INFO - ======================================================================
+
+2025-12-04 19:10:42,165 - INFO - 
+======================================================================
+2025-12-04 19:10:42,166 - INFO - SCRAPING: Telugu (telugu)
+2025-12-04 19:10:42,166 - INFO - ======================================================================
+2025-12-04 19:10:42,167 - INFO - URL: https://pagalworldmusic.com/language/telugu
+
+2025-12-04 19:10:43,134 - INFO - Status: 200
+2025-12-04 19:10:43,172 - INFO - Found 20 track containers
+
+2025-12-04 19:10:43,775 - INFO -   [Album] Akhanda 2 Thaandavam
+2025-12-04 19:10:44,347 - INFO -   [Album] Andhra King Taluka
+2025-12-04 19:10:45,201 - INFO -   [Song] Bella Bella From Bhartha Mahasayulaku Wi
+2025-12-04 19:10:45,896 - INFO -   [Album] Tere Ishk Mein Telugu
+2025-12-04 19:10:46,756 - INFO -   [Song] Bhimavaram Balma From Anaganaga Oka Raju
+2025-12-04 19:10:47,568 - INFO -   [Song] Ratnamala From Parasakthi Telugu
+2025-12-04 19:10:48,405 - INFO -   [Song] Gira Gira Gingiraagirey From Champion
+2025-12-04 19:10:49,196 - INFO -   [Song] Blue Yellow From Psych Siddhartha
+2025-12-04 19:10:50,047 - INFO -   [Song] Pilla From Dhandoraa
+2025-12-04 19:10:50,899 - INFO -   [Song] Vanavaasam From Mowgli 2025
+2025-12-04 19:10:51,764 - INFO -   [Song] Danger Mama From Revolver Rita Telugu
+2025-12-04 19:10:52,572 - INFO -   [Song] Emosanal Drama From Patang
+2025-12-04 19:10:54,158 - INFO -   [Song] Chandrullo Kundele From Failure Boys
+2025-12-04 19:10:54,945 - INFO -   [Song] Rebel Saab From The Rajasaab Telugu
+2025-12-04 19:11:01,449 - INFO -   [Album] Premante
+2025-12-04 19:11:02,722 - INFO -   [Song] Choodu Choodu Side A From Godari Gattupa
+2025-12-04 19:11:03,513 - INFO -   [Song] Bayilone Ballipalike
+2025-12-04 19:11:04,363 - INFO -   [Song] Jajikaya Jajikaya From Akhanda 2 Thaanda
+2025-12-04 19:11:05,185 - INFO -   [Song] Cheliya
+2025-12-04 19:11:06,002 - INFO -   [Song] Rana Kumbha From Varanasi
+2025-12-04 19:11:06,002 - INFO - 
+======================================================================
+2025-12-04 19:11:06,002 - INFO - SUMMARY for Telugu
+2025-12-04 19:11:06,003 - INFO -   Albums found: 4
+2025-12-04 19:11:06,003 - INFO -   Songs found: 16
+2025-12-04 19:11:06,003 - INFO - ======================================================================
+
+2025-12-04 19:11:08,003 - INFO - 
+Saving results to pagalworld_extended_results.json...
+2025-12-04 19:11:08,012 - INFO - Results saved to pagalworld_extended_results.json
+2025-12-04 19:11:08,013 - INFO - 
+======================================================================
+2025-12-04 19:11:08,013 - INFO - FINAL SUMMARY - EXTENDED FIELDS
+2025-12-04 19:11:08,015 - INFO - ======================================================================
+2025-12-04 19:11:08,015 - INFO - Total Albums Found: 14
+2025-12-04 19:11:08,015 - INFO - Total Songs Found: 66
+2025-12-04 19:11:08,016 - INFO - Total Errors: 0
+2025-12-04 19:11:08,016 - INFO - 
+Album Fields Captured (per album):
+2025-12-04 19:11:08,023 - INFO -   1. type: album
+2025-12-04 19:11:08,023 - INFO -   2. title: Dhurandhar
+2025-12-04 19:11:08,024 - INFO -   3. url: https://pagalworldmusic.com/album/ft4MGKjYem0_/dhurandhar
+2025-12-04 19:11:08,024 - INFO -   4. album_id: ft4MGKjYem0_
+2025-12-04 19:11:08,025 - INFO -   5. slug: dhurandhar
+2025-12-04 19:11:08,025 - INFO -   6. language: Hindi
+2025-12-04 19:11:08,025 - INFO -   7. image_url: https://pagalworldmusic.com/default.webp
+2025-12-04 19:11:08,025 - INFO -   9. song_count: 6
+2025-12-04 19:11:08,025 - INFO -   10. year: 2025
+2025-12-04 19:11:08,026 - INFO -   14. description: Dhurandhar Album Mp3 Songs Pagalworld Music Song Com Downloa
+2025-12-04 19:11:08,026 - INFO -   16. scrape_timestamp: 2025-12-04T19:09:43.013638
+2025-12-04 19:11:08,026 - INFO - 
+Song Fields Captured (per song):
+2025-12-04 19:11:08,026 - INFO -   1. type: song
+2025-12-04 19:11:08,026 - INFO -   2. title: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:11:08,027 - INFO -   3. url: https://pagalworldmusic.com/track/VphajinY-tu-meri-main-tera
+2025-12-04 19:11:08,027 - INFO -   4. song_id: VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-
+2025-12-04 19:11:08,027 - INFO -   5. slug: VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-
+2025-12-04 19:11:08,027 - INFO -   6. language: Hindi
+2025-12-04 19:11:08,027 - INFO -   7. artist: Unknown
+2025-12-04 19:11:08,027 - INFO -   8. singer: Unknown
+2025-12-04 19:11:08,027 - INFO -   9. image_url: https://pagalworldmusic.com/default.webp
+2025-12-04 19:11:08,027 - INFO -   14. description: Download Tu Meri Main Tera Main Tera Tu Meri Title Track Fro
+2025-12-04 19:11:08,028 - INFO -   16. scrape_timestamp: 2025-12-04T19:09:43.843623
+2025-12-04 19:11:08,028 - INFO - ======================================================================
+
+2025-12-04 19:11:08,028 - INFO - Log file: pagalworld_extended_scraper.log
+2025-12-04 19:11:08,029 - INFO - Results file: pagalworld_extended_results.json
+2025-12-04 19:17:37,514 - INFO - 
+======================================================================
+2025-12-04 19:17:37,515 - INFO - PAGAL WORLD EXTENDED SCRAPER - MAXIMUM FIELDS
+2025-12-04 19:17:37,515 - INFO - ======================================================================
+
+2025-12-04 19:17:37,515 - INFO - Starting scrape for 4 languages
+
+2025-12-04 19:17:37,515 - INFO - 
+======================================================================
+2025-12-04 19:17:37,515 - INFO - SCRAPING: Hindi (hindi)
+2025-12-04 19:17:37,515 - INFO - ======================================================================
+2025-12-04 19:17:37,515 - INFO - URL: https://pagalworldmusic.com/language/hindi
+
+2025-12-04 19:17:38,099 - INFO - Status: 200
+2025-12-04 19:17:38,154 - INFO - Found 20 track containers
+
+2025-12-04 19:17:39,043 - INFO -   [Album] Dhurandhar
+2025-12-04 19:17:39,822 - INFO -   [Song] Tu Meri Main Tera Main Tera Tu Meri Titl
+2025-12-04 19:17:40,633 - INFO -   [Song] Chal Musafir From Gustaakh Ishq
+2025-12-04 19:17:41,412 - INFO -   [Song] Hey Penne
+2025-12-04 19:17:42,204 - INFO -   [Song] Ishq Jalakar Karvaan From Dhurandhar
+2025-12-04 19:17:43,021 - INFO -   [Song] Rebel Saab From The Rajasaab Hindi
+2025-12-04 19:17:43,857 - INFO -   [Song] He Dil Pagal Pagal Hogaya From Chimera
+2025-12-04 19:17:44,462 - INFO -   [Album] De De Pyaar De 2 Deluxe Album
+2025-12-04 19:17:44,987 - INFO -   [Album] Ek Deewane Ki Deewaniyat
+2025-12-04 19:17:46,242 - INFO -   [Song] One In Crore From Mastiii 4
+2025-12-04 19:17:47,130 - INFO -   [Song] The Thaandavam From Akhanda 2 Thaandavam
+2025-12-04 19:17:47,911 - INFO -   [Song] Mehndi Laagi
+2025-12-04 19:17:48,749 - INFO -   [Song] Nobody Came
+2025-12-04 19:17:49,317 - INFO -   [Album] Tere Ishk Mein
+2025-12-04 19:17:50,138 - INFO -   [Song] They Call Him KING King Theme From King
+2025-12-04 19:17:51,389 - INFO -   [Song] Sundara From Non Violence
+2025-12-04 19:17:52,221 - INFO -   [Song] Aakhri Salaam From De De Pyaar De 2
+2025-12-04 19:17:53,058 - INFO -   [Song] Rasiya Balama From Mastiii 4
+2025-12-04 19:17:53,660 - INFO -   [Album] 120 Bahadur Original Motion Picture Soun
+2025-12-04 19:17:54,465 - INFO -   [Song] Chikiri Chikiri From Peddi Hindi
+2025-12-04 19:17:54,466 - INFO - 
+======================================================================
+2025-12-04 19:17:54,466 - INFO - SUMMARY for Hindi
+2025-12-04 19:17:54,466 - INFO -   Albums found: 5
+2025-12-04 19:17:54,466 - INFO -   Songs found: 15
+2025-12-04 19:17:54,468 - INFO - ======================================================================
+
+2025-12-04 19:17:56,474 - INFO - 
+======================================================================
+2025-12-04 19:17:56,474 - INFO - SCRAPING: Marathi (marathi)
+2025-12-04 19:17:56,474 - INFO - ======================================================================
+2025-12-04 19:17:56,475 - INFO - URL: https://pagalworldmusic.com/language/marathi
+
+2025-12-04 19:17:57,025 - INFO - Status: 200
+2025-12-04 19:17:57,080 - INFO - Found 20 track containers
+
+2025-12-04 19:17:57,904 - INFO -   [Song] Aye Chedva From Kairee
+2025-12-04 19:17:58,744 - INFO -   [Song] Zat Pat Pata Pat
+2025-12-04 19:17:59,987 - INFO -   [Song] Sur Tech Chedata From Asa Mee Ashi Mee
+2025-12-04 19:18:00,890 - INFO -   [Song] Kshanbhar
+2025-12-04 19:18:02,605 - INFO -   [Song] Porancha Ranga Original Soundtrack From 
+2025-12-04 19:18:03,457 - INFO -   [Song] Malhari From Gondhal
+2025-12-04 19:18:04,283 - INFO -   [Song] Narali Pophlichya Baga From Kairee
+2025-12-04 19:18:05,102 - INFO -   [Song] PROUD
+2025-12-04 19:18:05,926 - INFO -   [Song] Ho Aai From Uttar
+2025-12-04 19:18:06,446 - INFO -   [Album] Antarrashtriya
+2025-12-04 19:18:07,267 - INFO -   [Song] Dream Wali Girl
+2025-12-04 19:18:08,066 - INFO -   [Song] Lover
+2025-12-04 19:18:08,862 - INFO -   [Song] Chandwa Nabhatla
+2025-12-04 19:18:09,651 - INFO -   [Song] 96
+2025-12-04 19:18:10,474 - INFO -   [Song] Raanjai
+2025-12-04 19:18:11,258 - INFO -   [Song] Ishkacha Utara
+2025-12-04 19:18:12,089 - INFO -   [Song] Haldi Kunkvala Yayach Ha From Smart Sunb
+2025-12-04 19:18:12,902 - INFO -   [Song] Tuzyasathi Kaay Pan
+2025-12-04 19:18:13,707 - INFO -   [Song] Tiraki Najar
+2025-12-04 19:18:14,506 - INFO -   [Song] Avatarli Tarka
+2025-12-04 19:18:14,506 - INFO - 
+======================================================================
+2025-12-04 19:18:14,508 - INFO - SUMMARY for Marathi
+2025-12-04 19:18:14,508 - INFO -   Albums found: 1
+2025-12-04 19:18:14,509 - INFO -   Songs found: 19
+2025-12-04 19:18:14,509 - INFO - ======================================================================
+
+2025-12-04 19:18:16,519 - INFO - 
+======================================================================
+2025-12-04 19:18:16,519 - INFO - SCRAPING: Tamil (tamil)
+2025-12-04 19:18:16,519 - INFO - ======================================================================
+2025-12-04 19:18:16,520 - INFO - URL: https://pagalworldmusic.com/language/tamil
+
+2025-12-04 19:18:17,048 - INFO - Status: 200
+2025-12-04 19:18:17,119 - INFO - Found 20 track containers
+
+2025-12-04 19:18:17,694 - INFO -   [Album] Tere Ishk Mein Tamil
+2025-12-04 19:18:18,547 - INFO -   [Song] Pattuma From Love Insurance Kompany
+2025-12-04 19:18:19,384 - INFO -   [Song] Aalapikkey Ummak From Vaa Vaathiyaar
+2025-12-04 19:18:20,248 - INFO -   [Song] Mannichiru From Sirai
+2025-12-04 19:18:21,042 - INFO -   [Song] Vasthara From Kombuseevi
+2025-12-04 19:18:21,671 - INFO -   [Album] Revolver Rita Original Motion Picture So
+2025-12-04 19:18:22,521 - INFO -   [Song] Manasu Valikithu From Pookie Original Mo
+2025-12-04 19:18:23,420 - INFO -   [Song] Noodhana Noodhana From Niram
+2025-12-04 19:18:24,241 - INFO -   [Song] Emkoney From Draupathi 2
+2025-12-04 19:18:24,782 - INFO -   [Album] Theeyavar Kulai Nadunga Original Motion 
+2025-12-04 19:18:25,582 - INFO -   [Song] Ratnamala From Parasakthi Tamil
+2025-12-04 19:18:26,354 - INFO -   [Song] Dashamakan Title Promo Tamil
+2025-12-04 19:18:27,132 - INFO -   [Song] Vetri Veerane From Mask
+2025-12-04 19:18:27,958 - INFO -   [Song] Kandara Kolli From Retta Thala
+2025-12-04 19:18:28,761 - INFO -   [Song] Pretty Baby From BIKERTamil
+2025-12-04 19:18:29,561 - INFO -   [Song] Rebel Saab From The Rajasaab Tamil
+2025-12-04 19:18:30,095 - INFO -   [Album] Mangai
+2025-12-04 19:18:30,901 - INFO -   [Song] Storm The Moonwalk Theme From Moon Walk
+2025-12-04 19:18:31,698 - INFO -   [Song] Esa Kaaththa From My Lord
+2025-12-04 19:18:32,943 - INFO -   [Song] Karmugil Kannazhago From KaanthaTamil
+2025-12-04 19:18:32,945 - INFO - 
+======================================================================
+2025-12-04 19:18:32,945 - INFO - SUMMARY for Tamil
+2025-12-04 19:18:32,945 - INFO -   Albums found: 4
+2025-12-04 19:18:32,946 - INFO -   Songs found: 16
+2025-12-04 19:18:32,946 - INFO - ======================================================================
+
+2025-12-04 19:18:34,953 - INFO - 
+======================================================================
+2025-12-04 19:18:34,954 - INFO - SCRAPING: Telugu (telugu)
+2025-12-04 19:18:34,954 - INFO - ======================================================================
+2025-12-04 19:18:34,954 - INFO - URL: https://pagalworldmusic.com/language/telugu
+
+2025-12-04 19:18:35,799 - INFO - Status: 200
+2025-12-04 19:18:35,841 - INFO - Found 20 track containers
+
+2025-12-04 19:18:36,400 - INFO -   [Album] Akhanda 2 Thaandavam
+2025-12-04 19:18:36,969 - INFO -   [Album] Andhra King Taluka
+2025-12-04 19:18:37,778 - INFO -   [Song] Bella Bella From Bhartha Mahasayulaku Wi
+2025-12-04 19:18:38,338 - INFO -   [Album] Tere Ishk Mein Telugu
+2025-12-04 19:18:39,141 - INFO -   [Song] Bhimavaram Balma From Anaganaga Oka Raju
+2025-12-04 19:18:39,958 - INFO -   [Song] Ratnamala From Parasakthi Telugu
+2025-12-04 19:18:44,105 - INFO -   [Song] Gira Gira Gingiraagirey From Champion
+2025-12-04 19:18:44,942 - INFO -   [Song] Blue Yellow From Psych Siddhartha
+2025-12-04 19:18:45,781 - INFO -   [Song] Pilla From Dhandoraa
+2025-12-04 19:18:46,570 - INFO -   [Song] Vanavaasam From Mowgli 2025
+2025-12-04 19:18:47,374 - INFO -   [Song] Danger Mama From Revolver Rita Telugu
+2025-12-04 19:18:48,155 - INFO -   [Song] Emosanal Drama From Patang
+2025-12-04 19:18:48,938 - INFO -   [Song] Chandrullo Kundele From Failure Boys
+2025-12-04 19:18:49,706 - INFO -   [Song] Rebel Saab From The Rajasaab Telugu
+2025-12-04 19:18:50,291 - INFO -   [Album] Premante
+2025-12-04 19:18:51,087 - INFO -   [Song] Choodu Choodu Side A From Godari Gattupa
+2025-12-04 19:18:51,901 - INFO -   [Song] Bayilone Ballipalike
+2025-12-04 19:18:52,715 - INFO -   [Song] Jajikaya Jajikaya From Akhanda 2 Thaanda
+2025-12-04 19:18:53,505 - INFO -   [Song] Cheliya
+2025-12-04 19:18:54,287 - INFO -   [Song] Rana Kumbha From Varanasi
+2025-12-04 19:18:54,288 - INFO - 
+======================================================================
+2025-12-04 19:18:54,288 - INFO - SUMMARY for Telugu
+2025-12-04 19:18:54,288 - INFO -   Albums found: 4
+2025-12-04 19:18:54,289 - INFO -   Songs found: 16
+2025-12-04 19:18:54,290 - INFO - ======================================================================
+
+2025-12-04 19:18:56,296 - INFO - 
+Saving results to pagalworld_extended_results.json...
+2025-12-04 19:18:56,330 - INFO - Results saved to pagalworld_extended_results.json
+2025-12-04 19:18:56,332 - INFO - 
+======================================================================
+2025-12-04 19:18:56,332 - INFO - FINAL SUMMARY - EXTENDED FIELDS
+2025-12-04 19:18:56,332 - INFO - ======================================================================
+2025-12-04 19:18:56,333 - INFO - Total Albums Found: 14
+2025-12-04 19:18:56,333 - INFO - Total Songs Found: 66
+2025-12-04 19:18:56,333 - INFO - Total Errors: 0
+2025-12-04 19:18:56,334 - INFO - 
+Album Fields Captured (per album):
+2025-12-04 19:18:56,334 - INFO -   1. type: album
+2025-12-04 19:18:56,334 - INFO -   2. title: Dhurandhar
+2025-12-04 19:18:56,335 - INFO -   3. url: https://pagalworldmusic.com/album/ft4MGKjYem0_/dhurandhar
+2025-12-04 19:18:56,335 - INFO -   4. album_id: ft4MGKjYem0_
+2025-12-04 19:18:56,335 - INFO -   5. slug: dhurandhar
+2025-12-04 19:18:56,336 - INFO -   6. language: Hindi
+2025-12-04 19:18:56,336 - INFO -   7. image_url: https://pagalworldmusic.com/default.webp
+2025-12-04 19:18:56,336 - INFO -   9. song_count: 6
+2025-12-04 19:18:56,336 - INFO -   12. music_director: Song Com Download
+2025-12-04 19:18:56,336 - INFO -   14. description: Dhurandhar Album Mp3 Songs Pagalworld Music Song Com Downloa
+2025-12-04 19:18:56,338 - INFO -   16. scrape_timestamp: 2025-12-04T19:17:39.043381
+2025-12-04 19:18:56,338 - INFO - 
+Song Fields Captured (per song):
+2025-12-04 19:18:56,338 - INFO -   1. type: song
+2025-12-04 19:18:56,339 - INFO -   2. title: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:18:56,339 - INFO -   3. url: https://pagalworldmusic.com/track/VphajinY-tu-meri-main-tera
+2025-12-04 19:18:56,339 - INFO -   4. song_id: VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-
+2025-12-04 19:18:56,339 - INFO -   5. slug: VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-
+2025-12-04 19:18:56,340 - INFO -   6. language: Hindi
+2025-12-04 19:18:56,340 - INFO -   7. artist: Unknown
+2025-12-04 19:18:56,341 - INFO -   8. singer: Unknown
+2025-12-04 19:18:56,341 - INFO -   9. image_url: https://pagalworldmusic.com/default.webp
+2025-12-04 19:18:56,341 - INFO -   10. artist_main: Anvita Dutt Guptan
+2025-12-04 19:18:56,341 - INFO -   11. all_artists: Anvita Dutt Guptan
+2025-12-04 19:18:56,342 - INFO -   12. artists: ['Anvita Dutt Guptan']
+2025-12-04 19:18:56,342 - INFO -   13. album_name: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:18:56,344 - INFO -   14. music_composer: Hindi
+2025-12-04 19:18:56,344 - INFO -   15. label: SaReGaMA India Ltd
+2025-12-04 19:18:56,344 - INFO -   16. audio_url: /download.php?title=Tu+Meri+Main+Tera+Main+Tera+Tu+Meri+Titl
+2025-12-04 19:18:56,344 - INFO -   17. audio_quality: 320kbps
+2025-12-04 19:18:56,345 - INFO -   18. audio_size: 7.02 MB
+2025-12-04 19:18:56,345 - INFO -   19. audio_urls_all: {'320kbps': {'url': '/download.php?title=Tu+Meri+Main+Tera+M
+2025-12-04 19:18:56,345 - INFO -   21. duration: 03:03
+2025-12-04 19:18:56,346 - INFO -   22. release_date: 2025-11-28
+2025-12-04 19:18:56,346 - INFO -   23. year: 2025
+2025-12-04 19:18:56,346 - INFO -   24. description: Download Tu Meri Main Tera Main Tera Tu Meri Title Track Fro
+2025-12-04 19:18:56,347 - INFO -   26. track_name: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:18:56,347 - INFO -   27. scrape_timestamp: 2025-12-04T19:17:39.822206
+2025-12-04 19:18:56,347 - INFO - ======================================================================
+
+2025-12-04 19:18:56,348 - INFO - Log file: pagalworld_extended_scraper.log
+2025-12-04 19:18:56,348 - INFO - Results file: pagalworld_extended_results.json
+2025-12-04 19:28:36,910 - INFO - 
+======================================================================
+2025-12-04 19:28:36,910 - INFO - PAGAL WORLD EXTENDED SCRAPER - MAXIMUM FIELDS
+2025-12-04 19:28:36,910 - INFO - ======================================================================
+
+2025-12-04 19:28:36,910 - INFO - Starting scrape for 4 languages
+
+2025-12-04 19:28:36,910 - INFO - 
+======================================================================
+2025-12-04 19:28:36,910 - INFO - SCRAPING: Hindi (hindi)
+2025-12-04 19:28:36,910 - INFO - ======================================================================
+2025-12-04 19:28:36,910 - INFO - URL: https://pagalworldmusic.com/language/hindi
+
+2025-12-04 19:28:37,476 - INFO - Status: 200
+2025-12-04 19:28:37,497 - INFO - Found 20 track containers
+
+2025-12-04 19:28:38,110 - INFO -   [Album] Dhurandhar
+2025-12-04 19:28:38,744 - INFO -   [Song] Tu Meri Main Tera Main Tera Tu Meri Titl
+2025-12-04 19:28:39,377 - INFO -   [Song] Chal Musafir From Gustaakh Ishq
+2025-12-04 19:28:40,047 - INFO -   [Song] Hey Penne
+2025-12-04 19:28:40,682 - INFO -   [Song] Ishq Jalakar Karvaan From Dhurandhar
+2025-12-04 19:28:41,293 - INFO -   [Song] Rebel Saab From The Rajasaab Hindi
+2025-12-04 19:28:43,526 - INFO -   [Song] He Dil Pagal Pagal Hogaya From Chimera
+2025-12-04 19:28:44,191 - INFO -   [Album] De De Pyaar De 2 Deluxe Album
+2025-12-04 19:28:44,824 - INFO -   [Album] Ek Deewane Ki Deewaniyat
+2025-12-04 19:28:45,876 - INFO -   [Song] One In Crore From Mastiii 4
+2025-12-04 19:28:46,524 - INFO -   [Song] The Thaandavam From Akhanda 2 Thaandavam
+2025-12-04 19:28:48,409 - INFO -   [Song] Mehndi Laagi
+2025-12-04 19:28:49,241 - INFO -   [Song] Nobody Came
+2025-12-04 19:28:50,342 - INFO -   [Album] Tere Ishk Mein
+2025-12-04 19:28:50,961 - INFO -   [Song] They Call Him KING King Theme From King
+2025-12-04 19:28:52,254 - INFO -   [Song] Sundara From Non Violence
+2025-12-04 19:28:52,921 - INFO -   [Song] Aakhri Salaam From De De Pyaar De 2
+2025-12-04 19:28:53,537 - INFO -   [Song] Rasiya Balama From Mastiii 4
+2025-12-04 19:28:55,173 - INFO -   [Album] 120 Bahadur Original Motion Picture Soun
+2025-12-04 19:28:55,803 - INFO -   [Song] Chikiri Chikiri From Peddi Hindi
+2025-12-04 19:28:55,803 - INFO - 
+======================================================================
+2025-12-04 19:28:55,803 - INFO - SUMMARY for Hindi
+2025-12-04 19:28:55,803 - INFO -   Albums found: 5
+2025-12-04 19:28:55,803 - INFO -   Songs found: 15
+2025-12-04 19:28:55,803 - INFO - ======================================================================
+
+2025-12-04 19:28:57,814 - INFO - 
+======================================================================
+2025-12-04 19:28:57,814 - INFO - SCRAPING: Marathi (marathi)
+2025-12-04 19:28:57,814 - INFO - ======================================================================
+2025-12-04 19:28:57,814 - INFO - URL: https://pagalworldmusic.com/language/marathi
+
+2025-12-04 19:28:59,067 - INFO - Status: 200
+2025-12-04 19:28:59,080 - INFO - Found 20 track containers
+
+2025-12-04 19:28:59,687 - INFO -   [Song] Aye Chedva From Kairee
+2025-12-04 19:29:00,339 - INFO -   [Song] Zat Pat Pata Pat
+2025-12-04 19:29:01,953 - INFO -   [Song] Sur Tech Chedata From Asa Mee Ashi Mee
+2025-12-04 19:29:02,619 - INFO -   [Song] Kshanbhar
+2025-12-04 19:29:04,369 - INFO -   [Song] Porancha Ranga Original Soundtrack From 
+2025-12-04 19:29:05,033 - INFO -   [Song] Malhari From Gondhal
+2025-12-04 19:29:05,650 - INFO -   [Song] Narali Pophlichya Baga From Kairee
+2025-12-04 19:29:06,247 - INFO -   [Song] PROUD
+2025-12-04 19:29:06,896 - INFO -   [Song] Ho Aai From Uttar
+2025-12-04 19:29:07,569 - INFO -   [Album] Antarrashtriya
+2025-12-04 19:29:09,485 - INFO -   [Song] Dream Wali Girl
+2025-12-04 19:29:10,315 - INFO -   [Song] Lover
+2025-12-04 19:29:11,323 - INFO -   [Song] Chandwa Nabhatla
+2025-12-04 19:29:12,684 - INFO -   [Song] 96
+2025-12-04 19:29:13,563 - INFO -   [Song] Raanjai
+2025-12-04 19:29:15,565 - INFO -   [Song] Ishkacha Utara
+2025-12-04 19:29:16,189 - INFO -   [Song] Haldi Kunkvala Yayach Ha From Smart Sunb
+2025-12-04 19:29:16,831 - INFO -   [Song] Tuzyasathi Kaay Pan
+2025-12-04 19:29:17,472 - INFO -   [Song] Tiraki Najar
+2025-12-04 19:29:18,224 - INFO -   [Song] Avatarli Tarka
+2025-12-04 19:29:18,224 - INFO - 
+======================================================================
+2025-12-04 19:29:18,224 - INFO - SUMMARY for Marathi
+2025-12-04 19:29:18,224 - INFO -   Albums found: 1
+2025-12-04 19:29:18,224 - INFO -   Songs found: 19
+2025-12-04 19:29:18,224 - INFO - ======================================================================
+
+2025-12-04 19:29:20,229 - INFO - 
+======================================================================
+2025-12-04 19:29:20,229 - INFO - SCRAPING: Tamil (tamil)
+2025-12-04 19:29:20,229 - INFO - ======================================================================
+2025-12-04 19:29:20,229 - INFO - URL: https://pagalworldmusic.com/language/tamil
+
+2025-12-04 19:29:20,813 - INFO - Status: 200
+2025-12-04 19:29:20,813 - INFO - Found 20 track containers
+
+2025-12-04 19:29:22,442 - INFO -   [Album] Tere Ishk Mein Tamil
+2025-12-04 19:29:23,113 - INFO -   [Song] Pattuma From Love Insurance Kompany
+2025-12-04 19:29:24,194 - INFO -   [Song] Aalapikkey Ummak From Vaa Vaathiyaar
+2025-12-04 19:29:25,264 - INFO -   [Song] Mannichiru From Sirai
+2025-12-04 19:29:25,911 - INFO -   [Song] Vasthara From Kombuseevi
+2025-12-04 19:29:26,762 - INFO -   [Album] Revolver Rita Original Motion Picture So
+2025-12-04 19:29:27,344 - INFO -   [Song] Manasu Valikithu From Pookie Original Mo
+2025-12-04 19:29:27,961 - INFO -   [Song] Noodhana Noodhana From Niram
+2025-12-04 19:29:31,571 - INFO -   [Song] Emkoney From Draupathi 2
+2025-12-04 19:29:32,142 - INFO -   [Album] Theeyavar Kulai Nadunga Original Motion 
+2025-12-04 19:29:32,779 - INFO -   [Song] Ratnamala From Parasakthi Tamil
+2025-12-04 19:29:36,457 - INFO -   [Song] Dashamakan Title Promo Tamil
+2025-12-04 19:29:37,640 - INFO -   [Song] Vetri Veerane From Mask
+2025-12-04 19:29:38,269 - INFO -   [Song] Kandara Kolli From Retta Thala
+2025-12-04 19:29:38,908 - INFO -   [Song] Pretty Baby From BIKERTamil
+2025-12-04 19:29:39,562 - INFO -   [Song] Rebel Saab From The Rajasaab Tamil
+2025-12-04 19:29:40,222 - INFO -   [Album] Mangai
+2025-12-04 19:29:40,806 - INFO -   [Song] Storm The Moonwalk Theme From Moon Walk
+2025-12-04 19:29:41,939 - INFO -   [Song] Esa Kaaththa From My Lord
+2025-12-04 19:29:42,586 - INFO -   [Song] Karmugil Kannazhago From KaanthaTamil
+2025-12-04 19:29:42,586 - INFO - 
+======================================================================
+2025-12-04 19:29:42,586 - INFO - SUMMARY for Tamil
+2025-12-04 19:29:42,586 - INFO -   Albums found: 4
+2025-12-04 19:29:42,586 - INFO -   Songs found: 16
+2025-12-04 19:29:42,586 - INFO - ======================================================================
+
+2025-12-04 19:29:44,599 - INFO - 
+======================================================================
+2025-12-04 19:29:44,599 - INFO - SCRAPING: Telugu (telugu)
+2025-12-04 19:29:44,599 - INFO - ======================================================================
+2025-12-04 19:29:44,599 - INFO - URL: https://pagalworldmusic.com/language/telugu
+
+2025-12-04 19:29:45,469 - INFO - Status: 200
+2025-12-04 19:29:45,476 - INFO - Found 20 track containers
+
+2025-12-04 19:29:47,225 - INFO -   [Album] Akhanda 2 Thaandavam
+2025-12-04 19:29:47,820 - INFO -   [Album] Andhra King Taluka
+2025-12-04 19:29:51,476 - INFO -   [Song] Bella Bella From Bhartha Mahasayulaku Wi
+2025-12-04 19:29:52,210 - INFO -   [Album] Tere Ishk Mein Telugu
+2025-12-04 19:29:52,931 - INFO -   [Song] Bhimavaram Balma From Anaganaga Oka Raju
+2025-12-04 19:29:53,854 - INFO -   [Song] Ratnamala From Parasakthi Telugu
+2025-12-04 19:29:54,638 - INFO -   [Song] Gira Gira Gingiraagirey From Champion
+2025-12-04 19:29:55,790 - INFO -   [Song] Blue Yellow From Psych Siddhartha
+2025-12-04 19:29:56,617 - INFO -   [Song] Pilla From Dhandoraa
+2025-12-04 19:29:57,467 - INFO -   [Song] Vanavaasam From Mowgli 2025
+2025-12-04 19:29:59,275 - INFO -   [Song] Danger Mama From Revolver Rita Telugu
+2025-12-04 19:29:59,983 - INFO -   [Song] Emosanal Drama From Patang
+2025-12-04 19:30:00,716 - INFO -   [Song] Chandrullo Kundele From Failure Boys
+2025-12-04 19:30:01,516 - INFO -   [Song] Rebel Saab From The Rajasaab Telugu
+2025-12-04 19:30:02,350 - INFO -   [Album] Premante
+2025-12-04 19:30:02,980 - INFO -   [Song] Choodu Choodu Side A From Godari Gattupa
+2025-12-04 19:30:03,675 - INFO -   [Song] Bayilone Ballipalike
+2025-12-04 19:30:05,415 - INFO -   [Song] Jajikaya Jajikaya From Akhanda 2 Thaanda
+2025-12-04 19:30:06,237 - INFO -   [Song] Cheliya
+2025-12-04 19:30:06,963 - INFO -   [Song] Rana Kumbha From Varanasi
+2025-12-04 19:30:06,963 - INFO - 
+======================================================================
+2025-12-04 19:30:06,963 - INFO - SUMMARY for Telugu
+2025-12-04 19:30:06,963 - INFO -   Albums found: 4
+2025-12-04 19:30:06,963 - INFO -   Songs found: 16
+2025-12-04 19:30:06,963 - INFO - ======================================================================
+
+2025-12-04 19:30:08,973 - INFO - 
+Saving results to pagalworld_extended_results.json...
+2025-12-04 19:30:08,989 - INFO - Results saved to pagalworld_extended_results.json
+2025-12-04 19:30:08,989 - INFO - 
+======================================================================
+2025-12-04 19:30:08,989 - INFO - FINAL SUMMARY - EXTENDED FIELDS
+2025-12-04 19:30:08,989 - INFO - ======================================================================
+2025-12-04 19:30:08,989 - INFO - Total Albums Found: 14
+2025-12-04 19:30:08,989 - INFO - Total Songs Found: 66
+2025-12-04 19:30:08,989 - INFO - Total Errors: 0
+2025-12-04 19:30:08,989 - INFO - 
+Album Fields Captured (per album):
+2025-12-04 19:30:08,989 - INFO -   1. type: album
+2025-12-04 19:30:08,989 - INFO -   2. title: Dhurandhar
+2025-12-04 19:30:08,989 - INFO -   3. url: https://pagalworldmusic.com/album/ft4MGKjYem0_/dhurandhar
+2025-12-04 19:30:08,989 - INFO -   4. album_id: ft4MGKjYem0_
+2025-12-04 19:30:08,989 - INFO -   5. slug: dhurandhar
+2025-12-04 19:30:08,989 - INFO -   6. language: Hindi
+2025-12-04 19:30:08,989 - INFO -   7. image_url: https://pagalworldmusic.com/downloads/cover/4578394/4578394.
+2025-12-04 19:30:08,989 - INFO -   8. image_url_high: https://pagalworldmusic.com/downloads/cover/4578394/4578394.
+2025-12-04 19:30:08,989 - INFO -   9. song_count: 6
+2025-12-04 19:30:08,995 - INFO -   12. music_director: Song Com Download
+2025-12-04 19:30:08,995 - INFO -   14. description: Dhurandhar Album Mp3 Songs Pagalworld Music Song Com Downloa
+2025-12-04 19:30:08,995 - INFO -   16. scrape_timestamp: 2025-12-04T19:28:38.110271
+2025-12-04 19:30:08,995 - INFO - 
+Song Fields Captured (per song):
+2025-12-04 19:30:08,995 - INFO -   1. type: song
+2025-12-04 19:30:08,995 - INFO -   2. title: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:30:08,996 - INFO -   3. url: https://pagalworldmusic.com/track/VphajinY-tu-meri-main-tera
+2025-12-04 19:30:08,996 - INFO -   4. song_id: VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-
+2025-12-04 19:30:08,996 - INFO -   5. slug: VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-
+2025-12-04 19:30:08,996 - INFO -   6. language: Hindi
+2025-12-04 19:30:08,996 - INFO -   7. artist: Unknown
+2025-12-04 19:30:08,996 - INFO -   8. singer: Unknown
+2025-12-04 19:30:08,996 - INFO -   10. artist_main: Anvita Dutt Guptan
+2025-12-04 19:30:08,996 - INFO -   11. all_artists: Anvita Dutt Guptan
+2025-12-04 19:30:08,997 - INFO -   12. artists: ['Anvita Dutt Guptan']
+2025-12-04 19:30:08,997 - INFO -   13. album_name: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:30:08,997 - INFO -   14. music_composer: Hindi
+2025-12-04 19:30:08,997 - INFO -   15. label: SaReGaMA India Ltd
+2025-12-04 19:30:08,997 - INFO -   16. audio_url: /download.php?title=Tu+Meri+Main+Tera+Main+Tera+Tu+Meri+Titl
+2025-12-04 19:30:08,997 - INFO -   17. audio_quality: 320kbps
+2025-12-04 19:30:08,997 - INFO -   18. audio_size: 7.02 MB
+2025-12-04 19:30:08,998 - INFO -   19. audio_urls_all: {'320kbps': {'url': '/download.php?title=Tu+Meri+Main+Tera+M
+2025-12-04 19:30:08,998 - INFO -   21. duration: 03:03
+2025-12-04 19:30:08,998 - INFO -   22. release_date: 2025-11-28
+2025-12-04 19:30:08,998 - INFO -   23. year: 2025
+2025-12-04 19:30:08,998 - INFO -   24. description: Download Tu Meri Main Tera Main Tera Tu Meri Title Track Fro
+2025-12-04 19:30:08,998 - INFO -   25. image_url_high: https://pagalworldmusic.com/downloads/cover/4578388/4578388.
+2025-12-04 19:30:08,998 - INFO -   26. track_name: Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri
+2025-12-04 19:30:08,998 - INFO -   27. scrape_timestamp: 2025-12-04T19:28:38.744119
+2025-12-04 19:30:08,998 - INFO - ======================================================================
+
+2025-12-04 19:30:08,999 - INFO - Log file: pagalworld_extended_scraper.log
+2025-12-04 19:30:08,999 - INFO - Results file: pagalworld_extended_results.json

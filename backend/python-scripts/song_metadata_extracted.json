@@ -1,0 +1,32 @@
+{
+  "track_name": "Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri Main Tera Main Tera Tu Meri",
+  "artist": "Anvita Dutt Guptan",
+  "album": "Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri Main Tera Main Tera Tu Meri",
+  "release_date": "2025-11-28",
+  "duration": "03:03",
+  "year": "2025",
+  "language": "Hindi",
+  "music_composer": "Hindi",
+  "label": "SaReGaMA India Ltd",
+  "artists": [
+    "Anvita Dutt Guptan"
+  ],
+  "downloads": [
+    {
+      "quality": "320kbps",
+      "size": "7.02 MB",
+      "url": "/download.php?title=Tu+Meri+Main+Tera+Main+Tera+Tu+Meri+Title+Track+From+Tu+Meri+Main+Tera+Main+Tera+Tu+Meri-320kbps&path=downloads%2Fhigh%2FJhgDUB5ZWWo%2FJhgDUB5ZWWo.mp3"
+    },
+    {
+      "quality": "128kbps",
+      "size": "2.81 MB",
+      "url": "/download.php?title=Tu+Meri+Main+Tera+Main+Tera+Tu+Meri+Title+Track+From+Tu+Meri+Main+Tera+Main+Tera+Tu+Meri-128kbps&path=downloads%2Fmedium%2FJhgDUB5ZWWo%2FJhgDUB5ZWWo.mp3"
+    },
+    {
+      "quality": "64kbps",
+      "size": "1.4 MB",
+      "url": "/download.php?title=Tu+Meri+Main+Tera+Main+Tera+Tu+Meri+Title+Track+From+Tu+Meri+Main+Tera+Main+Tera+Tu+Meri-64kbps&path=downloads%2Flow%2FJhgDUB5ZWWo%2FJhgDUB5ZWWo.mp3"
+    }
+  ],
+  "audio_src": "/downloads/low/JhgDUB5ZWWo/JhgDUB5ZWWo.mp3"
+}

@@ -94,6 +94,7 @@ const Player = () => {
       }
     }
     
+    // Fetch song (will use cache if available for instant playback, or API as fallback)
     fetchSingleSong();
     setPlayCountUpdated(false); // Reset when song changes
     setAudioRetryCount(0); // Reset retry counter when song changes

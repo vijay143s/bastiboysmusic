@@ -7,6 +7,7 @@ Provides connection management, timestamp queries, and idempotent inserts.
 import mysql.connector
 import os
 import logging
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any, List
@@ -38,7 +39,7 @@ def get_db_config() -> Dict[str, Any]:
 
 
 @contextmanager
-def get_db_connection():
+def get_db_connection(max_retries: Optional[int] = None, retry_delay: Optional[float] = None):
     """
     Context manager for database connections.
     Automatically handles connection cleanup.
@@ -48,10 +49,46 @@ def get_db_connection():
             cursor = conn.cursor()
             # ... do work
     """
+    max_retries = max_retries or int(os.getenv('DB_MAX_RETRIES', 3))
+    retry_delay = retry_delay or float(os.getenv('DB_RETRY_DELAY', 3))
+    config = get_db_config()
+    config.update({
+        'connection_timeout': 300,
+        'autocommit': True,
+        'charset': 'utf8mb4',
+        'use_unicode': True,
+        'sql_mode': '',
+        'get_warnings': True,
+    })
     connection = None
+    last_error = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            connection = mysql.connector.connect(**config)
+            break
+        except mysql.connector.Error as err:
+            last_error = err
+            logger.error(
+                "Database connection error (attempt %s/%s): %s",
+                attempt,
+                max_retries,
+                err
+            )
+            if attempt == max_retries:
+                raise
+            sleep_time = retry_delay * attempt
+            logger.info("Retrying database connection in %.1f seconds...", sleep_time)
+            time.sleep(sleep_time)
+    if connection is None:
+        raise last_error or RuntimeError("Unable to establish database connection")
+
     try:
-        config = get_db_config()
-        connection = mysql.connector.connect(**config)
+        cursor = connection.cursor()
+        cursor.execute("SET SESSION wait_timeout = 3600")
+        cursor.execute("SET SESSION interactive_timeout = 3600")
+        cursor.execute("SET SESSION net_read_timeout = 300")
+        cursor.execute("SET SESSION net_write_timeout = 300")
+        cursor.close()
         logger.info("Database connection established")
         yield connection
     except mysql.connector.Error as err:
@@ -366,6 +403,31 @@ def execute_sql_files_with_truncate(sql_dir: Path, truncate: bool = False) -> Di
     results['errors'].extend(batch_results['errors'])
     
     return results
+
+
+def get_existing_album_titles(language: str) -> set:
+    """
+    Get all album titles for a specific language.
+    Used to avoid re-scraping existing albums in incremental mode.
+    
+    Args:
+        language: Language code (e.g., 'hindi', 'punjabi')
+    
+    Returns:
+        Set of album titles for the specified language
+    """
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT title FROM albums WHERE language = %s"
+            cursor.execute(query, (language,))
+            results = cursor.fetchall()
+            cursor.close()
+            
+            return set(row[0] for row in results) if results else set()
+    except Exception as e:
+        logger.error(f"Error getting existing album titles: {e}")
+        return set()
 
 
 def test_connection() -> bool:

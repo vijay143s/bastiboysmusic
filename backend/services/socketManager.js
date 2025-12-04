@@ -4,7 +4,6 @@ class SocketManager extends EventEmitter {
   constructor(io) {
     super();
     this.io = io;
-    this.sseClients = new Map(); // For Server-Sent Events clients
     this.socketClients = new Set(); // For WebSocket clients
     this.setupSocketHandlers();
   }
@@ -17,8 +16,15 @@ class SocketManager extends EventEmitter {
 
         // Handle client events
         socket.on('join-scraper', () => {
+          console.log('Client joining scraper-updates room:', socket.id);
           socket.join('scraper-updates');
-          socket.emit('joined', { room: 'scraper-updates' });
+          socket.emit('joined-scraper', { room: 'scraper-updates' });
+          console.log('Client joined scraper-updates room successfully:', socket.id);
+        });
+
+        socket.on('test-message', (message) => {
+          console.log('Received test message from frontend:', message);
+          socket.emit('test-response', 'Backend received your message');
         });
 
         socket.on('disconnect', () => {
@@ -32,19 +38,7 @@ class SocketManager extends EventEmitter {
     }
   }
 
-  // Add SSE client for /api/scrape/logs endpoint
-  addSSEClient(clientId, response) {
-    this.sseClients.set(clientId, response);
-    console.log(`SSE client added: ${clientId}`);
-  }
 
-  // Remove SSE client
-  removeSSEClient(clientId) {
-    if (this.sseClients.has(clientId)) {
-      this.sseClients.delete(clientId);
-      console.log(`SSE client removed: ${clientId}`);
-    }
-  }
 
   // Broadcast log message to all connected clients
   broadcastLog(message) {
@@ -54,13 +48,15 @@ class SocketManager extends EventEmitter {
       timestamp: new Date().toISOString()
     };
 
+    console.log('Broadcasting log to scraper-updates room:', data.message.substring(0, 100) + '...');
+
     // Send to WebSocket clients
     if (this.io) {
+      const room = this.io.sockets.adapter.rooms.get('scraper-updates');
+      const clientCount = room ? room.size : 0;
+      console.log(`Broadcasting to ${clientCount} clients in scraper-updates room`);
       this.io.to('scraper-updates').emit('log', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
   // Broadcast statistics update
@@ -75,9 +71,6 @@ class SocketManager extends EventEmitter {
     if (this.io) {
       this.io.to('scraper-updates').emit('stats', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
   // Broadcast progress update
@@ -92,9 +85,6 @@ class SocketManager extends EventEmitter {
     if (this.io) {
       this.io.to('scraper-updates').emit('progress', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
   // Broadcast error message
@@ -109,9 +99,6 @@ class SocketManager extends EventEmitter {
     if (this.io) {
       this.io.to('scraper-updates').emit('error', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
   // Broadcast completion status
@@ -127,9 +114,6 @@ class SocketManager extends EventEmitter {
     if (this.io) {
       this.io.to('scraper-updates').emit('complete', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
   // Broadcast current task update
@@ -144,24 +128,9 @@ class SocketManager extends EventEmitter {
     if (this.io) {
       this.io.to('scraper-updates').emit('task', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
-  // Send data to all SSE clients
-  broadcastToSSE(data) {
-    const message = `data: ${JSON.stringify(data)}\n\n`;
-    
-    this.sseClients.forEach((response, clientId) => {
-      try {
-        response.write(message);
-      } catch (error) {
-        console.error(`Error sending SSE to client ${clientId}:`, error);
-        this.removeSSEClient(clientId);
-      }
-    });
-  }
+
 
   // Get initial status for new connections
   getInitialStatus() {
@@ -188,33 +157,18 @@ class SocketManager extends EventEmitter {
     if (this.io) {
       this.io.emit('notification', data);
     }
-
-    // Send to SSE clients
-    this.broadcastToSSE(data);
   }
 
   // Get connected clients count
   getClientCount() {
     return {
       websocket: this.socketClients.size,
-      sse: this.sseClients.size,
-      total: this.socketClients.size + this.sseClients.size
+      total: this.socketClients.size
     };
   }
 
   // Close all connections
   closeAllConnections() {
-    // Close SSE connections
-    this.sseClients.forEach((response, clientId) => {
-      try {
-        response.write('data: {"type": "close", "message": "Server shutting down"}\n\n');
-        response.end();
-      } catch (error) {
-        console.error(`Error closing SSE client ${clientId}:`, error);
-      }
-    });
-    this.sseClients.clear();
-
     // WebSocket connections will be closed by socket.io automatically
     this.socketClients.clear();
   }

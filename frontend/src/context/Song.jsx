@@ -16,6 +16,9 @@ export const SongProvider = ({ children }) => {
   const [queueIndex, setQueueIndex] = useState(0);
   const [queueLabel, setQueueLabel] = useState("All Songs");
   const [onQueueEnd, setOnQueueEnd] = useState(null);
+  
+  // Cache for song data from queue - for instant next/prev playback
+  const [songDataCache, setSongDataCache] = useState(new Map());
 
   // Year-based queue pagination state
   const [availableYears, setAvailableYears] = useState([]);
@@ -268,18 +271,32 @@ export const SongProvider = ({ children }) => {
 
   const [song, setSong] = useState([]);
 
+  // Use cached song data if available (for instant playback on next/prev)
   async function fetchSingleSong() {
     try {
       if (!selectedSong) return;
       
+      // OPTIMIZATION: Check cache first for instant playback
+      if (songDataCache && songDataCache.has(String(selectedSong))) {
+        const cachedSong = songDataCache.get(String(selectedSong));
+        if (cachedSong && cachedSong.audio && cachedSong.audio.url) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log("✅ Using CACHED song data (no API call):", cachedSong.title);
+          }
+          setSong(cachedSong);
+          return;  // Instant return, no API call!
+        }
+      }
+      
+      // Fallback: Fetch from API if not in cache
       if (process.env.NODE_ENV === 'development') {
-        console.log("Fetching song with ID:", selectedSong);
+        console.log("⏳ Fetching song from API with ID:", selectedSong);
       }
       
       const { data } = await axios.get("/api/song/single/" + selectedSong);
       
       if (process.env.NODE_ENV === 'development') {
-        console.log("Fetched song data:", data);
+        console.log("📡 Fetched song data from API:", data);
         console.log("Audio URL:", data?.audio?.url);
       }
 
@@ -404,6 +421,16 @@ export const SongProvider = ({ children }) => {
       .filter(Boolean);
 
     if (!normalizedQueue.length) return;
+
+    // Pre-populate song data cache for instant next/prev playback
+    const cache = new Map();
+    normalizedQueue.forEach((song) => {
+      const id = getSongId(song);
+      if (id && song && typeof song === "object") {
+        cache.set(id, song);
+      }
+    });
+    setSongDataCache(cache);
 
     const targetId = startSongId ? normalizeSongId(startSongId) : null;
     const startIndex = targetId
@@ -621,6 +648,8 @@ export const SongProvider = ({ children }) => {
         hasMoreInCurrentYear,
         currentYearIndex,
         setOnQueueEnd,
+        // Song data cache for instant playback
+        songDataCache,
       }}
     >
       {children}

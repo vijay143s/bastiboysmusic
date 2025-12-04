@@ -10,6 +10,7 @@ const socketIo = require('socket.io');
 // Import scraper routes
 const { router: scraperRoutes, initSocketManager } = require('./routes/scraper');
 const scraperDatabaseRoutes = require('./routes/database');
+const adminQueryRoutes = require('./routes/adminQuery');
 
 // Load .env from backend directory
 const envPath = path.resolve(__dirname, ".env");
@@ -46,6 +47,7 @@ const songRoutes = require("./routes/songRoutes.js");
 const homeRoutes = require("./routes/homeRoutes.js");
 const interactionRoutes = require("./routes/interactionRoutes.js");
 const adminRoutes = require("./routes/adminRoutes.js");
+const audioProxyRoutes = require("./routes/audioProxyRoutes.js");
 
 //using existing routes
 app.use("/api/user", userRoutes);
@@ -53,10 +55,12 @@ app.use("/api/song", songRoutes);
 app.use("/api/home", homeRoutes);
 app.use("/api/interaction", interactionRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/audio", audioProxyRoutes);
 
 // Add scraper routes
 app.use('/api/scrape', scraperRoutes);
 app.use('/api/scraper-database', scraperDatabaseRoutes);
+app.use('/api/admin/query', adminQueryRoutes);
 
 // Health check endpoint for scraper
 app.get('/api/scraper/health', (req, res) => {
@@ -91,11 +95,10 @@ server.listen(port, () => {
   console.log(`💻 WebSocket: http://localhost:${port}`);
 });
 
-// Graceful shutdown
+// Simple shutdown handlers
 process.on('SIGTERM', () => {
   console.log('Received SIGTERM, shutting down gracefully...');
   server.close(() => {
-    console.log('Server closed');
     process.exit(0);
   });
 });
@@ -103,7 +106,6 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   console.log('Received SIGINT, shutting down gracefully...');
   server.close(() => {
-    console.log('Server closed');
     process.exit(0);
   });
 });

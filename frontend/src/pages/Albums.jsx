@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { useLanguage } from "../context/Language";
 import axios from "axios";
 import AlbumItem from "../components/AlbumItem";
 import Loading from "../components/Loading";
 import { FaArrowLeft } from "react-icons/fa";
+import { useAlbumsByLanguage, useSongsByLanguageAndYear } from "../lib/useLanguageContent";
 
 const Albums = () => {
+  const { language } = useLanguage();
   const [albums, setAlbums] = useState([]);
-  const [allAlbums, setAllAlbums] = useState([]);
-  const [yearFilteredAlbums, setYearFilteredAlbums] = useState([]);
+  const [allLanguageAlbums, setAllLanguageAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,46 +18,42 @@ const Albums = () => {
   const [filteredAlbums, setFilteredAlbums] = useState([]);
   const navigate = useNavigate();
 
+  // Fetch all albums for current language
+  const { albums: languageAlbums, loading: albumsLoading, total: totalAlbums } = useAlbumsByLanguage(1000, 1);
+
   const page = Number(searchParams.get("page")) || 1;
   const yearsParam = searchParams.get("years");
   const yearFilter = yearsParam ? yearsParam.split(",").map(y => parseInt(y.trim())) : null;
   const limit = 12;
 
+  // Filter albums when language or data changes
   useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        setLoading(true);
-        
-        // If year filter is provided, fetch all albums and filter by year
-        if (yearFilter && yearFilter.length > 0) {
-          const searchResponse = await axios.get(`/api/home/search/albums`);
-          const allAlbumsData = searchResponse.data.data;
-          setAllAlbums(allAlbumsData);
-          
-          // Filter by years
-          const yearFiltered = allAlbumsData.filter(album => 
-            yearFilter.includes(album.year)
-          );
-          
-          // Store year-filtered albums for search
-          setYearFilteredAlbums(yearFiltered);
-          
-          // Apply pagination manually
-          const startIndex = (page - 1) * limit;
-          const endIndex = startIndex + limit;
-          const paginatedAlbums = yearFiltered.slice(startIndex, endIndex);
-          
-          setAlbums(paginatedAlbums);
-          setPagination({
-            page,
-            limit,
-            total: yearFiltered.length,
-            pages: Math.ceil(yearFiltered.length / limit)
-          });
-        } else {
-          // Normal pagination without year filter
-          const response = await axios.get(
-            `/api/home/albums?page=${page}&limit=${limit}`
+    setLoading(albumsLoading);
+    
+    let albumsToUse = languageAlbums;
+    
+    // Apply year filter if provided
+    if (yearFilter && yearFilter.length > 0) {
+      albumsToUse = albumsToUse.filter(album => 
+        yearFilter.includes(album.year)
+      );
+    }
+
+    setAllLanguageAlbums(albumsToUse);
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedAlbums = albumsToUse.slice(startIndex, endIndex);
+
+    setAlbums(paginatedAlbums);
+    setPagination({
+      page,
+      limit,
+      total: albumsToUse.length,
+      pages: Math.ceil(albumsToUse.length / limit)
+    });
+  }, [languageAlbums, page, language, yearFilter, albumsLoading]);
           );
           setAlbums(response.data.data);
           setPagination(response.data.pagination);

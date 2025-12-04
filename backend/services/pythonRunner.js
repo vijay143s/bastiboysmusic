@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 const EventEmitter = require('events');
 
 class PythonScraperService extends EventEmitter {
@@ -11,6 +12,70 @@ class PythonScraperService extends EventEmitter {
     this.stats = { albums: 0, songs: 0, errors: 0 };
     this.currentTask = 'Idle';
     this.startTime = null;
+    this.logFile = path.join(__dirname, '../python-scripts/logs/ingestion.log');
+  }
+
+  // Clear log file at start of new session
+  clearLogFile() {
+    try {
+      const logDir = path.dirname(this.logFile);
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+      fs.writeFileSync(this.logFile, '', 'utf8');
+    } catch (error) {
+      console.error('Error clearing log file:', error);
+    }
+  }
+
+  // Write log to file for HTTP polling
+  writeLogToFile(message) {
+    try {
+      const logDir = path.dirname(this.logFile);
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+      
+      const timestamp = new Date().toISOString().replace('T', ' ').replace('Z', '');
+      const logEntry = `${timestamp} - INFO - ${message}\n`;
+      fs.appendFileSync(this.logFile, logEntry, 'utf8');
+    } catch (error) {
+      console.error('Error writing to log file:', error);
+    }
+  }
+
+  // Method to start any Python script (for scraping or duplicate removal)
+  startPythonScript(scriptPath, args = []) {
+    if (this.isRunning) {
+      throw new Error('A Python script is already running');
+    }
+
+    console.log('Starting Python script:', scriptPath, 'with args:', args);
+
+    this.currentProcess = spawn('python', [scriptPath, ...args], {
+      cwd: path.dirname(scriptPath),
+      env: { ...process.env },
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+
+    this.isRunning = true;
+    this.startTime = new Date();
+    this.progress = 0;
+    this.stats = { albums: 0, songs: 0, errors: 0 };
+    this.currentTask = 'Starting script...';
+
+    // Clear previous log file
+    this.clearLogFile();
+    
+    this.setupProcessHandlers();
+
+    // Emit start event
+    this.emit('start', { 
+      scriptPath,
+      args, 
+      startTime: this.startTime,
+      pid: this.currentProcess.pid 
+    });
   }
 
   async startScraping(options) {
@@ -20,7 +85,7 @@ class PythonScraperService extends EventEmitter {
 
     try {
       const args = this.buildPythonArgs(options);
-      const scriptPath = path.join(__dirname, '../senslive_incremental.py');
+      const scriptPath = path.join(__dirname, '../python-scripts/senslive_incremental.py');
       
       console.log('Starting Python scraper with args:', args);
 
@@ -36,6 +101,9 @@ class PythonScraperService extends EventEmitter {
       this.stats = { albums: 0, songs: 0, errors: 0 };
       this.currentTask = 'Starting scraper...';
 
+      // Clear previous log file
+      this.clearLogFile();
+      
       this.setupProcessHandlers();
 
       // Emit start event
@@ -109,16 +177,26 @@ class PythonScraperService extends EventEmitter {
       console.log('Python stdout:', output);
       
       this.emit('log', output);
+      this.writeLogToFile(output.trim());
       this.parseOutput(output);
     });
 
-    // Handle stderr (error output)
+    // Handle stderr (error output and logging)
     this.currentProcess.stderr.on('data', (data) => {
-      const error = data.toString();
-      console.error('Python stderr:', error);
+      const output = data.toString();
+      console.error('Python stderr:', output);
       
-      this.emit('error', error);
-      this.parseError(error);
+      // Check if this is actually an error or just logging output
+      if (output.includes('ERROR') || output.includes('CRITICAL') || output.includes('Exception') || output.includes('Traceback')) {
+        this.emit('error', output);
+        this.parseError(data);
+      } else {
+        // Treat INFO, DEBUG, WARNING logs as regular log output
+        console.log('Emitting log:', output.substring(0, 100) + '...');
+        this.emit('log', output);
+        this.writeLogToFile(output.trim());
+        this.parseOutput(output);
+      }
     });
 
     // Handle process exit
@@ -153,29 +231,43 @@ class PythonScraperService extends EventEmitter {
 
     for (const line of lines) {
       // Parse progress indicators
-      if (line.includes('Processing') || line.includes('Scraping')) {
-        this.currentTask = line.trim();
+      if (line.includes('Processing') || line.includes('Scraping') || line.includes('EXECUTING SQL')) {
+        this.currentTask = line.includes('INFO -') ? line.split('INFO -')[1].trim() : line.trim();
         this.emit('task', this.currentTask);
       }
 
-      // Parse album count
-      const albumMatch = line.match(/(\d+)\s*albums?\s*(found|processed|inserted)/i);
+      // Parse album count from generated SQL
+      const albumMatch = line.match(/Albums:\s*(\d+)/i);
       if (albumMatch) {
         this.stats.albums = parseInt(albumMatch[1]);
         this.emit('stats', this.stats);
       }
 
-      // Parse song count
-      const songMatch = line.match(/(\d+)\s*songs?\s*(found|processed|inserted)/i);
+      // Parse song count from generated SQL
+      const songMatch = line.match(/Songs:\s*(\d+)/i);
       if (songMatch) {
         this.stats.songs = parseInt(songMatch[1]);
         this.emit('stats', this.stats);
       }
 
-      // Parse error count
-      const errorMatch = line.match(/(\d+)\s*errors?/i);
-      if (errorMatch) {
-        this.stats.errors = parseInt(errorMatch[1]);
+      // Parse artists count
+      const artistMatch = line.match(/Artists:\s*(\d+)/i);
+      if (artistMatch) {
+        this.stats.artists = parseInt(artistMatch[1]);
+        this.emit('stats', this.stats);
+      }
+
+      // Parse singers count
+      const singerMatch = line.match(/Singers:\s*(\d+)/i);
+      if (singerMatch) {
+        this.stats.singers = parseInt(singerMatch[1]);
+        this.emit('stats', this.stats);
+      }
+
+      // Parse music directors count
+      const directorMatch = line.match(/Music Directors:\s*(\d+)/i);
+      if (directorMatch) {
+        this.stats.musicDirectors = parseInt(directorMatch[1]);
         this.emit('stats', this.stats);
       }
 
@@ -187,8 +279,17 @@ class PythonScraperService extends EventEmitter {
       }
 
       // Parse specific status messages
-      if (line.includes('Starting')) {
-        this.currentTask = line.trim();
+      if (line.includes('STARTING') || line.includes('COMPLETED')) {
+        const status = line.includes('STARTING') ? 'Running' : 'Completed';
+        this.stats.status = status;
+        this.currentTask = line.includes('INFO -') ? line.split('INFO -')[1].trim() : line.trim();
+        this.emit('task', this.currentTask);
+        this.emit('stats', this.stats);
+      }
+
+      // Parse database execution status
+      if (line.includes('Successfully executed') || line.includes('Database connection established')) {
+        this.currentTask = line.includes('INFO -') ? line.split('INFO -')[1].trim() : line.trim();
         this.emit('task', this.currentTask);
       }
 
@@ -202,15 +303,18 @@ class PythonScraperService extends EventEmitter {
   }
 
   parseError(error) {
+    // Convert to string if it's a Buffer
+    const errorStr = error.toString ? error.toString() : String(error);
+    
     // Count errors
-    if (error.toLowerCase().includes('error')) {
+    if (errorStr.toLowerCase().includes('error')) {
       this.stats.errors++;
       this.emit('stats', this.stats);
     }
 
     // Update task if it's a significant error
-    if (error.includes('Failed') || error.includes('Exception')) {
-      this.currentTask = `Error: ${error.trim().substring(0, 50)}...`;
+    if (errorStr.includes('Failed') || errorStr.includes('Exception')) {
+      this.currentTask = `Error: ${errorStr.trim().substring(0, 50)}...`;
       this.emit('task', this.currentTask);
     }
   }

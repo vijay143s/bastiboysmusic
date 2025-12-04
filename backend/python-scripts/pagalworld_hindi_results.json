@@ -1,0 +1,214 @@
+{
+  "timestamp": "2025-12-04T19:39:54.282086",
+  "language": "hindi",
+  "total_pages_scraped": 1,
+  "total_albums": 5,
+  "total_songs": 15,
+  "total_errors": 0,
+  "data": {
+    "albums": [
+      {
+        "type": "album",
+        "id": "ft4MGKjYem0_",
+        "title": "Dhurandhar",
+        "url": "https://pagalworldmusic.com/album/ft4MGKjYem0_/dhurandhar",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Reble | Total songs = 6",
+        "source": "language_page"
+      },
+      {
+        "type": "album",
+        "id": "mT5P5rCNkj4_",
+        "title": "De De Pyaar De 2 Deluxe Album",
+        "url": "https://pagalworldmusic.com/album/mT5P5rCNkj4_/de-de-pyaar-de-2-deluxe-album",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Yo Yo Honey Singh | Total songs = 6",
+        "source": "language_page"
+      },
+      {
+        "type": "album",
+        "id": "S5P6rg88ZDI_",
+        "title": "Ek Deewane Ki Deewaniyat",
+        "url": "https://pagalworldmusic.com/album/S5P6rg88ZDI_/ek-deewane-ki-deewaniyat",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Prince Dubey | Total songs = 2",
+        "source": "language_page"
+      },
+      {
+        "type": "album",
+        "id": "miLuahpnTkM_",
+        "title": "Tere Ishk Mein",
+        "url": "https://pagalworldmusic.com/album/miLuahpnTkM_/tere-ishk-mein",
+        "image_url": null,
+        "language": "hindi",
+        "description": "A.R. Rahman | Total songs = 8",
+        "source": "language_page"
+      },
+      {
+        "type": "album",
+        "id": "AoyxJ5K1Iyg_",
+        "title": "120 Bahadur Original Motion Picture Soundtrack",
+        "url": "https://pagalworldmusic.com/album/AoyxJ5K1Iyg_/120-bahadur-original-motion-picture-soundtrack",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Javed Akhtar | Total songs = 4",
+        "source": "language_page"
+      }
+    ],
+    "songs": [
+      {
+        "type": "song",
+        "id": "VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-meri-main-tera-main-tera-tu-meri",
+        "title": "Tu Meri Main Tera Main Tera Tu Meri Title Track From Tu Meri Main Tera Main Tera Tu Meri",
+        "url": "https://pagalworldmusic.com/track/VphajinY-tu-meri-main-tera-main-tera-tu-meri-title-track-tu-meri-main-tera-main-tera-tu-meri",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Anvita Dutt Guptan | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "EGDxuQCt-chal-musafir-gustaakh-ishq",
+        "title": "Chal Musafir From Gustaakh Ishq",
+        "url": "https://pagalworldmusic.com/track/EGDxuQCt-chal-musafir-gustaakh-ishq",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Armaan Malik | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "fUpEjre_-hey-penne",
+        "title": "Hey Penne",
+        "url": "https://pagalworldmusic.com/track/fUpEjre_-hey-penne",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Neeraj Kumar | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "voBxdpLJ-ishq-jalakar-karvaan-dhurandhar",
+        "title": "Ishq Jalakar Karvaan From Dhurandhar",
+        "url": "https://pagalworldmusic.com/track/voBxdpLJ-ishq-jalakar-karvaan-dhurandhar",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Irshad Kamil | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "D0t8ffq3-rebel-saab-the-rajasaab-hindi",
+        "title": "Rebel Saab From The Rajasaab Hindi",
+        "url": "https://pagalworldmusic.com/track/D0t8ffq3-rebel-saab-the-rajasaab-hindi",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Thaman S | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "zswv4Hn4-he-dil-pagal-pagal-hogaya-chimera",
+        "title": "He Dil Pagal Pagal Hogaya From Chimera",
+        "url": "https://pagalworldmusic.com/track/zswv4Hn4-he-dil-pagal-pagal-hogaya-chimera",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Anuradha Bhat | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "hQvMlzZe-one-in-crore-mastiii-4",
+        "title": "One In Crore From Mastiii 4",
+        "url": "https://pagalworldmusic.com/track/hQvMlzZe-one-in-crore-mastiii-4",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Kanika Kapoor | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "C6ZbNlZV-the-thaandavam-akhanda-2-thaandavamhindi",
+        "title": "The Thaandavam From Akhanda 2 ThaandavamHindi",
+        "url": "https://pagalworldmusic.com/track/C6ZbNlZV-the-thaandavam-akhanda-2-thaandavamhindi",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Jubin Nautiyal | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "RwQJuCgj-mehndi-laagi",
+        "title": "Mehndi Laagi",
+        "url": "https://pagalworldmusic.com/track/RwQJuCgj-mehndi-laagi",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Moti Khan | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "VTkEbR9J-nobody-came",
+        "title": "Nobody Came",
+        "url": "https://pagalworldmusic.com/track/VTkEbR9J-nobody-came",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Dhanda Nyoliwala | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "yPXE2kiz-they-call-him-king-king-theme-king",
+        "title": "They Call Him KING King Theme From King",
+        "url": "https://pagalworldmusic.com/track/yPXE2kiz-they-call-him-king-king-theme-king",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Anirudh Ravichander | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "R8gdmeHD-sundara-non-violence",
+        "title": "Sundara From Non Violence",
+        "url": "https://pagalworldmusic.com/track/R8gdmeHD-sundara-non-violence",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Yuvan Shankar Raja | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "FRwmPJMk-aakhri-salaam-de-de-pyaar-de-2",
+        "title": "Aakhri Salaam From De De Pyaar De 2",
+        "url": "https://pagalworldmusic.com/track/FRwmPJMk-aakhri-salaam-de-de-pyaar-de-2",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Sagar Bhatia | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "ksXf_G7P-rasiya-balama-mastiii-4",
+        "title": "Rasiya Balama From Mastiii 4",
+        "url": "https://pagalworldmusic.com/track/ksXf_G7P-rasiya-balama-mastiii-4",
+        "image_url": null,
+        "language": "hindi",
+        "description": "Sanjeev Chaturvedi | Total songs = 1",
+        "source": "language_page"
+      },
+      {
+        "type": "song",
+        "id": "amxHYsB9-chikiri-chikiri-peddi-hindi",
+        "title": "Chikiri Chikiri From Peddi Hindi",
+        "url": "https://pagalworldmusic.com/track/amxHYsB9-chikiri-chikiri-peddi-hindi",
+        "image_url": null,
+        "language": "hindi",
+        "description": "A.R. Rahman | Total songs = 1",
+        "source": "language_page"
+      }
+    ]
+  }
+}
