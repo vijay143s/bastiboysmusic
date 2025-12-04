@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Don't rewrite existing files or directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Proxy API requests to Node.js backend
+  RewriteRule ^api/(.*)$ http://127.0.0.1:8080/api/$1 [P,L]
+  
+  # Serve frontend
+  RewriteRule ^(.*)$ frontend/dist/$1 [L]
+</IfModule>

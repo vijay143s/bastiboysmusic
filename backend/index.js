@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
+const cors = require("cors");
 const { connectDb } = require("./database/db.js");
 const cookieParser = require("cookie-parser");
 const cloudinary = require("cloudinary");
@@ -24,14 +25,23 @@ cloudinary.v2.config({
 
 const app = express();
 const server = http.createServer(app);
+
+// CORS configuration for cPanel and local development
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'])
+    : '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+  cors: corsOptions
 });
 
 // using middlewares
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -39,7 +49,8 @@ app.use(cookieParser());
 // Initialize socket manager for scraper
 initSocketManager(io);
 
-const port = Number(process.env.PORT) || 5000;
+// Port configuration: Use 8080 for cPanel, 5000 for local development
+const port = Number(process.env.PORT) || (process.env.NODE_ENV === 'production' ? 8080 : 5000);
 
 //importing existing routes
 const userRoutes = require("./routes/userRoutes.js");
@@ -92,9 +103,17 @@ app.use((error, req, res, next) => {
 
 server.listen(port, () => {
   connectDb();
-  console.log(`🚀 Telugu Songs App running on port ${port}`);
-  console.log(`📊 Scraper API: http://localhost:${port}/api/scrape`);
-  console.log(`💻 WebSocket: http://localhost:${port}`);
+  console.log(`
+╔═══════════════════════════════════════════════════════════╗
+║         🚀 Telugu Songs App Starting                      ║
+╠═══════════════════════════════════════════════════════════╣
+║ Server Port:     ${port}
+║ Environment:     ${process.env.NODE_ENV || 'development'}
+║ Scraper API:     http://localhost:${port}/api/scrape
+║ Health Check:    http://localhost:${port}/api/scraper/health
+║ WebSocket:       http://localhost:${port}
+╚═══════════════════════════════════════════════════════════╝
+  `);
 });
 
 // Simple shutdown handlers
