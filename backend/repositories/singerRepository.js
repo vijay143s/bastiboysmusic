@@ -1,4 +1,5 @@
 const { pool } = require("../database/db.js");
+const { cacheManager } = require("../utils/cacheManager.js");
 
 const mapSingerRow = (row) => ({
   singerId: row.singer_id,
@@ -75,22 +76,44 @@ const deleteSingersBySong = async (songId) => {
   // No-op: singers table no longer has song relationship
 };
 
-const getTopSingers = async (limit = 10) => {
-  const [rows] = await pool.query(
-    `SELECT s.singer_id, s.singer_name, COUNT(so.id) as song_count
+const getTopSingers = async (limit = 10, language = null) => {
+  // Generate cache key
+  const cacheKey = cacheManager.generateKey('singers:top', { limit, language: language || 'all' });
+  
+  // Check cache
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  let query = `SELECT s.singer_id, s.singer_name, COUNT(so.id) as song_count
      FROM singers s 
      LEFT JOIN songs so ON (so.singer = s.singer_name OR FIND_IN_SET(s.singer_name, so.singer) > 0)
-     GROUP BY s.singer_id, s.singer_name 
+     LEFT JOIN albums a ON so.album_id = a.id`;
+  let params = [];
+  
+  if (language) {
+    query += ` WHERE a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` GROUP BY s.singer_id, s.singer_name 
      ORDER BY song_count DESC, s.singer_name ASC 
-     LIMIT ?`,
-    [limit]
-  );
+     LIMIT ?`;
+  params.push(limit);
+  
+  const [rows] = await pool.query(query, params);
 
-  return rows.map(row => ({
+  const result = rows.map(row => ({
     singerId: row.singer_id,
     singerName: row.singer_name,
     songCount: row.song_count
   }));
+  
+  // Cache for 2 hours
+  cacheManager.set(cacheKey, result, 2 * 60 * 60 * 1000);
+
+  return result;
 };
 
 const getSingersPaginated = async (page = 1, limit = 12) => {

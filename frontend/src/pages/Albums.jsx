@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/Language";
+import { SongData } from "../context/Song";
 import axios from "axios";
 import AlbumItem from "../components/AlbumItem";
 import Loading from "../components/Loading";
 import { FaArrowLeft } from "react-icons/fa";
-import { useAlbumsByLanguage, useSongsByLanguageAndYear } from "../lib/useLanguageContent";
+
 
 const Albums = () => {
-  const { language } = useLanguage();
+  const { selectedLanguage } = useLanguage();
+  const { albums: contextAlbums } = SongData();
   const [albums, setAlbums] = useState([]);
-  const [allLanguageAlbums, setAllLanguageAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredAlbums, setFilteredAlbums] = useState([]);
   const navigate = useNavigate();
-
-  // Fetch all albums for current language
-  const { albums: languageAlbums, loading: albumsLoading, total: totalAlbums } = useAlbumsByLanguage(1000, 1);
 
   const page = Number(searchParams.get("page")) || 1;
   const yearsParam = searchParams.get("years");
@@ -28,9 +26,7 @@ const Albums = () => {
 
   // Filter albums when language or data changes
   useEffect(() => {
-    setLoading(albumsLoading);
-    
-    let albumsToUse = languageAlbums;
+    let albumsToUse = contextAlbums || [];
     
     // Apply year filter if provided
     if (yearFilter && yearFilter.length > 0) {
@@ -38,8 +34,6 @@ const Albums = () => {
         yearFilter.includes(album.year)
       );
     }
-
-    setAllLanguageAlbums(albumsToUse);
 
     // Apply pagination
     const startIndex = (page - 1) * limit;
@@ -53,30 +47,8 @@ const Albums = () => {
       total: albumsToUse.length,
       pages: Math.ceil(albumsToUse.length / limit)
     });
-  }, [languageAlbums, page, language, yearFilter, albumsLoading]);
-          );
-          setAlbums(response.data.data);
-          setPagination(response.data.pagination);
-          
-          // If it's the first page and no search, fetch minimal data for searching
-          if (page === 1 && !searchQuery) {
-            const searchResponse = await axios.get(`/api/home/search/albums`);
-            setAllAlbums(searchResponse.data.data);
-          }
-          
-          // Clear year filtered albums when no year filter
-          setYearFilteredAlbums([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch albums:", error);
-        setAlbums([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAlbums();
-  }, [page, yearsParam]);
+    setLoading(false);
+  }, [contextAlbums, page, selectedLanguage, yearFilter]);
 
   // Filter albums based on search query
   useEffect(() => {
@@ -85,15 +57,12 @@ const Albums = () => {
       return;
     }
     
-    // Search in year-filtered albums if year filter exists, otherwise search in all albums
-    const searchSource = yearFilteredAlbums.length > 0 ? yearFilteredAlbums : allAlbums;
-    
-    const filtered = searchSource.filter(album => 
+    const filtered = (contextAlbums || []).filter(album => 
       album.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       album.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredAlbums(filtered);
-  }, [searchQuery, allAlbums, yearFilteredAlbums]);
+  }, [searchQuery, contextAlbums]);
 
   const displayAlbums = searchQuery ? filteredAlbums : albums;
 
@@ -154,11 +123,11 @@ const Albums = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
             {displayAlbums.map((album) => (
               <AlbumItem
-                key={album._id}
+                key={album._id || album.id}
                 image={album.thumbnail?.url}
                 name={album.title}
                 desc={album.description}
-                id={album._id}
+                id={album._id || album.id}
               />
             ))}
           </div>

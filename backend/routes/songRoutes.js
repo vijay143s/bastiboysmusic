@@ -23,6 +23,7 @@ const {
   getAlbumsByYear,
   getQueueByYearBatch,
   getPlaylistSongs,
+  getDistinctLanguages,
 } = require("../controllers/songControllers.js");
 
 const router = express.Router();
@@ -45,6 +46,7 @@ router.get("/queue/years", getQueueYears); // Get available years
 router.get("/queue/year/:year", getQueueByYear); // Get songs by year
 router.get("/search", searchSongs); // Search songs with optional year filter
 router.get("/single/:id", getSingleSong);
+router.get("/languages", getDistinctLanguages); // Get distinct languages
 router.post("/:id/play", updatePlayCount); // Update play count
 router.post("/:id/thumbnail", isAuth, uploadFile, addThumbnail);
 router.post("/:id/singer", isAuth, addSingerToSong);

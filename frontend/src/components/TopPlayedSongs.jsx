@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SongData } from "../context/Song";
+import { useLanguage } from "../context/Language";
 import { UserData } from "../context/User";
 import { FaShuffle, FaPlay, FaPause, FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
@@ -14,6 +15,7 @@ const TopPlayedSongs = () => {
     isPlaying,
     playQueue,
   } = SongData();
+  const { selectedLanguage } = useLanguage();
   const { user, addToPlaylist } = UserData();
   const [topSongs, setTopSongs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,9 +53,14 @@ const TopPlayedSongs = () => {
       setLoading(true);
       setError(null);
       const currentOffset = isLoadMore ? offset : 0;
-      const { data } = await axios.get(
-        `/api/song/top-played?limit=${limit}&offset=${currentOffset}&shuffle=${shuffle}`
-      );
+      const params = new URLSearchParams();
+      params.append("limit", limit);
+      params.append("offset", currentOffset);
+      params.append("shuffle", shuffle);
+      if (selectedLanguage) {
+        params.append("language", selectedLanguage);
+      }
+      const { data } = await axios.get(`/api/song/top-played?${params}`);
       
       if (isLoadMore) {
         setTopSongs([...topSongs, ...data.songs]);
@@ -75,7 +82,7 @@ const TopPlayedSongs = () => {
 
   useEffect(() => {
     fetchTopPlayed();
-  }, []);
+  }, [selectedLanguage]);
 
   const handleShuffle = () => {
     if (topSongs.length === 0) return;

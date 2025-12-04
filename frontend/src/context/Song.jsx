@@ -2,6 +2,7 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { UserData } from "./User";
+import { useLanguage } from "./Language";
 
 const SongContext = createContext();
 
@@ -29,6 +30,7 @@ export const SongProvider = ({ children }) => {
   const [hasMoreInCurrentYear, setHasMoreInCurrentYear] = useState(true);
 
   const { user } = UserData();
+  const { selectedLanguage } = useLanguage();
 
   const normalizeSongId = (value) => {
     if (value === undefined || value === null) return null;
@@ -89,7 +91,13 @@ export const SongProvider = ({ children }) => {
 
   async function fetchSongs() {
     try {
-      const { data } = await axios.get("/api/song/all");
+      const params = new URLSearchParams();
+      if (selectedLanguage) {
+        params.append("language", selectedLanguage);
+      }
+      console.log(`Fetching songs with language: ${selectedLanguage}`);
+      const { data } = await axios.get(`/api/song/all?${params}`);
+      console.log(`Fetched ${data.length} songs`, data.slice(0, 2)); // Log first 2 songs to see structure
 
       setSongs(data);
       if (!selectedSong && data.length) {
@@ -377,14 +385,20 @@ export const SongProvider = ({ children }) => {
 
   const fetchAlbums = useCallback(async () => {
     try {
-      const { data } = await axios.get("/api/song/album/all");
+      const params = new URLSearchParams();
+      if (selectedLanguage) {
+        params.append("language", selectedLanguage);
+      }
+      console.log(`Fetching albums with language: ${selectedLanguage}`);
+      const { data } = await axios.get(`/api/song/album/all?${params}`);
+      console.log(`Fetched ${data.length} albums`, data.slice(0, 2)); // Log first 2 albums to see structure
 
       setAlbums(data || []);
     } catch (error) {
       console.error("Error fetching albums:", error);
       setAlbums([]);
     }
-  }, []);
+  }, [selectedLanguage]);
 
   async function deleteSong(id) {
     try {
@@ -401,7 +415,16 @@ export const SongProvider = ({ children }) => {
     // Don't auto-load queue on mount - let individual pages decide what to load
     // initializeYearBasedQueue(); 
     fetchAlbums();
-  }, [fetchAlbums]);
+    fetchSongs();
+  }, []);
+
+  // Refetch songs and albums when language changes
+  useEffect(() => {
+    if (selectedLanguage) {
+      fetchSongs();
+      fetchAlbums();
+    }
+  }, [selectedLanguage]);
 
   const playQueue = (collection = [], startSongId, label = "Queue") => {
     if (!collection.length) return;
@@ -488,8 +511,9 @@ export const SongProvider = ({ children }) => {
   };
 
   const loadDefaultQueue = async () => {
+    const { selectedLanguage } = useLanguage();
     try {
-      const { data } = await axios.get("/api/song/top-played?limit=50&offset=0");
+      const { data } = await axios.get(`/api/song/top-played?limit=50&offset=0&language=${selectedLanguage}`);
       if (data.songs && data.songs.length) {
         const firstSongId = getSongId(data.songs[0]);
         if (firstSongId) {

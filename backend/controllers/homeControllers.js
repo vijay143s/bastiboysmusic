@@ -54,6 +54,7 @@ const getLatestAlbumsByYear = TryCatch(async (req, res) => {
 // Smart Latest Albums (fetches from max year and previous year if max year != current year)
 const getLatestAlbumsSmart_Controller = TryCatch(async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : 10;
+  const language = req.query.language || null;
 
   if (Number.isNaN(limit)) {
     return res.status(400).json({
@@ -61,7 +62,7 @@ const getLatestAlbumsSmart_Controller = TryCatch(async (req, res) => {
     });
   }
 
-  const result = await getLatestAlbumsSmart(limit);
+  const result = await getLatestAlbumsSmart(limit, language);
 
   res.json({
     message: "Latest albums retrieved successfully",
@@ -96,6 +97,7 @@ const getAllAlbumsPaginated = TryCatch(async (req, res) => {
 // Get top artists
 const getTopArtistsSection = TryCatch(async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : 10;
+  const language = req.query.language || null;
 
   if (Number.isNaN(limit) || limit < 1) {
     return res.status(400).json({
@@ -103,7 +105,7 @@ const getTopArtistsSection = TryCatch(async (req, res) => {
     });
   }
 
-  const artists = await getTopArtists(limit);
+  const artists = await getTopArtists(limit, language);
 
   res.json({
     message: "Top artists retrieved successfully",
@@ -135,6 +137,7 @@ const getAllArtistsPaginated = TryCatch(async (req, res) => {
 // Get top singers
 const getTopSingersSection = TryCatch(async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : 10;
+  const language = req.query.language || null;
 
   if (Number.isNaN(limit) || limit < 1) {
     return res.status(400).json({
@@ -142,7 +145,7 @@ const getTopSingersSection = TryCatch(async (req, res) => {
     });
   }
 
-  const singers = await getTopSingers(limit);
+  const singers = await getTopSingers(limit, language);
 
   res.json({
     message: "Top singers retrieved successfully",
@@ -174,6 +177,7 @@ const getAllSingersPaginated = TryCatch(async (req, res) => {
 // Get top music directors
 const getTopMusicDirectorsSection = TryCatch(async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : 10;
+  const language = req.query.language || null;
 
   if (Number.isNaN(limit) || limit < 1) {
     return res.status(400).json({
@@ -181,7 +185,7 @@ const getTopMusicDirectorsSection = TryCatch(async (req, res) => {
     });
   }
 
-  const directors = await getTopMusicDirectors(limit);
+  const directors = await getTopMusicDirectors(limit, language);
 
   res.json({
     message: "Top music directors retrieved successfully",

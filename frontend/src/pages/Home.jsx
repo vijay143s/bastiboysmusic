@@ -7,11 +7,7 @@ import TopPlayedSongs from "../components/TopPlayedSongs";
 import LatestAlbums from "../components/LatestAlbums";
 import { FaCalendarAlt } from "react-icons/fa";
 import axios from "axios";
-import { 
-  useAlbumsByLanguage, 
-  useAvailableYearsByLanguage,
-  useAllSongsByLanguage 
-} from "../lib/useLanguageContent";
+
 
 const ArtistCard = ({ artist, onNavigate }) => {
   return (
@@ -106,12 +102,8 @@ const AlbumCard = ({ album, onNavigate }) => {
 
 const Home = () => {
   const navigate = useNavigate();
-  const { language } = useLanguage();
-  
-  // Fetch language-specific content
-  const { albums: languageAlbums, loading: albumsLoading } = useAlbumsByLanguage(10, 1);
-  const { years, loading: yearsLoading } = useAvailableYearsByLanguage();
-  const { songs: allSongs, loading: songsLoading } = useAllSongsByLanguage();
+  const { selectedLanguage } = useLanguage();
+  const { albums: languageAlbums, loading: albumsLoading } = SongData();
 
   const [topArtists, setTopArtists] = useState([]);
   const [topSingers, setTopSingers] = useState([]);
@@ -134,35 +126,30 @@ const Home = () => {
     const fetchArtistsAndSingers = async () => {
       try {
         setLoading(true);
-        
-        // Get unique artists, singers, directors from language-specific songs
-        const artistSet = new Set();
-        const singerSet = new Set();
-        const directorSet = new Set();
-
-        allSongs.forEach(song => {
-          if (song.singer) {
-            singerSet.add(song.singer);
-          }
-        });
 
         // Fetch artist and director info from API
+        const params = new URLSearchParams();
+        params.append("limit", 10);
+        if (selectedLanguage) {
+          params.append("language", selectedLanguage);
+        }
+
         try {
-          const artistsRes = await axios.get("/api/home/artists/top?limit=10");
+          const artistsRes = await axios.get(`/api/home/artists/top?${params}`);
           setTopArtists(artistsRes.data.data || []);
         } catch (e) {
           console.log("Artists fetch optional");
         }
 
         try {
-          const singersRes = await axios.get("/api/home/singers/top?limit=10");
+          const singersRes = await axios.get(`/api/home/singers/top?${params}`);
           setTopSingers(singersRes.data.data || []);
         } catch (e) {
           console.log("Singers fetch optional");
         }
 
         try {
-          const directorsRes = await axios.get("/api/home/music-directors/top?limit=10");
+          const directorsRes = await axios.get(`/api/home/music-directors/top?${params}`);
           setTopDirectors(directorsRes.data.data || []);
         } catch (e) {
           console.log("Directors fetch optional");
@@ -174,10 +161,8 @@ const Home = () => {
       }
     };
 
-    if (allSongs.length > 0) {
-      fetchArtistsAndSingers();
-    }
-  }, [allSongs, language]);
+    fetchArtistsAndSingers();
+  }, [selectedLanguage]);
 
   return (
     <div className="px-2 md:px-6 py-4">
@@ -223,31 +208,13 @@ const Home = () => {
       {/* Years Section - Mobile Only */}
       <div className="block md:hidden">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Browse by Year ({language.toUpperCase()})</h2>
+          <h2 className="text-xl font-bold">Browse by Year</h2>
           <button
             onClick={() => navigate("/years")}
             className="text-sm text-green-400 hover:text-green-300 transition-colors"
           >
             See All
           </button>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {yearsLoading ? (
-            Array(6).fill(0).map((_, i) => (
-              <div key={i} className="bg-[#1a1a1a] rounded-lg h-24 animate-pulse"></div>
-            ))
-          ) : (
-            years.slice(0, 6).map((year) => (
-              <button
-                key={year}
-                onClick={() => navigate(`/years?year=${year}`)}
-                className="bg-gradient-to-br from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 rounded-lg p-4 transition-all group"
-              >
-                <FaCalendarAlt className="text-green-500 text-2xl mb-2 mx-auto" />
-                <p className="text-white font-bold text-center">{year}</p>
-              </button>
-            ))
-          )}
         </div>
       </div>
     </div>

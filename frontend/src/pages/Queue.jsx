@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useCallback, useState } from "react";
 import { SongData } from "../context/Song";
 import { UserData } from "../context/User";
+import { useLanguage } from "../context/Language";
 import { RiPulseLine } from "react-icons/ri";
 import { RiSearchLine, RiCloseLine } from "react-icons/ri";
 import axios from "axios";
@@ -17,6 +18,7 @@ const Queue = () => {
     loadDefaultQueue,
   } = SongData();
   const { user, addToPlaylist } = UserData();
+  const { selectedLanguage } = useLanguage();
   
   // Search functionality state - must be declared before performSearch
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,7 +84,7 @@ const Queue = () => {
       if (!queue || queue.length === 0) {
         try {
           // Load queue from user interactions and all user playlists
-          const { data } = await axios.get('/api/interaction/queue?limit=50');
+          const { data } = await axios.get(`/api/interaction/queue?limit=50&language=${selectedLanguage}`);
           if (data.success && data.songs && data.songs.length > 0) {
             playQueue(data.songs, data.songs[0]._id, 'Community Activity');
           } else {
@@ -97,7 +99,7 @@ const Queue = () => {
       setIsLoading(false);
     };
     initQueue();
-  }, []);
+  }, [selectedLanguage]);
 
   const albumTitleMap = useMemo(() => {
     const map = new Map();

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { SongData } from "../context/Song";
+import { useLanguage } from "../context/Language";
 import { UserData } from "../context/User";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { FaPlay } from "react-icons/fa";
@@ -9,6 +10,7 @@ import Loading from "../components/Loading";
 
 const Years = () => {
   const [searchParams] = useSearchParams();
+  const { selectedLanguage } = useLanguage();
   const { setSelectedSong, setIsPlaying, playQueue, setOnQueueEnd, song, selectedSong, isPlaying, queue, queueLabel } = SongData();
   const { user, addToPlaylist } = UserData();
   const [topYears, setTopYears] = useState([]);
@@ -48,7 +50,7 @@ const Years = () => {
     if (yearParam) {
       fetchAlbumsByYear(parseInt(yearParam));
     }
-  }, [searchParams]); // fetchTopYears and fetchAlbumsByYear are defined below, not in dependencies to avoid stale closures
+  }, [searchParams, selectedLanguage]);
 
   // Note: Removed automatic year progression - when a year's songs finish, player will stop
   // This matches expected behavior where user manually selects next year if desired
@@ -56,8 +58,12 @@ const Years = () => {
   const fetchTopYears = async () => {
     try {
       setLoading(true);
+      const params = new URLSearchParams();
+      if (selectedLanguage) {
+        params.append("language", selectedLanguage);
+      }
       const { data } = await axios.get(
-        `/api/song/years/top`
+        `/api/song/years/top?${params}`
       );
       // Sort years from latest to oldest
       setTopYears((data.years || []).sort((a, b) => b.year - a.year));
@@ -74,8 +80,12 @@ const Years = () => {
     try {
       setAlbumsLoading(true);
       setAlbumsError(null);
+      const params = new URLSearchParams();
+      if (selectedLanguage) {
+        params.append("language", selectedLanguage);
+      }
       const { data } = await axios.get(
-        `/api/song/years/${year}/albums`
+        `/api/song/years/${year}/albums?${params}`
       );
       
       if (!data.albums || data.albums.length === 0) {

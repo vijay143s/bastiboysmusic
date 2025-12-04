@@ -1,4 +1,5 @@
 const { pool } = require("../database/db.js");
+const { cacheManager } = require("../utils/cacheManager.js");
 
 const mapArtistRow = (row) => ({
   artistId: row.artist_id,
@@ -111,18 +112,41 @@ const deleteArtistsByAlbum = async (albumId) => {
   await pool.execute(`DELETE FROM artists WHERE album_id = ?`, [albumId]);
 };
 
-const getTopArtists = async (limit = 10) => {
-  const [rows] = await pool.query(
-    `SELECT MIN(artist_id) as artistId, artist_name, COUNT(*) as album_count
-     FROM artists GROUP BY artist_name ORDER BY album_count DESC LIMIT ?`,
-    [limit]
-  );
+const getTopArtists = async (limit = 10, language = null) => {
+  // Generate cache key
+  const cacheKey = cacheManager.generateKey('artists:top', { limit, language: language || 'all' });
+  
+  // Check cache
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
 
-  return rows.map(row => ({
+  let query = `SELECT MIN(a.artist_id) as artistId, a.artist_name, COUNT(*) as album_count
+     FROM artists a`;
+  let params = [];
+  
+  if (language) {
+    query += ` LEFT JOIN albums alb ON a.album_id = alb.id
+     WHERE alb.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` GROUP BY a.artist_name ORDER BY album_count DESC LIMIT ?`;
+  params.push(limit);
+  
+  const [rows] = await pool.query(query, params);
+
+  const result = rows.map(row => ({
     artistId: row.artistId,
     artistName: row.artist_name,
     albumCount: row.album_count,
   }));
+  
+  // Cache for 2 hours
+  cacheManager.set(cacheKey, result, 2 * 60 * 60 * 1000);
+
+  return result;
 };
 
 const getArtistsPaginated = async (page = 1, limit = 12) => {

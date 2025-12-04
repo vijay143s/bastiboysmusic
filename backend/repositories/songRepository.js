@@ -1,4 +1,5 @@
 const { pool } = require("../database/db.js");
+const { cacheManager } = require("../utils/cacheManager.js");
 
 const mapSongRow = (row) => ({
   id: row.id,
@@ -43,6 +44,9 @@ const createSong = async ({
     ]
   );
 
+  // Invalidate song caches when new song is added
+  cacheManager.invalidateSongsCaches();
+
   return findSongById(result.insertId);
 };
 
@@ -52,19 +56,43 @@ const updateSongThumbnail = async (songId, thumbnail) => {
     [thumbnail?.id ?? null, thumbnail?.url ?? null, songId]
   );
 
+  // Invalidate cache
+  cacheManager.invalidateSongsCaches();
+
   return findSongById(songId);
 };
 
-const getAllSongs = async () => {
-  const [rows] = await pool.query(
-    `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.stream_url, s.album_id, s.created_at, s.updated_at
+const getAllSongs = async (language = null) => {
+  // Generate cache key
+  const cacheKey = cacheManager.generateKey('songs:all', { language: language || 'all' });
+  
+  // Check cache first
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  let query = `SELECT s.id, s.title, s.description, s.singer, s.thumbnail_id, s.thumbnail_url, s.audio_id, s.audio_url, s.stream_url, s.album_id, s.created_at, s.updated_at
      FROM songs s
      LEFT JOIN albums a ON s.album_id = a.id
-     WHERE s.audio_url IS NOT NULL 
-     ORDER BY a.year DESC, s.created_at DESC`
-  );
-
-  return rows.map(mapSongRow);
+     WHERE s.audio_url IS NOT NULL`;
+  
+  const params = [];
+  
+  if (language) {
+    query += ` AND a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` ORDER BY a.year DESC, s.created_at DESC`;
+  
+  const [rows] = await pool.query(query, params);
+  const result = rows.map(mapSongRow);
+  
+  // Cache the result for 1 hour
+  cacheManager.set(cacheKey, result, 60 * 60 * 1000);
+  
+  return result;
 };
 
 // Optimized: Get playlist songs directly from DB instead of fetching all songs
@@ -134,8 +162,8 @@ const getSongsBySinger = async (singerName) => {
 };
 
 // Optimized function for queue - only returns essential data
-const getQueueSongs = async () => {
-  const [rows] = await pool.query(`
+const getQueueSongs = async (language = null) => {
+  let query = `
     SELECT 
       s.id, 
       s.title, 
@@ -147,9 +175,17 @@ const getQueueSongs = async () => {
       a.title as album_name
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    WHERE s.audio_url IS NOT NULL
-    ORDER BY a.year DESC, s.created_at DESC
-  `);
+    WHERE s.audio_url IS NOT NULL`;
+  let params = [];
+  
+  if (language) {
+    query += ` AND a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` ORDER BY a.year DESC, s.created_at DESC`;
+  
+  const [rows] = await pool.query(query, params);
 
   return rows.map(row => ({
     _id: row.id,
@@ -167,19 +203,28 @@ const getQueueSongs = async () => {
 };
 
 // Get available years for pagination
-const getAvailableYears = async () => {
-  const [rows] = await pool.query(`
-    SELECT DISTINCT YEAR(created_at) as year 
-    FROM songs 
-    ORDER BY year DESC
-  `);
+const getAvailableYears = async (language = null) => {
+  let query = `
+    SELECT DISTINCT a.year
+    FROM albums a
+    INNER JOIN songs s ON a.id = s.album_id`;
+  let params = [];
+  
+  if (language) {
+    query += ` WHERE a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` ORDER BY a.year DESC`;
+  
+  const [rows] = await pool.query(query, params);
 
   return rows.map(row => row.year);
 };
 
 // Year-based paginated queue function with offset support
-const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
-  const [rows] = await pool.query(`
+const getQueueSongsByYear = async (year, limit = 50, offset = 0, language = null) => {
+  let query = `
     SELECT 
       s.id, 
       s.title, 
@@ -193,17 +238,34 @@ const getQueueSongsByYear = async (year, limit = 50, offset = 0) => {
       a.year
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    WHERE YEAR(s.created_at) = ? AND s.audio_url IS NOT NULL
-    ORDER BY a.year DESC, s.created_at DESC
-    LIMIT ? OFFSET ?
-  `, [year, limit, offset]);
+    WHERE YEAR(s.created_at) = ? AND s.audio_url IS NOT NULL`;
+  let params = [year];
+  
+  if (language) {
+    query += ` AND a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` ORDER BY a.year DESC, s.created_at DESC
+    LIMIT ? OFFSET ?`;
+  params.push(limit, offset);
+  
+  const [rows] = await pool.query(query, params);
 
   // Get total count for this year
-  const [countResult] = await pool.query(`
+  let countQuery = `
     SELECT COUNT(*) as total
     FROM songs s
-    WHERE YEAR(s.created_at) = ? AND s.audio_url IS NOT NULL
-  `, [year]);
+    LEFT JOIN albums a ON s.album_id = a.id
+    WHERE YEAR(s.created_at) = ? AND s.audio_url IS NOT NULL`;
+  let countParams = [year];
+  
+  if (language) {
+    countQuery += ` AND a.language = ?`;
+    countParams.push(language);
+  }
+  
+  const [countResult] = await pool.query(countQuery, countParams);
 
   const total = countResult[0].total;
 
@@ -273,8 +335,18 @@ const incrementPlayCount = async (songId) => {
 };
 
 // Get top played songs
-const getTopPlayedSongs = async (limit = 20, offset = 0) => {
-  const [rows] = await pool.query(`
+const getTopPlayedSongs = async (limit = 20, offset = 0, language = null) => {
+  // Cache only the first page (offset = 0) to avoid huge cache
+  const cacheKey = offset === 0 ? cacheManager.generateKey('songs:topplayed', { limit, language: language || 'all' }) : null;
+  
+  if (cacheKey) {
+    const cached = cacheManager.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  }
+
+  let query = `
     SELECT 
       s.id, 
       s.title, 
@@ -286,12 +358,29 @@ const getTopPlayedSongs = async (limit = 20, offset = 0) => {
       a.year as album_year
     FROM songs s
     LEFT JOIN albums a ON s.album_id = a.id
-    WHERE s.audio_url IS NOT NULL
-    ORDER BY s.play_count DESC, a.year DESC
-    LIMIT ? OFFSET ?
-  `, [limit, offset]);
+    WHERE s.audio_url IS NOT NULL`;
+  let params = [];
+  
+  if (language) {
+    query += ` AND a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` ORDER BY s.play_count DESC, a.year DESC
+    LIMIT ? OFFSET ?`;
+  params.push(limit, offset);
+  
+  const [rows] = await pool.query(query, params);
 
-  const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM songs WHERE audio_url IS NOT NULL`);
+  let countQuery = `SELECT COUNT(*) as total FROM songs s LEFT JOIN albums a ON s.album_id = a.id WHERE s.audio_url IS NOT NULL`;
+  let countParams = [];
+  
+  if (language) {
+    countQuery += ` AND a.language = ?`;
+    countParams.push(language);
+  }
+  
+  const [countResult] = await pool.query(countQuery, countParams);
   const total = countResult[0].total;
 
   return {
@@ -312,33 +401,80 @@ const getTopPlayedSongs = async (limit = 20, offset = 0) => {
     hasMore: offset + rows.length < total,
     nextOffset: offset + rows.length
   };
+  
+  const result = {
+    songs: rows.map(row => ({
+      _id: row.id,
+      id: row.id,
+      title: row.title,
+      singer: row.singer,
+      thumbnail: {
+        url: row.thumbnail_url
+      },
+      album: row.album_id,
+      albumName: row.album_name,
+      albumYear: row.album_year,
+      playCount: row.play_count || 0
+    })),
+    total,
+    hasMore: offset + rows.length < total,
+    nextOffset: offset + rows.length
+  };
+  
+  // Cache the result if it's the first page
+  if (cacheKey) {
+    cacheManager.set(cacheKey, result, 30 * 60 * 1000); // 30 min cache
+  }
+  
+  return result;
 };
 
 // Get top years by song/album count
-const getTopYears = async () => {
-  const [rows] = await pool.query(`
+const getTopYears = async (language = null) => {
+  // Generate cache key
+  const cacheKey = cacheManager.generateKey('years:top', { language: language || 'all' });
+  
+  // Check cache
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  let query = `
     SELECT 
       a.year,
       COUNT(DISTINCT a.id) as album_count,
       COUNT(s.id) as song_count
     FROM albums a
     LEFT JOIN songs s ON s.album_id = a.id
-    WHERE a.year IS NOT NULL and a.year >= 1990 and s.audio_url IS NOT NULL
-    GROUP BY a.year
-    ORDER BY a.year DESC, song_count DESC, album_count DESC
-    
-  `);
+    WHERE a.year IS NOT NULL and a.year >= 1990 and s.audio_url IS NOT NULL`;
+  let params = [];
+  
+  if (language) {
+    query += ` AND a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` GROUP BY a.year
+    ORDER BY a.year DESC, song_count DESC, album_count DESC`;
+  
+  const [rows] = await pool.query(query, params);
 
-  return rows.map(row => ({
+  const result = rows.map(row => ({
     year: row.year,
     albumCount: row.album_count,
     songCount: row.song_count
   }));
+  
+  // Cache for 2 hours
+  cacheManager.set(cacheKey, result, 2 * 60 * 60 * 1000);
+
+  return result;
 };
 
 // Get albums by year with songs
-const getAlbumsByYear = async (year) => {
-  const [albums] = await pool.query(`
+const getAlbumsByYear = async (year, language = null) => {
+  let query = `
     SELECT 
       a.id,
       a.title,
@@ -349,9 +485,17 @@ const getAlbumsByYear = async (year) => {
       a.music_director,
       a.star_cast
     FROM albums a
-    WHERE a.year = ?
-    ORDER BY a.title ASC
-  `, [year]);
+    WHERE a.year = ?`;
+  let params = [year];
+  
+  if (language) {
+    query += ` AND a.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` ORDER BY a.title ASC`;
+  
+  const [albums] = await pool.query(query, params);
 
   // Get songs for each album
   const albumsWithSongs = await Promise.all(
@@ -447,7 +591,7 @@ const getQueueSongsByYearBatch = async (limit = 1000, offset = 0) => {
 };
 
 // Search songs across all fields
-const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
+const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null, language = null) => {
   const searchPattern = `%${searchTerm}%`;
   const startsWithPattern = `${searchTerm}%`;
   
@@ -465,6 +609,11 @@ const searchSongs = async (searchTerm, limit = 50, offset = 0, year = null) => {
     if (year) {
       whereClause += ` AND a.year = ?`;
       params.push(year);
+    }
+    
+    if (language) {
+      whereClause += ` AND a.language = ?`;
+      params.push(language);
     }
 
     // Enhanced search query with smart ordering:

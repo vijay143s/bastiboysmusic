@@ -105,7 +105,8 @@ const createAlbum = TryCatch(async (req, res) => {
 });
 
 const getAllAlbums = TryCatch(async (req, res) => {
-  const albums = await fetchAlbums();
+  const { language } = req.query;
+  const albums = await fetchAlbums(language);
 
   res.json(albums.map(formatAlbum));
 });
@@ -195,20 +196,23 @@ const addThumbnail = TryCatch(async (req, res) => {
 });
 
 const getAllSongs = TryCatch(async (req, res) => {
-  const songs = await fetchSongs();
+  const { language } = req.query;
+  const songs = await fetchSongs(language);
 
   res.json(songs.map(formatSong));
 });
 
 // Optimized endpoint for queue - returns only essential data
 const getQueueData = TryCatch(async (req, res) => {
-  const songs = await getQueueSongs();
+  const language = req.query.language || null;
+  const songs = await getQueueSongs(language);
   res.json(songs);
 });
 
 // Get available years for queue pagination
 const getQueueYears = TryCatch(async (req, res) => {
-  const years = await getAvailableYears();
+  const language = req.query.language || null;
+  const years = await getAvailableYears(language);
   res.json({ years });
 });
 
@@ -217,6 +221,7 @@ const getQueueByYear = TryCatch(async (req, res) => {
   const year = Number(req.params.year);
   const limit = Number(req.query.limit) || 50;
   const offset = Number(req.query.offset) || 0;
+  const language = req.query.language || null;
 
   if (Number.isNaN(year)) {
     return res.status(400).json({
@@ -224,19 +229,19 @@ const getQueueByYear = TryCatch(async (req, res) => {
     });
   }
 
-  const result = await getQueueSongsByYear(year, limit, offset);
+  const result = await getQueueSongsByYear(year, limit, offset, language);
   res.json(result);
 });
 
 const searchSongs = TryCatch(async (req, res) => {
-  const { q: query, limit = 50, offset = 0, year } = req.query;
+  const { q: query, limit = 50, offset = 0, year, language } = req.query;
   
   if (!query || query.trim().length === 0) {
     return res.json({ songs: [], albums: [], artists: [], total: 0 });
   }
 
   const yearFilter = year ? parseInt(year) : null;
-  const songsResult = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset), yearFilter);
+  const songsResult = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset), yearFilter, language);
   
   // Search albums
   const { pool } = require('../database/db.js');
@@ -253,6 +258,11 @@ const searchSongs = TryCatch(async (req, res) => {
   if (yearFilter) {
     albumQuery += ' AND a.year = ?';
     albumParams.push(yearFilter);
+  }
+  
+  if (language) {
+    albumQuery += ' AND a.language = ?';
+    albumParams.push(language);
   }
   
   albumQuery += ' ORDER BY a.year DESC LIMIT 50';
@@ -478,8 +488,9 @@ module.exports = {
     const limit = parseInt(req.query.limit) || 20;
     const offset = parseInt(req.query.offset) || 0;
     const shuffle = req.query.shuffle === 'true';
+    const language = req.query.language || null;
 
-    let result = await getTopPlayedSongsRepo(limit, offset);
+    let result = await getTopPlayedSongsRepo(limit, offset, language);
 
     // Shuffle if requested
     if (shuffle && result.songs.length > 0) {
@@ -491,14 +502,16 @@ module.exports = {
 
   // Top years
   getTopYears: TryCatch(async (req, res) => {
-    const years = await getTopYearsRepo();
+    const language = req.query.language || null;
+    const years = await getTopYearsRepo(language);
     res.json({ years });
   }),
 
   // Albums by year
   getAlbumsByYear: TryCatch(async (req, res) => {
     const { year } = req.params;
-    const albums = await getAlbumsByYearRepo(parseInt(year));
+    const language = req.query.language || null;
+    const albums = await getAlbumsByYearRepo(parseInt(year), language);
     res.json({ year: parseInt(year), albums });
   }),
 
@@ -528,6 +541,13 @@ module.exports = {
     const playlistSongs = await fetchPlaylistSongs(user.playlist);
 
     res.json({ songs: playlistSongs.map(formatSong) });
+  }),
+
+  // Get distinct languages from albums
+  getDistinctLanguages: TryCatch(async (req, res) => {
+    const { getDistinctLanguages } = require("../repositories/albumRepository.js");
+    const languages = await getDistinctLanguages();
+    res.json(languages);
   }),
 };
 

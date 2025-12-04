@@ -1,4 +1,5 @@
 const { pool } = require("../database/db.js");
+const { cacheManager } = require("../utils/cacheManager.js");
 
 const mapMusicDirectorRow = (row) => ({
   directorId: row.director_id,
@@ -101,18 +102,41 @@ const deleteMusicDirectorsByAlbum = async (albumId) => {
   await pool.execute(`DELETE FROM music_directors WHERE album_id = ?`, [albumId]);
 };
 
-const getTopMusicDirectors = async (limit = 10) => {
-  const [rows] = await pool.query(
-    `SELECT MIN(director_id) as directorId, director_name, COUNT(*) as album_count
-     FROM music_directors GROUP BY director_name ORDER BY album_count DESC LIMIT ?`,
-    [limit]
-  );
+const getTopMusicDirectors = async (limit = 10, language = null) => {
+  // Generate cache key
+  const cacheKey = cacheManager.generateKey('directors:top', { limit, language: language || 'all' });
+  
+  // Check cache
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
 
-  return rows.map(row => ({
+  let query = `SELECT MIN(md.director_id) as directorId, md.director_name, COUNT(*) as album_count
+     FROM music_directors md`;
+  let params = [];
+  
+  if (language) {
+    query += ` LEFT JOIN albums alb ON md.album_id = alb.id
+     WHERE alb.language = ?`;
+    params.push(language);
+  }
+  
+  query += ` GROUP BY md.director_name ORDER BY album_count DESC LIMIT ?`;
+  params.push(limit);
+  
+  const [rows] = await pool.query(query, params);
+
+  const result = rows.map(row => ({
     directorId: row.directorId,
     directorName: row.director_name,
     albumCount: row.album_count,
   }));
+  
+  // Cache for 2 hours
+  cacheManager.set(cacheKey, result, 2 * 60 * 60 * 1000);
+
+  return result;
 };
 
 const getMusicDirectorsPaginated = async (page = 1, limit = 12) => {

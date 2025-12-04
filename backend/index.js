@@ -48,6 +48,7 @@ const homeRoutes = require("./routes/homeRoutes.js");
 const interactionRoutes = require("./routes/interactionRoutes.js");
 const adminRoutes = require("./routes/adminRoutes.js");
 const audioProxyRoutes = require("./routes/audioProxyRoutes.js");
+const cacheRoutes = require("./routes/cacheRoutes.js");
 
 //using existing routes
 app.use("/api/user", userRoutes);
@@ -56,6 +57,7 @@ app.use("/api/home", homeRoutes);
 app.use("/api/interaction", interactionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/audio", audioProxyRoutes);
+app.use("/api/cache", cacheRoutes);
 
 // Add scraper routes
 app.use('/api/scrape', scraperRoutes);

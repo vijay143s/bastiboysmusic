@@ -2,11 +2,13 @@ import React from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { UserData } from "../context/User";
+import { useLanguage } from "../context/Language";
 import ProfileMenu from "./ProfileMenu";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user } = UserData();
+  const { selectedLanguage, availableLanguages, changeLanguage } = useLanguage();
   
   return (
     <>
@@ -26,6 +28,23 @@ const Navbar = () => {
         <div className="hidden lg:block"></div>
         
         <div className="flex items-center gap-4">
+          {/* Language Selector */}
+          <select
+            value={selectedLanguage || ""}
+            onChange={(e) => changeLanguage(e.target.value)}
+            className="px-3 py-1 rounded bg-[#282828] text-white border border-white/20 hover:bg-[#3a3a3a] transition cursor-pointer text-sm"
+          >
+            {availableLanguages.length > 0 ? (
+              availableLanguages.map((lang) => (
+                <option key={lang} value={lang}>
+                  {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                </option>
+              ))
+            ) : (
+              <option value="">Loading languages...</option>
+            )}
+          </select>
+          
           {user && <ProfileMenu />}
         </div>
       </div>

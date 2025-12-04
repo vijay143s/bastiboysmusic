@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useLanguage } from "../context/Language";
 import { FaChevronDown, FaChevronUp, FaPlay, FaPause } from "react-icons/fa6";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { SongData } from "../context/Song";
@@ -9,6 +10,7 @@ import Loading from "./Loading";
 
 const LatestAlbums = () => {
   const navigate = useNavigate();
+  const { selectedLanguage } = useLanguage();
   const {
     setSelectedSong,
     setIsPlaying,
@@ -61,7 +63,12 @@ const LatestAlbums = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await axios.get(`/api/home/albums/latest-smart?limit=${limit}`);
+      const params = new URLSearchParams();
+      params.append("limit", limit);
+      if (selectedLanguage) {
+        params.append("language", selectedLanguage);
+      }
+      const { data } = await axios.get(`/api/home/albums/latest-smart?${params}`);
       setAlbums(data.data || []);
       setMaxYear(data.maxYear);
       setCurrentYear(data.currentYear);
@@ -77,11 +84,11 @@ const LatestAlbums = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedLanguage]);
 
   useEffect(() => {
     fetchLatestAlbums();
-  }, []); // Remove fetchLatestAlbums from dependencies
+  }, [selectedLanguage, fetchLatestAlbums]);
 
   // Set up callback for when queue ends to load more albums
   useEffect(() => {
@@ -90,7 +97,12 @@ const LatestAlbums = () => {
 
       const newLimit = currentLimit + 10;
       try {
-        const { data } = await axios.get(`/api/home/albums/latest-smart?limit=${newLimit}`);
+        const params = new URLSearchParams();
+        params.append("limit", newLimit);
+        if (selectedLanguage) {
+          params.append("language", selectedLanguage);
+        }
+        const { data } = await axios.get(`/api/home/albums/latest-smart?${params}`);
         const updatedAlbums = data.data || [];
         const nextAlbums = updatedAlbums.slice(currentLimit);
 
