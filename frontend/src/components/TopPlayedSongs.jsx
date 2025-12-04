@@ -184,9 +184,12 @@ const TopPlayedSongs = () => {
                   >
                     <div className="relative mb-3">
                       <img
-                        src={song.thumbnail?.url || "/placeholder.jpg"}
+                        src={song.thumbnail?.url || song.albumThumbnail || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23333'/%3E%3Ctext x='100' y='100' text-anchor='middle' dy='0.3em' fill='%23fff' font-size='16'%3ENo Image%3C/text%3E%3C/svg%3E"}
                         alt={song.title}
                         className="w-full aspect-square object-cover rounded-md"
+                        onError={(e) => {
+                          e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23333'/%3E%3Ctext x='100' y='100' text-anchor='middle' dy='0.3em' fill='%23fff' font-size='16'%3ENo Image%3C/text%3E%3C/svg%3E";
+                        }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center rounded-md">
                         {isCurrentlyPlaying ? (

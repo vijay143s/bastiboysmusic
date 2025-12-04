@@ -271,11 +271,33 @@ export const SongProvider = ({ children }) => {
   async function fetchSingleSong() {
     try {
       if (!selectedSong) return;
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Fetching song with ID:", selectedSong);
+      }
+      
       const { data } = await axios.get("/api/song/single/" + selectedSong);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Fetched song data:", data);
+        console.log("Audio URL:", data?.audio?.url);
+      }
 
+      // Validate that the song has audio data
+      if (data && (!data.audio || !data.audio.url)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn("Song loaded but has no valid audio URL:", data);
+        }
+        // You might want to skip to next song or show an error
+        // For now, still set the song to show the UI
+      }
+      
       setSong(data);
     } catch (error) {
-      console.log(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error fetching single song:", error);
+      }
+      // Don't auto-skip on fetch error - show error state instead
     }
   }
 
@@ -414,7 +436,7 @@ export const SongProvider = ({ children }) => {
 
   const playFromSongs = (songId) => playQueue(songs, songId, "All Songs");
 
-  const jumpToIndex = (index) => {
+  const jumpToIndex = (index, source = null) => {
     if (!queue.length) return;
     if (index < 0 || index >= queue.length) return;
 
@@ -455,6 +477,28 @@ export const SongProvider = ({ children }) => {
   };
 
   const nextMusic = async (mode = "manual") => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`nextMusic called with mode: ${mode}, current song: ${selectedSong}`);
+    }
+    
+    // Track skip if manually skipping current song
+    if (mode === "manual" && selectedSong) {
+      try {
+        const audioElement = document.querySelector('audio');
+        const skipPosition = audioElement ? audioElement.currentTime : 0;
+        const totalDuration = audioElement ? audioElement.duration : 0;
+        
+        await axios.post(`/api/interaction/track/skip/${selectedSong}`, {
+          skipPosition,
+          totalDuration
+        });
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error tracking skip:", error);
+        }
+      }
+    }
+
     if (!queue.length) {
       if (mode === "manual") {
         await loadDefaultQueue();
@@ -483,7 +527,25 @@ export const SongProvider = ({ children }) => {
     jumpToIndex(queueIndex + 1);
   };
 
-  const prevMusic = () => {
+  const prevMusic = async () => {
+    // Track skip when going to previous song
+    if (selectedSong) {
+      try {
+        const audioElement = document.querySelector('audio');
+        const skipPosition = audioElement ? audioElement.currentTime : 0;
+        const totalDuration = audioElement ? audioElement.duration : 0;
+        
+        await axios.post(`/api/interaction/track/skip/${selectedSong}`, {
+          skipPosition,
+          totalDuration
+        });
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error tracking skip:", error);
+        }
+      }
+    }
+
     if (!queue.length) return;
     const nextIndex = queueIndex === 0 ? queue.length - 1 : queueIndex - 1;
     jumpToIndex(nextIndex);

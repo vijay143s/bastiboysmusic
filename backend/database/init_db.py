@@ -47,7 +47,7 @@ def execute_sql_file(connection, file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             sql_content = f.read()
         
-        cursor = connection.cursor()
+        cursor = connection.cursor(buffered=True)
         
         # Disable foreign key checks for schema.sql to allow dropping tables
         if 'schema.sql' in file_path:
@@ -57,29 +57,60 @@ def execute_sql_file(connection, file_path):
         statements = [stmt.strip() for stmt in sql_content.split(';') if stmt.strip()]
         
         for statement in statements:
-            if statement:
-                print(f"Executing: {statement[:80]}...")
-                cursor.execute(statement)
+            # Skip empty statements and comments
+            if not statement or statement.startswith('--') or statement.startswith('/*'):
+                continue
                 
-                # Fetch and display results for SELECT queries
-                if statement.strip().upper().startswith('SELECT'):
+            # Clean statement by removing comments
+            clean_statement = '\n'.join(line for line in statement.split('\n') if not line.strip().startswith('--'))
+            clean_statement = clean_statement.strip()
+            
+            if not clean_statement:
+                continue
+                
+            print(f"Executing: {clean_statement[:80]}...")
+            cursor.execute(clean_statement)
+            
+            # Fetch and display results for SELECT queries
+            if clean_statement.upper().startswith('SELECT'):
+                try:
                     results = cursor.fetchall()
                     if results:
-                        print(f"Results ({len(results)} rows):")
+                        print(f"\n=== Results ({len(results)} rows) ===")
                         # Get column names
-                        columns = [desc[0] for desc in cursor.description]
-                        print(f"  {' | '.join(columns)}")
-                        print("  " + "-" * 80)
-                        for row in results:
-                            print(f"  {' | '.join(str(val) for val in row)}")
+                        columns = [desc[0] for desc in cursor.description] if cursor.description else []
+                        if columns:
+                            # Print header
+                            header = " | ".join(f"{col:<15}" for col in columns)
+                            print(header)
+                            print("-" * len(header))
+                            
+                            # Print rows
+                            for row in results:
+                                row_str = " | ".join(f"{str(val) if val is not None else 'NULL':<15}" for val in row)
+                                print(row_str)
+                        else:
+                            print("No column information available")
+                        print("=" * 50)
                     else:
-                        print("No results returned")
+                        print("\n=== No results returned ===")
+                except Exception as e:
+                    print(f"Error fetching results: {e}")
+            
+            # Consume any remaining results to avoid "Unread result found" error
+            try:
+                while cursor.nextset():
+                    pass
+            except mysql.connector.Error:
+                pass
         
         # Re-enable foreign key checks after schema.sql
         if 'schema.sql' in file_path:
             cursor.execute("SET FOREIGN_KEY_CHECKS=1")
         
-        connection.commit()
+        # Only commit if not SELECT statements (to avoid committing empty transactions)
+        if not all(stmt.strip().upper().startswith('SELECT') for stmt in statements if stmt.strip()):
+            connection.commit()
         
         print(f"✓ Successfully executed {file_path}")
         return True
@@ -162,16 +193,9 @@ def init_database(sql_files=None):
         # Close connection and cleanup
         if connection is not None:
             try:
-                # Close all active cursors
-                for cursor in connection.get_warnings():
-                    pass
-                
-                # Rollback any uncommitted transactions in case of error
-                if connection.is_connected():
-                    connection.rollback()
-                
                 # Close the connection
-                connection.close()
+                if connection.is_connected():
+                    connection.close()
                 print("\n✓ Database connection closed successfully")
             except Exception as err:
                 print(f"Error closing connection: {err}")

@@ -82,9 +82,12 @@ const AlbumCard = ({ album, onNavigate }) => {
     >
       <div className="w-full h-40 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg overflow-hidden mb-3 group-hover:opacity-80 transition-opacity">
         <img
-          src={album.thumbnail?.url}
+          src={album.thumbnail?.url || album.thumbnail_url || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect width='160' height='160' fill='%23333'/%3E%3Ctext x='80' y='80' text-anchor='middle' dy='0.3em' fill='%23fff' font-size='14'%3E${album.title || 'Album'}%3C/text%3E%3C/svg%3E"}
           alt={album.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+          onError={(e) => {
+            e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect width='160' height='160' fill='%23333'/%3E%3Ctext x='80' y='80' text-anchor='middle' dy='0.3em' fill='%23fff' font-size='12'%3E${encodeURIComponent(album.title || 'Album')}%3C/text%3E%3C/svg%3E`;
+          }}
         />
       </div>
       <h3 className="text-white font-semibold text-sm truncate group-hover:text-green-400 transition-colors">

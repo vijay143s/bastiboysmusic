@@ -42,6 +42,8 @@ const Player = () => {
   }, [song]);
 
   const [playCountUpdated, setPlayCountUpdated] = useState(false);
+  const [audioRetryCount, setAudioRetryCount] = useState(0);
+  const maxRetries = 2;
   const playCountThreshold = 0.3; // 30% of song duration
   
   const isInPlaylist = useMemo(() => {
@@ -73,8 +75,33 @@ const Player = () => {
   };
 
   useEffect(() => {
+    // Track listening session for previous song before changing
+    const previousSong = audioRef.current?.getAttribute('data-song-id');
+    if (previousSong && previousSong !== selectedSong && audioRef.current) {
+      const listenDuration = audioRef.current.currentTime || 0;
+      const totalDuration = audioRef.current.duration || 0;
+      
+      if (listenDuration > 5 && totalDuration > 0) { // Only track if listened for more than 5 seconds
+        axios.post(`/api/interaction/track/completion/${previousSong}`, {
+          listenDuration,
+          totalDuration,
+          source: 'player'
+        }).catch(err => {
+          if (process.env.NODE_ENV === 'development') {
+            console.error("Error tracking listening session on song change:", err);
+          }
+        });
+      }
+    }
+    
     fetchSingleSong();
     setPlayCountUpdated(false); // Reset when song changes
+    setAudioRetryCount(0); // Reset retry counter when song changes
+    
+    // Store current song ID for tracking
+    if (audioRef.current && selectedSong) {
+      audioRef.current.setAttribute('data-song-id', selectedSong);
+    }
   }, [selectedSong]);
 
   const audioRef = useRef(null);
@@ -82,10 +109,24 @@ const Player = () => {
   const handlePlayPause = () => {
     if (!audioRef.current) return;
     
+    // Check if song has valid audio source
+    if (!song || !song.audio || !song.audio.url) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn("Cannot play song: no valid audio source", song);
+      }
+      return; // Don't auto-skip, just return
+    }
+    
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      audioRef.current.play().catch(error => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Audio play failed:", error);
+        }
+        setIsPlaying(false);
+        // Don't auto-skip on play failure - let user manually skip
+      });
     }
     setIsPlaying(!isPlaying);
   };
@@ -129,25 +170,52 @@ const Player = () => {
     if (!audio) return;
 
     const handleLoadedMetaData = () => {
-      setDuration(audio.duration || 0);
+      const duration = audio.duration || 0;
+      setDuration(duration);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Audio loaded - Duration: ${duration}s, Song:`, selectedSong);
+      }
     };
 
     const handleTimeUpdate = () => {
       const currentTime = audio.currentTime || 0;
       setProgress(currentTime);
 
-      // Update play count when 30% of song is played
+      // Track play interaction when 30% of song is played
       if (!playCountUpdated && audio.duration > 0 && currentTime >= audio.duration * playCountThreshold) {
         setPlayCountUpdated(true);
-        axios.post(`/api/song/${selectedSong}/play`).catch(err => {
+        axios.post(`/api/interaction/track/play/${selectedSong}`, {
+          source: 'player',
+          listenDuration: currentTime
+        }).catch(err => {
           if (process.env.NODE_ENV === 'development') {
-            console.error("Error updating play count:", err);
+            console.error("Error tracking play interaction:", err);
           }
         });
       }
     };
 
     const handleEnded = () => {
+      // Only proceed if audio has actually played (not just ended immediately on load)
+      if (!audio || audio.currentTime < 1) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn("Song ended immediately, might be invalid audio source");
+        }
+        return; // Don't auto-advance if song didn't actually play
+      }
+      
+      // Track completion
+      if (selectedSong && audio && audio.duration) {
+        axios.post(`/api/interaction/track/completion/${selectedSong}`, {
+          listenDuration: audio.duration,
+          totalDuration: audio.duration,
+          source: 'player'
+        }).catch(err => {
+          if (process.env.NODE_ENV === 'development') {
+            console.error("Error tracking completion:", err);
+          }
+        });
+      }
       nextMusic("auto");
     };
 
@@ -164,9 +232,24 @@ const Player = () => {
 
   const handleProgressChange = (e) => {
     if (!audioRef.current) return;
+    const oldTime = audioRef.current.currentTime;
     const newTime = (e.target.value / 100) * duration;
     audioRef.current.currentTime = newTime;
     setProgress(newTime);
+    
+    // Track listening session if significant time has passed
+    if (selectedSong && oldTime > 30 && duration > 0) {
+      const completionPercentage = (oldTime / duration) * 100;
+      axios.post(`/api/interaction/track/completion/${selectedSong}`, {
+        listenDuration: oldTime,
+        totalDuration: duration,
+        source: 'player'
+      }).catch(err => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error tracking listening session:", err);
+        }
+      });
+    }
   };
   const progressPercent = duration ? (progress / duration) * 100 : 0;
   
@@ -182,32 +265,82 @@ const Player = () => {
       {song && (
         <div className="bg-black border-t border-white/10 text-white px-3 md:px-4 py-2 md:py-3 lg:pb-4 z-20 relative">
           {/* Audio Element */}
-          {song && song.audio && (
+          {song && song.audio && song.audio.url && (
             <>
               {isPlaying ? (
                 <audio 
                   ref={audioRef} 
                   src={song.audio.url} 
+                  preload="metadata"
                   autoPlay
                   onError={(e) => {
                     if (process.env.NODE_ENV === 'development') {
                       console.error("Audio playback error:", e);
+                      console.error("Song data:", song);
+                      console.error("Audio URL:", song.audio?.url);
+                      const error = e.target.error;
+                      if (error) {
+                        console.error("Error code:", error.code);
+                        console.error("Error message:", error.message);
+                        switch(error.code) {
+                          case 1: console.error("MEDIA_ERR_ABORTED: Audio load was aborted"); break;
+                          case 2: console.error("MEDIA_ERR_NETWORK: Network error"); break;
+                          case 3: console.error("MEDIA_ERR_DECODE: Audio decode error"); break;
+                          case 4: console.error("MEDIA_ERR_SRC_NOT_SUPPORTED: Audio format not supported"); break;
+                        }
+                      }
                     }
                     setIsPlaying(false);
+                    
+                    // Try to reload audio if we haven't exceeded max retries
+                    if (audioRetryCount < maxRetries) {
+                      setTimeout(() => {
+                        if (process.env.NODE_ENV === 'development') {
+                          console.log(`Retrying audio load (attempt ${audioRetryCount + 1}/${maxRetries})`);
+                        }
+                        setAudioRetryCount(prev => prev + 1);
+                        e.target.load(); // Reload the audio
+                      }, 1000);
+                    } else {
+                      if (process.env.NODE_ENV === 'development') {
+                        console.error('Max audio retry attempts reached');
+                      }
+                    }
                   }}
                 />
               ) : (
                 <audio 
                   ref={audioRef} 
                   src={song.audio.url}
+                  preload="metadata"
                   onError={(e) => {
                     if (process.env.NODE_ENV === 'development') {
                       console.error("Audio load error:", e);
+                      console.error("Song data:", song);
+                      console.error("Audio URL:", song.audio?.url);
+                      const error = e.target.error;
+                      if (error) {
+                        console.error("Error code:", error.code);
+                        console.error("Error message:", error.message);
+                        switch(error.code) {
+                          case 1: console.error("MEDIA_ERR_ABORTED: Audio load was aborted"); break;
+                          case 2: console.error("MEDIA_ERR_NETWORK: Network error"); break;
+                          case 3: console.error("MEDIA_ERR_DECODE: Audio decode error"); break;
+                          case 4: console.error("MEDIA_ERR_SRC_NOT_SUPPORTED: Audio format not supported"); break;
+                        }
+                      }
                     }
                   }}
                 />
               )}
             </>
+          )}
+          
+          {/* Show message if no valid audio source */}
+          {song && (!song.audio || !song.audio.url) && (
+            <div className="text-center text-red-400 text-sm p-2">
+              No audio source available for this song
+            </div>
           )}
 
           {/* Mobile Player (Compact) */}
