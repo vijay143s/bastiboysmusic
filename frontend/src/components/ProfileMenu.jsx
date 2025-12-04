@@ -11,7 +11,10 @@ const ProfileMenu = () => {
   const menuItems = [
     { label: "Community", path: "/community", icon: "🎵" },
     { label: "My Playlist", path: "/playlist", icon: "📑" },
-    ...(user?.role === "admin" ? [{ label: "Admin Dashboard", path: "/admin", icon: "⚙️" }] : []),
+    ...(user?.role === "admin" ? [
+      { label: "Admin Dashboard", path: "/admin", icon: "⚙️" },
+      { label: "Scraper Dashboard", path: "/scraper", icon: "🔧" }
+    ] : []),
   ];
 
   const handleLogout = () => {

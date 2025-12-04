@@ -48,12 +48,20 @@ const Sidebar = () => {
   ];
 
   if (user && user.role === "admin") {
-    libraryMenu.push({
-      label: "Admin Dashboard",
-      icon: assets.arrow_icon,
-      path: "/admin",
-      highlight: true,
-    });
+    libraryMenu.push(
+      {
+        label: "Admin Dashboard",
+        icon: assets.arrow_icon,
+        path: "/admin",
+        highlight: true,
+      },
+      {
+        label: "Scraper Dashboard",
+        icon: assets.arrow_icon,
+        path: "/scraper",
+        highlight: true,
+      }
+    );
   }
 
   const renderNavItem = (item) => (

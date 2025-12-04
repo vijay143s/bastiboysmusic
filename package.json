@@ -1,31 +1,46 @@
 {
-  "name": "spotify-clone-youtube",
+  "name": "bastiboysmusic-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API for BastiBoys Music platform with Telugu Songs Scraper and real-time updates",
+  "main": "backend/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node backend/index.js",
     "dev": "nodemon backend/index.js",
     "build": "npm install && cd frontend && npm install && npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "music",
+    "streaming",
+    "telugu",
+    "songs",
+    "scraper",
+    "api",
+    "websocket",
+    "express",
+    "mysql"
+  ],
+  "author": "BastiBoys Music Team",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
-  "cloudinary": "^2.4.0",
+    "cloudinary": "^2.4.0",
     "cookie-parser": "^1.4.6",
     "datauri": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.3.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
-    "express-rate-limit": "^7.3.2",
     "mysql2": "^3.11.3",
+    "socket.io": "^4.7.2",
+    "ws": "^8.13.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
