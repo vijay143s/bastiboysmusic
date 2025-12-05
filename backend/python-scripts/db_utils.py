@@ -10,7 +10,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Set
 from contextlib import contextmanager
 
 try:
@@ -405,22 +405,26 @@ def execute_sql_files_with_truncate(sql_dir: Path, truncate: bool = False) -> Di
     return results
 
 
-def get_existing_album_titles(language: str) -> set:
+def get_existing_album_titles(language: str = None) -> set:
     """
-    Get all album titles for a specific language.
+    Get all album titles, optionally filtered by language.
     Used to avoid re-scraping existing albums in incremental mode.
     
     Args:
-        language: Language code (e.g., 'hindi', 'punjabi')
+        language: Language code (e.g., 'hindi', 'punjabi'). If None, gets all albums.
     
     Returns:
-        Set of album titles for the specified language
+        Set of album titles
     """
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT title FROM albums WHERE language = %s"
-            cursor.execute(query, (language,))
+            if language:
+                query = "SELECT title FROM albums WHERE language = %s"
+                cursor.execute(query, (language,))
+            else:
+                query = "SELECT title FROM albums"
+                cursor.execute(query)
             results = cursor.fetchall()
             cursor.close()
             
@@ -428,6 +432,41 @@ def get_existing_album_titles(language: str) -> set:
     except Exception as e:
         logger.error(f"Error getting existing album titles: {e}")
         return set()
+
+
+def get_existing_songs_map() -> Dict[str, Set[str]]:
+    """
+    Get all existing songs mapped by album title.
+    Returns a dictionary: {album_title: set(song_titles)}
+    This allows fast lookup to check if a song exists in an album.
+    
+    Returns:
+        Dict mapping album titles to sets of song titles
+    """
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            query = """
+                SELECT a.title as album_title, s.title as song_title
+                FROM songs s
+                INNER JOIN albums a ON s.album_id = a.id
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+            cursor.close()
+            
+            # Build the map
+            songs_map = {}
+            for album_title, song_title in results:
+                if album_title not in songs_map:
+                    songs_map[album_title] = set()
+                songs_map[album_title].add(song_title)
+            
+            logger.info(f"📊 Loaded {len(songs_map)} albums with songs into cache")
+            return songs_map
+    except Exception as e:
+        logger.error(f"Error getting existing songs map: {e}")
+        return {}
 
 
 def test_connection() -> bool:
