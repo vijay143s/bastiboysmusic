@@ -35,9 +35,9 @@ const PlayList = () => {
       setLoading(true);
       // Fetch user's playlist songs from API
       const { data } = await axios.get("/api/song/playlist");
-      
+
       setMyPlaylist(data.songs || []);
-      
+
       // Create album title map
       const albumMap = new Map();
       data.songs.forEach((song) => {
@@ -65,7 +65,7 @@ const PlayList = () => {
   const savePlayListHandler = async (id) => {
     // Optimistically update UI
     setMyPlaylist(prev => prev.filter(song => song._id !== id));
-    
+
     try {
       await addToPlaylist(id);
     } catch (error) {
@@ -154,9 +154,8 @@ const PlayList = () => {
                   return (
                     <div
                       key={i}
-                      className={`md:grid md:grid-cols-4 rounded transition cursor-pointer p-2 md:p-0 md:mt-2 active:scale-95 ${
-                        isActive ? "bg-[#1db9541a] md:bg-transparent" : "hover:bg-[#ffffff0a]"
-                      }`}
+                      className={`md:grid md:grid-cols-4 rounded transition cursor-pointer p-2 md:p-0 md:mt-2 active:scale-95 ${isActive ? "bg-[#1db9541a] md:bg-transparent" : "hover:bg-[#ffffff0a]"
+                        }`}
                       onClick={() => startPlaylistQueue(e._id)}
                     >
                       {/* Mobile Card View */}
@@ -169,9 +168,8 @@ const PlayList = () => {
                             <p className="text-white font-semibold flex items-center gap-2 truncate">
                               {isActive && (
                                 <RiPulseLine
-                                  className={`text-green-400 text-lg flex-shrink-0 ${
-                                    isPlaying ? "animate-pulse" : "opacity-60"
-                                  }`}
+                                  className={`text-green-400 text-lg flex-shrink-0 ${isPlaying ? "animate-pulse" : "opacity-60"
+                                    }`}
                                 />
                               )}
                               <span className="truncate">{e.title}</span>
@@ -197,9 +195,8 @@ const PlayList = () => {
                         <img src={e.thumbnail.url} className="w-10 h-10 rounded object-cover" alt="" />
                         {isActive && (
                           <RiPulseLine
-                            className={`text-green-400 flex-shrink-0 ${
-                              isPlaying ? "animate-pulse" : "opacity-60"
-                            }`}
+                            className={`text-green-400 flex-shrink-0 ${isPlaying ? "animate-pulse" : "opacity-60"
+                              }`}
                           />
                         )}
                         <span className="truncate">{e.title}</span>

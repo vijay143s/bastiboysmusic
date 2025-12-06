@@ -2,13 +2,13 @@ import React, { useMemo, useRef } from "react";
 import { SongData } from "../context/Song";
 import { UserData } from "../context/User";
 import { GrChapterNext, GrChapterPrevious } from "react-icons/gr";
-import { FaPause, FaPlay } from "react-icons/fa";
+import { FaPause, FaPlay, FaSearch } from "react-icons/fa";
 import { FaShuffle } from "react-icons/fa6";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import useSongTracking from "../hooks/useSongTracking";
 import useAudioPlayer from "../hooks/useAudioPlayer";
 
-const Player = () => {
+const Player = ({ onSearchClick }) => {
   const {
     song,
     fetchSingleSong,
@@ -125,7 +125,22 @@ const Player = () => {
   return (
     <div className="w-full">
       {song && (
-        <div className="glass rounded-[1.5rem] p-2 shadow-2xl backdrop-blur-xl border border-white/10 relative overflow-hidden group">
+        <div className="bg-black/90 backdrop-blur-3xl rounded-none lg:rounded-[1.5rem] p-2 shadow-2xl border-t border-white/30 lg:border relative overflow-hidden group">
+
+          {/* Mobile Progress Bar (Top Edge) */}
+          <div
+            className="md:hidden absolute top-0 left-0 w-full h-1 bg-white/10 cursor-pointer rounded-t-[1.5rem] overflow-hidden z-30"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const percent = ((e.clientX - rect.left) / rect.width) * 100;
+              handleProgressChange({ target: { value: percent } });
+            }}
+          >
+            <div
+              className="h-full bg-green-500 transition-all duration-100 pointer-events-none"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
 
           {/* Animated Background Glow */}
           <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]"></div>
@@ -273,7 +288,7 @@ const Player = () => {
             </div>
 
             {/* Mobile Controls (Bottom Row) */}
-            <div className="flex md:hidden w-full items-center justify-between px-4 pt-0.5">
+            <div className="flex md:hidden w-full items-center justify-between px-2 pt-0.5">
               <button
                 onClick={handleShuffle}
                 className="text-slate-400 hover:text-white transition-colors p-1.5 active:scale-90"
@@ -285,7 +300,7 @@ const Player = () => {
                 onClick={prevMusic}
                 className="text-white hover:text-green-400 transition-colors p-1.5 active:scale-90"
               >
-                <GrChapterPrevious size={22} />
+                <GrChapterPrevious size={20} />
               </button>
 
               <button
@@ -299,17 +314,19 @@ const Player = () => {
                 onClick={() => nextMusic("manual")}
                 className="text-white hover:text-green-400 transition-colors p-1.5 active:scale-90"
               >
-                <GrChapterNext size={22} />
+                <GrChapterNext size={20} />
               </button>
-            </div>
-          </div>
 
-          {/* Mobile Progress Bar (Bottom Edge) */}
-          <div className="md:hidden absolute bottom-0 left-0 w-full h-1 bg-white/10">
-            <div
-              className="h-full bg-green-500 transition-all duration-100"
-              style={{ width: `${progressPercent}%` }}
-            />
+              {onSearchClick && (
+                <button
+                  onClick={onSearchClick}
+                  className="text-green-400 hover:text-green-300 transition-colors p-1.5 active:scale-90"
+                  aria-label="Search"
+                >
+                  <FaSearch size={18} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
