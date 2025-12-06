@@ -37,7 +37,7 @@ const Layout = ({ children }) => {
       <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
 
       {/* Player - always visible, above bottom nav on mobile */}
-      <div className="absolute bottom-20 left-4 right-4 lg:bottom-4 lg:left-80 lg:right-4 z-30">
+      <div className="absolute bottom-20 left-4 right-4 lg:bottom-4 lg:left-80 lg:right-4 z-20">
         <Player />
       </div>
 

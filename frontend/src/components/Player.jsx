@@ -125,12 +125,12 @@ const Player = () => {
   return (
     <div className="w-full">
       {song && (
-        <div className="glass rounded-[2rem] p-3 shadow-2xl backdrop-blur-xl border border-white/10 relative overflow-hidden group">
+        <div className="glass rounded-[1.5rem] p-2 shadow-2xl backdrop-blur-xl border border-white/10 relative overflow-hidden group">
 
           {/* Animated Background Glow */}
           <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]"></div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 relative z-10 px-3 py-2 md:px-2 md:py-0">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 relative z-10 px-2 py-1 md:px-2 md:py-0">
 
             {/* Audio Element */}
             {song && song.audio && song.audio.url && (
@@ -156,20 +156,20 @@ const Player = () => {
             )}
 
             {/* Song Info (Desktop & Mobile) - Top Row on Mobile */}
-            <div className="flex items-center gap-4 w-full md:w-1/3 min-w-0 justify-between md:justify-start">
-              <div className="flex items-center gap-3 md:gap-4 min-w-0">
+            <div className="flex items-center gap-3 w-full md:w-1/3 min-w-0 justify-between md:justify-start">
+              <div className="flex items-center gap-2 md:gap-3 min-w-0">
                 <div className="relative group/cover flex-shrink-0">
                   <img
                     src={albumThumbnail || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23333'/%3E%3C/svg%3E"}
-                    className="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover shadow-lg group-hover/cover:scale-105 transition-transform duration-500"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover shadow-lg group-hover/cover:scale-105 transition-transform duration-500"
                     alt="Album Art"
                   />
-                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10"></div>
+                  <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10"></div>
                 </div>
 
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-sm md:text-base truncate text-white drop-shadow-sm max-w-[150px] md:max-w-none">{song.title}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-bold text-xs md:text-sm truncate text-white drop-shadow-sm max-w-[130px] md:max-w-none">{song.title}</p>
                     {/* Mobile Heart (Inline with Title) */}
                     <button
                       className="block md:hidden transition-all active:scale-95 ml-1"
@@ -177,70 +177,70 @@ const Player = () => {
                       disabled={!user || !user._id}
                     >
                       {isInPlaylist ? (
-                        <AiFillHeart className="text-green-400 drop-shadow-md" size={18} />
+                        <AiFillHeart className="text-green-400 drop-shadow-md" size={16} />
                       ) : (
-                        <AiOutlineHeart className="text-slate-400 hover:text-white" size={18} />
+                        <AiOutlineHeart className="text-slate-400 hover:text-white" size={16} />
                       )}
                     </button>
                   </div>
-                  <p className="text-xs text-slate-400 truncate font-medium max-w-[180px] md:max-w-none">{song.singer || albumTitle}</p>
+                  <p className="text-[10px] md:text-xs text-slate-400 truncate font-medium max-w-[150px] md:max-w-none">{song.singer || albumTitle}</p>
                 </div>
               </div>
 
               {/* Desktop Heart (Separate) */}
               <button
-                className="hidden md:block transition-all active:scale-95 ml-2"
+                className="hidden md:block transition-all active:scale-95 ml-1"
                 onClick={handleAddToPlaylist}
                 disabled={!user || !user._id}
               >
                 {isInPlaylist ? (
-                  <AiFillHeart className="text-green-400 drop-shadow-md" size={18} />
+                  <AiFillHeart className="text-green-400 drop-shadow-md" size={16} />
                 ) : (
-                  <AiOutlineHeart className="text-slate-400 hover:text-white" size={18} />
+                  <AiOutlineHeart className="text-slate-400 hover:text-white" size={16} />
                 )}
               </button>
             </div>
 
             {/* Controls (Desktop) */}
-            <div className="hidden md:flex flex-col items-center gap-1 flex-1 max-w-lg">
-              <div className="flex items-center gap-6">
+            <div className="hidden md:flex flex-col items-center gap-0.5 flex-1 max-w-lg">
+              <div className="flex items-center gap-4">
                 <button
                   onClick={handleShuffle}
-                  className="text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5 active:scale-90"
+                  className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/5 active:scale-90"
                   title="Shuffle"
                 >
-                  <FaShuffle size={16} />
+                  <FaShuffle size={14} />
                 </button>
 
                 <button
                   onClick={prevMusic}
-                  className="text-white hover:text-green-400 transition-colors p-2 active:scale-90"
+                  className="text-white hover:text-green-400 transition-colors p-1.5 active:scale-90"
                 >
-                  <GrChapterPrevious size={22} />
+                  <GrChapterPrevious size={18} />
                 </button>
 
                 <button
-                  className="bg-white text-black rounded-full p-3 hover:scale-105 transition active:scale-95 shadow-lg shadow-white/10"
+                  className="bg-white text-black rounded-full p-2.5 hover:scale-105 transition active:scale-95 shadow-lg shadow-white/10"
                   onClick={togglePlayPause}
                 >
-                  {isPlaying ? <FaPause size={16} /> : <FaPlay size={16} className="ml-1" />}
+                  {isPlaying ? <FaPause size={14} /> : <FaPlay size={14} className="ml-0.5" />}
                 </button>
 
                 <button
                   onClick={() => nextMusic("manual")}
-                  className="text-white hover:text-green-400 transition-colors p-2 active:scale-90"
+                  className="text-white hover:text-green-400 transition-colors p-1.5 active:scale-90"
                 >
-                  <GrChapterNext size={22} />
+                  <GrChapterNext size={18} />
                 </button>
 
                 {/* Spacer to balance shuffle button */}
                 <div className="w-8"></div>
               </div>
 
-              <div className="w-full flex items-center gap-3 text-[10px] font-medium text-slate-400">
-                <span className="min-w-[30px] text-right">{formatTime(progress)}</span>
+              <div className="w-full flex items-center gap-2 text-[9px] font-medium text-slate-400">
+                <span className="min-w-[28px] text-right">{formatTime(progress)}</span>
                 <div
-                  className="relative flex-1 h-1.5 bg-white/10 rounded-full cursor-pointer group/progress"
+                  className="relative flex-1 h-1 bg-white/10 rounded-full cursor-pointer group/progress"
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const percent = ((e.clientX - rect.left) / rect.width) * 100;
@@ -251,19 +251,19 @@ const Player = () => {
                     className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-100 group-hover/progress:from-green-300 group-hover/progress:to-emerald-400"
                     style={{ width: `${progressPercent}%` }}
                   >
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full shadow-md opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
                   </div>
                 </div>
-                <span className="min-w-[30px]">{formatTime(duration)}</span>
+                <span className="min-w-[28px]">{formatTime(duration)}</span>
               </div>
             </div>
 
             {/* Volume (Desktop) */}
-            <div className="hidden md:flex w-1/3 justify-end items-center gap-4 pr-4">
+            <div className="hidden md:flex w-1/3 justify-end items-center gap-3 pr-3">
               {/* Use standard range input with custom CSS in index.css */}
               <input
                 type="range"
-                className="w-24 accent-green-500 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+                className="w-20 accent-green-500 bg-white/10 h-1 rounded-lg appearance-none cursor-pointer"
                 min="0"
                 max="1"
                 step="0.01"
@@ -273,33 +273,33 @@ const Player = () => {
             </div>
 
             {/* Mobile Controls (Bottom Row) */}
-            <div className="flex md:hidden w-full items-center justify-between px-6 pt-1">
+            <div className="flex md:hidden w-full items-center justify-between px-4 pt-0.5">
               <button
                 onClick={handleShuffle}
-                className="text-slate-400 hover:text-white transition-colors p-2 active:scale-90"
+                className="text-slate-400 hover:text-white transition-colors p-1.5 active:scale-90"
               >
-                <FaShuffle size={18} />
+                <FaShuffle size={16} />
               </button>
 
               <button
                 onClick={prevMusic}
-                className="text-white hover:text-green-400 transition-colors p-2 active:scale-90"
+                className="text-white hover:text-green-400 transition-colors p-1.5 active:scale-90"
               >
-                <GrChapterPrevious size={26} />
+                <GrChapterPrevious size={22} />
               </button>
 
               <button
-                className="bg-white text-black rounded-full p-4 hover:scale-105 transition active:scale-95 shadow-md"
+                className="bg-white text-black rounded-full p-3 hover:scale-105 transition active:scale-95 shadow-md"
                 onClick={togglePlayPause}
               >
-                {isPlaying ? <FaPause size={18} /> : <FaPlay size={18} className="ml-1" />}
+                {isPlaying ? <FaPause size={16} /> : <FaPlay size={16} className="ml-0.5" />}
               </button>
 
               <button
                 onClick={() => nextMusic("manual")}
-                className="text-white hover:text-green-400 transition-colors p-2 active:scale-90"
+                className="text-white hover:text-green-400 transition-colors p-1.5 active:scale-90"
               >
-                <GrChapterNext size={26} />
+                <GrChapterNext size={22} />
               </button>
             </div>
           </div>

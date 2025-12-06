@@ -873,7 +873,6 @@ export const SongProvider = ({ children }) => {
         playQueue,
         addToQueue,
         playNext,
-        playNext,
         playFromSongs,
         playSingleSong,
         loadDefaultQueue,

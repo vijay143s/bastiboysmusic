@@ -40,12 +40,25 @@ const io = socketIo(server, {
   cors: corsOptions
 });
 
-const compression = require("compression");
 const helmet = require("helmet");
+
+// Optional compression - won't crash if module is not available on cPanel
+let compression;
+try {
+  compression = require("compression");
+} catch (err) {
+  console.warn('⚠️  Compression module not available - continuing without compression');
+  compression = null;
+}
 
 // using middlewares
 app.use(helmet());
-app.use(compression());
+if (compression) {
+  app.use(compression());
+  console.log('✅ Compression middleware enabled');
+} else {
+  console.log('ℹ️  Running without compression middleware');
+}
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
