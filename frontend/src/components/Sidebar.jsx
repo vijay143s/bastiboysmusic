@@ -67,9 +67,8 @@ const Sidebar = () => {
   const renderNavItem = (item) => (
     <button
       key={item.label}
-      className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors text-left hover:bg-white/10 ${
-        item.highlight ? "bg-white text-black hover:bg-white" : ""
-      }`}
+      className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors text-left hover:bg-white/10 ${item.highlight ? "bg-white text-black hover:bg-white" : ""
+        }`}
       onClick={() => navigate(item.path)}
     >
       <img src={item.icon} className={`${NAV_ICON_SIZE} flex-shrink-0`} alt="" />
@@ -89,30 +88,31 @@ const Sidebar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-full h-full p-2 text-white">
-        <div className="bg-[#121212] rounded-2xl flex flex-col w-full min-w-0">
-          <div className="px-5 py-4 border-b border-white/5 flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <img src={assets.logo} alt="Logo" className="w-6 h-6" />
-              <p className="text-lg font-semibold">Basti Boys Music</p>
+      <aside className="hidden lg:flex w-full h-full text-white">
+        <div className="glass rounded-3xl flex flex-col w-full min-w-0 h-full overflow-hidden shadow-2xl">
+          <div className="px-6 py-6 border-b border-white/5 flex-shrink-0 bg-white/5">
+            <div className="flex items-center gap-3">
+              <img src={assets.logo} alt="Logo" className="w-8 h-8 drop-shadow-lg" />
+              <p className="text-xl font-bold tracking-tight">Basti Boys</p>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-            <section className="space-y-1">
+          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
+            <section className="space-y-2">
+              <p className="uppercase text-[10px] font-bold tracking-[0.2em] text-slate-400 px-3 mb-2">Menu</p>
               {mainMenu.map(renderNavItem)}
             </section>
             <section className="space-y-2">
-              <p className="uppercase text-xs tracking-[0.2em] text-gray-400 px-1">
-                Your Library
+              <p className="uppercase text-[10px] font-bold tracking-[0.2em] text-slate-400 px-3 mb-2">
+                Library
               </p>
               <div className="space-y-1">{libraryMenu.map(renderNavItem)}</div>
             </section>
           </div>
 
-          <div className="px-4 py-4 border-t border-white/5">
+          <div className="px-4 py-6 border-t border-white/5 bg-white/5">
             <button
-              className="w-full bg-white text-black font-semibold px-4 py-2 rounded-2xl cursor-pointer hover:bg-gray-200 transition-colors"
+              className="w-full bg-white text-black font-semibold px-4 py-3 rounded-xl cursor-pointer hover:bg-slate-200 transition-all shadow-lg active:scale-95"
               onClick={logoutUser}
             >
               Logout
@@ -185,11 +185,10 @@ const Sidebar = () => {
                   {libraryMenu.map((item) => (
                     <button
                       key={item.label}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
-                        item.highlight
-                          ? "bg-white text-black hover:bg-gray-200"
-                          : "hover:bg-white/10 active:bg-white/20"
-                      }`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${item.highlight
+                        ? "bg-white text-black hover:bg-gray-200"
+                        : "hover:bg-white/10 active:bg-white/20"
+                        }`}
                       onClick={() => {
                         navigate(item.path);
                         setIsOpen(false);

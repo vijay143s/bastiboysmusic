@@ -22,7 +22,7 @@ const TopPlayedSongs = () => {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false); // Collapsed by default due to Hero
   const limit = 20;
 
   const resolveSongId = (song) => {
@@ -61,13 +61,13 @@ const TopPlayedSongs = () => {
         params.append("language", selectedLanguage);
       }
       const { data } = await axios.get(`/api/song/top-played?${params}`);
-      
+
       if (isLoadMore) {
         setTopSongs([...topSongs, ...data.songs]);
       } else {
         setTopSongs(data.songs);
       }
-      
+
       setHasMore(data.hasMore);
       setOffset(data.nextOffset || 0);
     } catch (error) {
@@ -145,7 +145,7 @@ const TopPlayedSongs = () => {
 
   return (
     <div className="mb-8">
-      <div 
+      <div
         className="flex items-center justify-between mb-4 cursor-pointer group"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -174,20 +174,19 @@ const TopPlayedSongs = () => {
 
       {isExpanded && (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {topSongs && topSongs.length > 0 ? (
               topSongs.map((song) => {
                 const normalizedId = resolveSongId(song);
                 const isCurrentSong = normalizedId ? selectedSong === normalizedId : false;
                 const isCurrentlyPlaying = isCurrentSong && isPlaying;
-                
+
                 return (
                   <div
                     key={normalizedId || song.id}
                     onClick={() => handleSongClick(song)}
-                    className={`bg-gray-800 hover:bg-gray-700 rounded-lg p-4 cursor-pointer transition-all group ${
-                      isCurrentSong ? 'ring-2 ring-green-500' : ''
-                    }`}
+                    className={`flex-shrink-0 w-40 md:w-48 bg-gray-800 hover:bg-gray-700 rounded-lg p-4 cursor-pointer transition-all group ${isCurrentSong ? 'ring-2 ring-green-500' : ''
+                      }`}
                   >
                     <div className="relative mb-3">
                       <img

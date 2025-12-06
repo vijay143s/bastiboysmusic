@@ -7,19 +7,24 @@ const envPath = path.resolve(__dirname, "..", ".env");
 dotenv.config({ path: envPath });
 
 const {
+  DB_HOST,
+  DB_PORT,
+  DB_USER,
+  DB_PASSWORD,
+  DB_DATABASE,
   MYSQL_HOST,
   MYSQL_PORT,
   MYSQL_USER,
   MYSQL_PASSWORD,
-  MYSQL_DATABASE,
+  MYSQL_DATABASE
 } = process.env;
 
 const pool = mysql.createPool({
-  host: MYSQL_HOST,
-  port: Number(MYSQL_PORT),
-  user: MYSQL_USER,
-  password: MYSQL_PASSWORD,
-  database: MYSQL_DATABASE,
+  host: DB_HOST || MYSQL_HOST || 'localhost',
+  port: Number(DB_PORT || MYSQL_PORT || 3306),
+  user: DB_USER || MYSQL_USER,
+  password: DB_PASSWORD || MYSQL_PASSWORD,
+  database: DB_DATABASE || MYSQL_DATABASE,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

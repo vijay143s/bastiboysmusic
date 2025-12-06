@@ -46,7 +46,7 @@ const findAlbumById = async (id) => {
 const getAllAlbums = async (language = null) => {
   // Generate cache key
   const cacheKey = cacheManager.generateKey('albums:all', { language: language || 'all' });
-  
+
   // Check cache first
   const cached = cacheManager.get(cacheKey);
   if (cached) {
@@ -56,17 +56,17 @@ const getAllAlbums = async (language = null) => {
   let query = `SELECT id, title, description, thumbnail_id, thumbnail_url, year, director, music_director, star_cast, language, created_at, updated_at
      FROM albums`;
   const params = [];
-  
+
   if (language) {
     query += ` WHERE language = ?`;
     params.push(language);
   }
-  
+
   query += ` ORDER BY created_at DESC`;
-  
+
   const [rows] = await pool.query(query, params);
   const result = rows.map(mapAlbumRow);
-  
+
   // Cache for 1 hour
   cacheManager.set(cacheKey, result, 60 * 60 * 1000);
 
@@ -96,7 +96,7 @@ const getLatestAlbums = async (year, limit = 10) => {
 const getLatestAlbumsSmart = async (limit = 10, language = null) => {
   // Generate cache key
   const cacheKey = cacheManager.generateKey('albums:latest-smart', { limit, language: language || 'all' });
-  
+
   // Check cache
   const cached = cacheManager.get(cacheKey);
   if (cached) {
@@ -106,15 +106,15 @@ const getLatestAlbumsSmart = async (limit = 10, language = null) => {
   // Get the max year
   let maxYearQuery = `SELECT MAX(year) as maxYear FROM albums WHERE year IS NOT NULL`;
   let maxYearParams = [];
-  
+
   if (language) {
     maxYearQuery += ` AND language = ?`;
     maxYearParams.push(language);
   }
-  
+
   const [maxYearResult] = await pool.query(maxYearQuery, maxYearParams);
   const maxYear = maxYearResult[0]?.maxYear;
-  
+
   if (!maxYear) {
     return { albums: [], maxYear: null, currentYear: new Date().getFullYear() };
   }
@@ -127,16 +127,16 @@ const getLatestAlbumsSmart = async (limit = 10, language = null) => {
      INNER JOIN songs s ON a.id = s.album_id
      WHERE a.year IN (?) AND s.audio_url IS NOT NULL`;
   let params = [yearsToFetch];
-  
+
   if (language) {
     query += ` AND a.language = ?`;
     params.push(language);
   }
-  
+
   query += ` ORDER BY a.year DESC, a.created_at DESC 
      LIMIT ?`;
   params.push(limit);
-  
+
   const [rows] = await pool.query(query, params);
 
   const result = {
@@ -154,14 +154,22 @@ const getLatestAlbumsSmart = async (limit = 10, language = null) => {
     currentYear,
     years: yearsToFetch
   };
-  
+
   // Cache for 1 hour
   cacheManager.set(cacheKey, result, 60 * 60 * 1000);
-  
+
   return result;
 };
 
 const getAlbumsPaginated = async (page = 1, limit = 12) => {
+  // Try to get from cache
+  const cacheKey = cacheManager.generateKey('albums:paginated', { page, limit });
+  const cached = cacheManager.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
   const offset = (page - 1) * limit;
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url
@@ -183,7 +191,7 @@ const getAlbumsPaginated = async (page = 1, limit = 12) => {
   const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM albums`);
   const total = countResult[0].total;
 
-  return {
+  const result = {
     data: albumsData,
     pagination: {
       page,
@@ -192,15 +200,27 @@ const getAlbumsPaginated = async (page = 1, limit = 12) => {
       pages: Math.ceil(total / limit),
     },
   };
+
+  // Cache for 30 seconds (high traffic list)
+  cacheManager.set(cacheKey, result, 30 * 1000);
+
+  return result;
 };
 
 // Optimized search - returns only essential data for search functionality including thumbnails
 const getAlbumsForSearch = async () => {
+  const cacheKey = 'albums:search:all';
+  const cached = cacheManager.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
   const [rows] = await pool.query(
     `SELECT id, title, description, thumbnail_id, thumbnail_url, year FROM albums ORDER BY title ASC`
   );
 
-  return rows.map(row => ({
+  const result = rows.map(row => ({
     _id: row.id,
     title: row.title,
     description: row.description,
@@ -210,6 +230,11 @@ const getAlbumsForSearch = async () => {
       url: row.thumbnail_url,
     },
   }));
+
+  // Cache for 1 hour (search data changes infrequently)
+  cacheManager.set(cacheKey, result, 60 * 60 * 1000);
+
+  return result;
 };
 
 // Get distinct languages from albums

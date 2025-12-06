@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import toast from "react-hot-toast";
 import { UserData } from "./User";
 import { useLanguage } from "./Language";
@@ -17,7 +17,20 @@ export const SongProvider = ({ children }) => {
   const [queueIndex, setQueueIndex] = useState(0);
   const [queueLabel, setQueueLabel] = useState("All Songs");
   const [onQueueEnd, setOnQueueEnd] = useState(null);
-  
+
+  // Ref to track selectedSong to avoid stale closures in async functions
+  const selectedSongRef = useRef(selectedSong);
+  const queueRef = useRef(queue);
+
+  // Sync ref with state
+  useEffect(() => {
+    selectedSongRef.current = selectedSong;
+  }, [selectedSong]);
+
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+
   // Cache for song data from queue - for instant next/prev playback
   const [songDataCache, setSongDataCache] = useState(new Map());
 
@@ -100,17 +113,25 @@ export const SongProvider = ({ children }) => {
       console.log(`Fetched ${data.length} songs`, data.slice(0, 2)); // Log first 2 songs to see structure
 
       setSongs(data);
-      if (!selectedSong && data.length) {
-        const firstSongId = getSongId(data[0]);
-        if (firstSongId) {
-          setSelectedSong(firstSongId);
+      setSongs(data);
+      // Use ref to check current value instead of captured closure value
+      if (!selectedSongRef.current && !selectedSong && data.length) {
+        // Prioritize user's last played song if available
+        const lastPlayedId = user?.lastPlayedSongId ? normalizeSongId(user.lastPlayedSongId) : null;
+        const songIdToSet = lastPlayedId || getSongId(data[0]);
+
+        if (songIdToSet) {
+          setSelectedSong(songIdToSet);
+          if (lastPlayedId && process.env.NODE_ENV === 'development') {
+            console.log('Setting last played song:', lastPlayedId);
+          }
         }
       }
-      if (!queue.length && data.length) {
+      if (!queueRef.current.length && data.length) {
         setQueue(data);
         setQueueIndex(0);
         setQueueLabel("All Songs");
-      } else if (queueLabel === "All Songs" && data.length) {
+      } else if (queueLabel === "All Songs" && !queueRef.current.length && data.length) {
         setQueue(data);
       }
     } catch (error) {
@@ -124,11 +145,17 @@ export const SongProvider = ({ children }) => {
   async function fetchQueueSongs() {
     try {
       const { data } = await axios.get("/api/song/queue");
-      
-      if (!selectedSong && data.length) {
-        const firstSongId = getSongId(data[0]);
-        if (firstSongId) {
-          setSelectedSong(firstSongId);
+
+      if (!selectedSongRef.current && !selectedSong && data.length) {
+        // Prioritize user's last played song if available
+        const lastPlayedId = user?.lastPlayedSongId ? normalizeSongId(user.lastPlayedSongId) : null;
+        const songIdToSet = lastPlayedId || getSongId(data[0]);
+
+        if (songIdToSet) {
+          setSelectedSong(songIdToSet);
+          if (lastPlayedId && process.env.NODE_ENV === 'development') {
+            console.log('Setting last played song:', lastPlayedId);
+          }
         }
       }
       if (!queue.length && data.length) {
@@ -166,20 +193,20 @@ export const SongProvider = ({ children }) => {
     try {
       setIsLoadingMore(true);
       const { data } = await axios.get(`/api/song/queue/year/${year}?limit=${limit}&offset=${offset}`);
-      
+
       if (data.songs.length > 0) {
         setQueue(prevQueue => [...prevQueue, ...data.songs]);
         setLoadedYears(prev => new Set([...prev, year]));
-        
+
         // Update offset for this year
         setYearOffsets(prev => new Map([...prev, [year, data.nextOffset]]));
-        
+
         // Check if this year has more songs
         if (!data.hasMore) {
           setHasMoreInCurrentYear(false);
         }
       }
-      
+
       return {
         songsLoaded: data.songs.length,
         hasMore: data.hasMore,
@@ -208,25 +235,31 @@ export const SongProvider = ({ children }) => {
       setYearOffsets(new Map());
       setCurrentYearIndex(0);
       setHasMoreInCurrentYear(true);
-      
+
       const years = await fetchAvailableYears();
       if (years.length > 0) {
         // Load songs from the most recent year first
         const { data } = await axios.get(`/api/song/queue/year/${years[0]}?limit=50&offset=0`);
-        
+
         if (data.songs.length > 0) {
           setQueue(data.songs);
           setLoadedYears(new Set([years[0]]));
           setYearOffsets(new Map([[years[0], data.nextOffset]]));
           setHasMoreInCurrentYear(data.hasMore);
-          
+
           if (!selectedSong) {
-            const firstSongId = getSongId(data.songs[0]);
-            if (firstSongId) {
-              setSelectedSong(firstSongId);
+            // Prioritize user's last played song if available
+            const lastPlayedId = user?.lastPlayedSongId ? normalizeSongId(user.lastPlayedSongId) : null;
+            const songIdToSet = lastPlayedId || getSongId(data.songs[0]);
+
+            if (songIdToSet) {
+              setSelectedSong(songIdToSet);
+              if (lastPlayedId && process.env.NODE_ENV === 'development') {
+                console.log('Setting last played song:', lastPlayedId);
+              }
             }
           }
-          
+
           setQueueIndex(0);
           setQueueLabel("All Songs");
         }
@@ -245,14 +278,14 @@ export const SongProvider = ({ children }) => {
     if (isLoadingMore || availableYears.length === 0) {
       return false;
     }
-    
+
     const currentYear = availableYears[currentYearIndex];
-    
+
     // First, try to load more songs from the current year
     if (hasMoreInCurrentYear && currentYear) {
       const currentOffset = yearOffsets.get(currentYear) || 0;
       const result = await loadSongsByYear(currentYear, 50, currentOffset);
-      
+
       if (result.songsLoaded > 0) {
         return true;
       } else {
@@ -260,30 +293,30 @@ export const SongProvider = ({ children }) => {
         setHasMoreInCurrentYear(false);
       }
     }
-    
+
     // Move to next year if current year is exhausted
     if (!hasMoreInCurrentYear && currentYearIndex + 1 < availableYears.length) {
       const nextYearIndex = currentYearIndex + 1;
       const nextYear = availableYears[nextYearIndex];
-      
+
       setCurrentYearIndex(nextYearIndex);
       setHasMoreInCurrentYear(true);
-      
+
       const result = await loadSongsByYear(nextYear, 50, 0);
       return result.songsLoaded > 0;
     }
-    
+
     // No more years to load
     return false;
   }
 
-  const [song, setSong] = useState([]);
+  const [song, setSong] = useState(null);
 
   // Use cached song data if available (for instant playback on next/prev)
   async function fetchSingleSong() {
     try {
       if (!selectedSong) return;
-      
+
       // OPTIMIZATION: Check cache first for instant playback
       if (songDataCache && songDataCache.has(String(selectedSong))) {
         const cachedSong = songDataCache.get(String(selectedSong));
@@ -295,14 +328,14 @@ export const SongProvider = ({ children }) => {
           return;  // Instant return, no API call!
         }
       }
-      
+
       // Fallback: Fetch from API if not in cache
       if (process.env.NODE_ENV === 'development') {
         console.log("⏳ Fetching song from API with ID:", selectedSong);
       }
-      
+
       const { data } = await axios.get("/api/song/single/" + selectedSong);
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log("📡 Fetched song data from API:", data);
         console.log("Audio URL:", data?.audio?.url);
@@ -316,7 +349,7 @@ export const SongProvider = ({ children }) => {
         // You might want to skip to next song or show an error
         // For now, still set the song to show the UI
       }
-      
+
       setSong(data);
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
@@ -418,13 +451,81 @@ export const SongProvider = ({ children }) => {
     fetchSongs();
   }, []);
 
+  const prevLanguageRef = useRef(selectedLanguage);
+
   // Refetch songs and albums when language changes
   useEffect(() => {
     if (selectedLanguage) {
       fetchSongs();
       fetchAlbums();
+
+      // Sync Queue with new Language
+      const syncQueue = async () => {
+        // Skip on initial mount to avoid overriding localStorage restoration
+        if (prevLanguageRef.current === selectedLanguage) {
+          return;
+        }
+        prevLanguageRef.current = selectedLanguage;
+
+        try {
+          // Fetch default "Top Played" for the new language
+          const params = new URLSearchParams();
+          params.append("limit", 50);
+          params.append("language", selectedLanguage);
+          params.append("offset", 0);
+
+          const { data } = await axios.get(`/api/song/top-played?${params}`);
+          const newSongs = data.songs || [];
+
+          if (newSongs.length === 0) return;
+
+          if (isPlaying && selectedSong) {
+            // If playing, keep current song and append new language songs
+            // We need the current song object
+            let currentSongObj = queue.find(s => getSongId(s) === selectedSong);
+
+            // If not in queue (rare), try to find in new songs or just basic object
+            if (!currentSongObj) {
+              currentSongObj = songs.find(s => getSongId(s) === selectedSong);
+            }
+
+            // If still not found, we can't safely merge, so maybe just don't touch queue or fetch full object?
+            // For now, if we have a current song object, we proceed.
+            if (currentSongObj) {
+              // Create new queue: [Current Song, ...New Language Songs (excluding current if present)]
+              const uniqueNewSongs = newSongs.filter(s => getSongId(s) !== selectedSong);
+              const mergedQueue = [currentSongObj, ...uniqueNewSongs];
+
+              setQueue(mergedQueue);
+              setQueueIndex(0); // Current song stays at top
+              setQueueLabel(`Top Played (${selectedLanguage})`);
+              toast.success(`Queue updated to ${selectedLanguage}`);
+            }
+          } else {
+            // Not playing, just replace the queue
+            setQueue(newSongs);
+            setQueueIndex(0);
+            setQueueLabel(`Top Played (${selectedLanguage})`);
+            if (newSongs.length > 0) {
+              const firstId = getSongId(newSongs[0]);
+              if (firstId) setSelectedSongAndSave(firstId);
+            }
+          }
+        } catch (error) {
+          console.error("Error syncing queue to language:", error);
+        }
+      };
+
+      syncQueue();
     }
   }, [selectedLanguage]);
+
+  // Fetch song details when selectedSong changes
+  useEffect(() => {
+    if (selectedSong) {
+      fetchSingleSong();
+    }
+  }, [selectedSong]);
 
   const playQueue = (collection = [], startSongId, label = "Queue") => {
     if (!collection.length) return;
@@ -469,7 +570,7 @@ export const SongProvider = ({ children }) => {
     if (nextSongId) {
       setSelectedSongAndSave(nextSongId);
       setIsPlaying(true);
-      
+
       // Save queue and current state to localStorage
       try {
         localStorage.setItem('lastQueue', JSON.stringify({
@@ -486,6 +587,75 @@ export const SongProvider = ({ children }) => {
 
   const playFromSongs = (songId) => playQueue(songs, songId, "All Songs");
 
+  const playSingleSong = (songId, songData = null) => {
+    const normalizedId = normalizeSongId(songId);
+    if (!normalizedId) return;
+
+    // Check if song is already in queue
+    const existingIndex = queue.findIndex(s => getSongId(s) === normalizedId);
+
+    if (existingIndex !== -1) {
+      // Just play it from there
+      jumpToIndex(existingIndex);
+      return;
+    }
+
+    // Not in queue, add it after current song and play
+    // If we have songData provided, use it, otherwise try to find it in songs list
+    let songToAdd = songData;
+
+    if (!songToAdd) {
+      songToAdd = songs.find(s => getSongId(s) === normalizedId);
+    }
+
+    // If still no object but we have an ID, make a minimal object
+    if (!songToAdd) {
+      songToAdd = { _id: normalizedId };
+    } else {
+      // ensure ID is normalized
+      songToAdd = { ...songToAdd, _id: normalizedId };
+    }
+
+    setQueue(prev => {
+      const newQueue = [...prev];
+      // Insert after current index
+      const insertIndex = queueIndex + 1;
+      newQueue.splice(insertIndex, 0, songToAdd);
+
+      // We will target this new index for playback
+      setTimeout(() => jumpToIndex(insertIndex), 0);
+
+      // Update local storage will be handled by jumpToIndex's effect or we do it here too?
+      // jumpToIndex updates it. But we need to make sure state is updated first.
+      // Actually, jumpToIndex depends on 'queue' state. If we call it immediately, it might use old queue.
+      // Better way: Set queue, then set index.
+
+      return newQueue;
+    });
+
+    // Since setQueue is async, jumpToIndex might look at old queue. 
+    // Let's optimize: update everything at once.
+    const newQueue = [...queue];
+    const insertIndex = queueIndex + 1;
+    newQueue.splice(insertIndex, 0, songToAdd);
+
+    setQueue(newQueue);
+    setQueueIndex(insertIndex);
+    setSelectedSongAndSave(normalizedId);
+    setIsPlaying(true);
+
+    try {
+      localStorage.setItem('lastQueue', JSON.stringify({
+        queue: newQueue,
+        queueIndex: insertIndex,
+        queueLabel,
+        selectedSong: normalizedId
+      }));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const jumpToIndex = (index, source = null) => {
     if (!queue.length) return;
     if (index < 0 || index >= queue.length) return;
@@ -496,7 +666,7 @@ export const SongProvider = ({ children }) => {
     setQueueIndex(index);
     setSelectedSongAndSave(songId);
     setIsPlaying(true);
-    
+
     // Save updated state to localStorage
     try {
       localStorage.setItem('lastQueue', JSON.stringify({
@@ -531,14 +701,14 @@ export const SongProvider = ({ children }) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(`nextMusic called with mode: ${mode}, current song: ${selectedSong}`);
     }
-    
+
     // Track skip if manually skipping current song
     if (mode === "manual" && selectedSong) {
       try {
         const audioElement = document.querySelector('audio');
         const skipPosition = audioElement ? audioElement.currentTime : 0;
         const totalDuration = audioElement ? audioElement.duration : 0;
-        
+
         await axios.post(`/api/interaction/track/skip/${selectedSong}`, {
           skipPosition,
           totalDuration
@@ -570,7 +740,7 @@ export const SongProvider = ({ children }) => {
           await loadDefaultQueue();
           return;
         }
-        
+
         if (onQueueEnd) {
           const maybePromise = onQueueEnd();
           if (maybePromise && typeof maybePromise.then === "function") {
@@ -596,6 +766,50 @@ export const SongProvider = ({ children }) => {
     jumpToIndex(queueIndex + 1);
   };
 
+  const addToQueue = (song) => {
+    if (!song) return;
+    const normalizedSong = getSongId(song) ? (song._id ? song : { ...song, _id: getSongId(song) }) : null;
+    if (!normalizedSong) return;
+
+    setQueue((prev) => {
+      const newQueue = [...prev, normalizedSong];
+      // Update local storage
+      try {
+        localStorage.setItem('lastQueue', JSON.stringify({
+          queue: newQueue,
+          queueIndex,
+          queueLabel,
+          selectedSong
+        }));
+      } catch (e) { console.error(e); }
+      return newQueue;
+    });
+    toast.success("Added to queue");
+  };
+
+  const playNext = (song) => {
+    if (!song) return;
+    const normalizedSong = getSongId(song) ? (song._id ? song : { ...song, _id: getSongId(song) }) : null;
+    if (!normalizedSong) return;
+
+    setQueue((prev) => {
+      const newQueue = [...prev];
+      newQueue.splice(queueIndex + 1, 0, normalizedSong);
+
+      // Update local storage
+      try {
+        localStorage.setItem('lastQueue', JSON.stringify({
+          queue: newQueue,
+          queueIndex,
+          queueLabel,
+          selectedSong
+        }));
+      } catch (e) { console.error(e); }
+      return newQueue;
+    });
+    toast.success("Playing next");
+  };
+
   const prevMusic = async () => {
     // Track skip when going to previous song
     if (selectedSong) {
@@ -603,7 +817,7 @@ export const SongProvider = ({ children }) => {
         const audioElement = document.querySelector('audio');
         const skipPosition = audioElement ? audioElement.currentTime : 0;
         const totalDuration = audioElement ? audioElement.duration : 0;
-        
+
         await axios.post(`/api/interaction/track/skip/${selectedSong}`, {
           skipPosition,
           totalDuration
@@ -657,7 +871,11 @@ export const SongProvider = ({ children }) => {
         queueLabel,
         queueIndex,
         playQueue,
+        addToQueue,
+        playNext,
+        playNext,
         playFromSongs,
+        playSingleSong,
         loadDefaultQueue,
         fetchAlbumSong,
         albumSong,

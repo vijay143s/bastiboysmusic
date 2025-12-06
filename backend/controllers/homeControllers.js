@@ -55,6 +55,7 @@ const getLatestAlbumsByYear = TryCatch(async (req, res) => {
 const getLatestAlbumsSmart_Controller = TryCatch(async (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : 10;
   const language = req.query.language || null;
+  console.log(`[DEBUG] getLatestAlbumsSmart - Language: ${language}`);
 
   if (Number.isNaN(limit)) {
     return res.status(400).json({
@@ -297,7 +298,7 @@ const getAlbumsByMusicDirector = TryCatch(async (req, res) => {
 // Optimized search endpoints - minimal data for search functionality
 const getAlbumsForSearchEndpoint = TryCatch(async (req, res) => {
   const albums = await getAlbumsForSearch();
-  
+
   res.json({
     message: "Albums for search retrieved successfully",
     data: albums,
@@ -314,7 +315,7 @@ const getArtistsForSearchEndpoint = TryCatch(async (req, res) => {
   }
 
   const artists = await getArtistsForSearch(q, limit);
-  
+
   res.json({
     message: "Artists for search retrieved successfully",
     data: artists,
@@ -325,7 +326,7 @@ const getArtistsForSearchEndpoint = TryCatch(async (req, res) => {
 
 const getSingersForSearchEndpoint = TryCatch(async (req, res) => {
   const singers = await getSingersForSearch();
-  
+
   res.json({
     message: "Singers for search retrieved successfully",
     data: singers,
@@ -335,7 +336,7 @@ const getSingersForSearchEndpoint = TryCatch(async (req, res) => {
 
 const getMusicDirectorsForSearchEndpoint = TryCatch(async (req, res) => {
   const directors = await getMusicDirectorsForSearch();
-  
+
   res.json({
     message: "Music directors for search retrieved successfully",
     data: directors,

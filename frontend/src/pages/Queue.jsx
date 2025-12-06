@@ -8,18 +8,18 @@ import axios from "axios";
 
 const Queue = () => {
   const isDev = process.env.NODE_ENV === 'development';
-  const { 
-    queue, 
-    queueIndex, 
-    queueLabel, 
-    playQueue, 
+  const {
+    queue,
+    queueIndex,
+    queueLabel,
+    playQueue,
     albums,
     fetchSongs,
     loadDefaultQueue,
   } = SongData();
   const { user, addToPlaylist } = UserData();
   const { selectedLanguage } = useLanguage();
-  
+
   // Search functionality state - must be declared before performSearch
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -27,11 +27,11 @@ const Queue = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchTotal, setSearchTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Context menu state
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedSong, setSelectedSong] = useState(null);
-  
+
   // Debounced search function - searches for songs only
   const performSearch = useCallback(async (query) => {
     if (!query.trim()) {
@@ -40,16 +40,16 @@ const Queue = () => {
       setSearchLoading(false);
       return;
     }
-    
+
     setSearchLoading(true);
     try {
       const { data } = await axios.get(
         `/api/song/search?q=${encodeURIComponent(query)}&limit=100`
       );
-      
+
       // Use only song results - albums are already included via song metadata
       const songs = data.songs || [];
-      
+
       setSearchResults(songs);
       setSearchTotal(songs.length);
     } catch (error) {
@@ -62,7 +62,7 @@ const Queue = () => {
       setSearchLoading(false);
     }
   }, []);
-  
+
   // Debounce search input
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -70,11 +70,11 @@ const Queue = () => {
       setSearchTotal(0);
       return;
     }
-    
+
     const timer = setTimeout(() => {
       performSearch(searchTerm);
     }, 300);
-    
+
     return () => clearTimeout(timer);
   }, [searchTerm, performSearch]);
 
@@ -114,11 +114,23 @@ const Queue = () => {
     return new Set(user.playlist);
   }, [user]);
 
-  // Use queue from context with safe defaults
+  // Pagination state
+  const [visibleUpcoming, setVisibleUpcoming] = useState(50);
+  const [visibleHistory, setVisibleHistory] = useState(20);
+
   const displayQueue = Array.isArray(queue) ? queue : [];
   const nowPlaying = displayQueue[queueIndex];
-  const upcoming = displayQueue.slice(queueIndex + 1);
-  const previouslyPlayed = displayQueue.slice(0, queueIndex).reverse();
+
+  // Slice arrays for performance
+  const fullUpcoming = displayQueue.slice(queueIndex + 1);
+  const visibleUpcomingSongs = fullUpcoming.slice(0, visibleUpcoming);
+
+  const fullHistory = displayQueue.slice(0, queueIndex).reverse();
+  const visibleHistorySongs = fullHistory.slice(0, visibleHistory);
+
+  const handleLoadMore = () => {
+    setVisibleUpcoming(prev => prev + 50);
+  };
 
   const handlePlayFromQueue = (songId) => {
     playQueue(displayQueue, songId, queueLabel || "Queue");
@@ -144,25 +156,10 @@ const Queue = () => {
     if (selectedSong && searchResults.length > 0) {
       if (isDev) {
         console.log("🎵 Playing now:", selectedSong.title, "ID:", selectedSong._id);
-        console.log("🎵 Search results:", searchResults.map(s => ({ id: s._id, title: s.title })));
       }
       // Ensure the selected song is in the search results
       const songExists = searchResults.find(s => s._id === selectedSong._id);
-      if (songExists) {
-        playQueue(searchResults, selectedSong._id, "Search Results");
-        if (isDev) {
-          console.log("✅ Song found and playing");
-        }
-      } else {
-        if (isDev) {
-          console.log("❌ Song not found in search results, playing anyway");
-        }
-        playQueue(searchResults, selectedSong._id, "Search Results");
-      }
-    } else {
-      if (isDev) {
-        console.log("❌ No selected song or empty search results");
-      }
+      playQueue(searchResults, selectedSong._id, "Search Results");
     }
     setContextMenu(null);
     setSelectedSong(null);
@@ -170,14 +167,9 @@ const Queue = () => {
 
   const handlePlayNext = () => {
     if (selectedSong && Array.isArray(queue)) {
-      if (isDev) {
-        console.log("🎵 Adding to play next:", selectedSong.title, "at position", queueIndex + 1);
-      }
-      // Add song to play next in the current queue
       const currentIndex = queueIndex;
       const newQueue = [...queue];
       newQueue.splice(currentIndex + 1, 0, selectedSong);
-      // Update the queue but keep the current song playing
       playQueue(newQueue, queue[queueIndex]?._id, queueLabel || "Queue");
     }
     setContextMenu(null);
@@ -186,12 +178,7 @@ const Queue = () => {
 
   const handleAddToQueue = () => {
     if (selectedSong && Array.isArray(queue)) {
-      if (isDev) {
-        console.log("🎵 Adding to end of queue:", selectedSong.title, "queue length:", queue.length);
-      }
-      // Add song to end of current queue
       const newQueue = [...queue, selectedSong];
-      // Update the queue but keep the current song playing
       playQueue(newQueue, queue[queueIndex]?._id, queueLabel || "Queue");
     }
     setContextMenu(null);
@@ -204,7 +191,7 @@ const Queue = () => {
       setContextMenu(null);
       setSelectedSong(null);
     };
-    
+
     if (contextMenu) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
@@ -216,9 +203,8 @@ const Queue = () => {
     return (
       <div
         key={song._id}
-        className={`flex items-center justify-between px-2 md:px-4 py-2 md:py-3 rounded transition cursor-pointer active:scale-95 ${
-          isActive ? "bg-[#1db9541a] border border-green-500" : "bg-[#1b1b1b] hover:bg-[#1f1f1f]"
-        }`}
+        className={`flex items-center justify-between px-2 md:px-4 py-2 md:py-3 rounded transition cursor-pointer active:scale-95 ${isActive ? "bg-[#1db9541a] border border-green-500" : "bg-[#1b1b1b] hover:bg-[#1f1f1f]"
+          }`}
         onClick={(e) => {
           if (isFromSearch) {
             handleContextMenu(e, song);
@@ -240,9 +226,8 @@ const Queue = () => {
             <p className="font-semibold flex items-center gap-2 text-sm md:text-base truncate">
               {isActive && (
                 <RiPulseLine
-                  className={`text-green-400 text-lg md:text-xl flex-shrink-0 ${
-                    isActive ? "animate-pulse" : "opacity-60"
-                  }`}
+                  className={`text-green-400 text-lg md:text-xl flex-shrink-0 ${isActive ? "animate-pulse" : "opacity-60"
+                    }`}
                 />
               )}
               <span className="truncate">{song.title}</span>
@@ -254,9 +239,8 @@ const Queue = () => {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 ml-2">
           <button
-            className={`p-2 rounded-full transition-all duration-200 ${
-              isSaved ? "bg-green-500 shadow-lg" : ""
-            }`}
+            className={`p-2 rounded-full transition-all duration-200 ${isSaved ? "bg-green-500 shadow-lg" : ""
+              }`}
             title={isSaved ? "Remove from playlist" : "Save to playlist"}
             onClick={async (event) => {
               event.stopPropagation();
@@ -268,9 +252,9 @@ const Queue = () => {
             ) : (
               <span className="text-white text-lg">♡</span>
             )}
-        </button>
+          </button>
+        </div>
       </div>
-    </div>
     );
   };
 
@@ -283,150 +267,162 @@ const Queue = () => {
         </div>
       ) : (
         <>
-      <header className="space-y-2">
-        <p className="uppercase text-xs tracking-[0.2em] text-slate-400">Current Queue</p>
-        <h1 className="text-2xl md:text-3xl font-bold">{queueLabel || "Queue"}</h1>
-        <p className="text-sm md:text-base text-slate-400">
-          {searchTerm ? `${searchTotal} song${searchTotal === 1 ? '' : 's'} found` : `${queue?.length || 0} track${(queue?.length || 0) === 1 ? "" : "s"} queued`}
-        </p>
-      </header>
+          <header className="space-y-2">
+            <p className="uppercase text-xs tracking-[0.2em] text-slate-400">Current Queue</p>
+            <h1 className="text-2xl md:text-3xl font-bold">{queueLabel || "Queue"}</h1>
+            <p className="text-sm md:text-base text-slate-400">
+              {searchTerm ? `${searchTotal} song${searchTotal === 1 ? '' : 's'} found` : `${queue?.length || 0} track${(queue?.length || 0) === 1 ? "" : "s"} queued`}
+            </p>
+          </header>
 
-      {/* Search Input */}
-      <div className="relative">
-        <div className="relative">
-          <RiSearchLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg" />
-          <input
-            type="text"
-            placeholder="Search by song, artist, album, or year..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#161616] text-white placeholder-slate-400 pl-10 pr-10 py-3 rounded-lg border border-slate-700 focus:border-blue-500 focus:outline-none transition-colors"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setSearchResults([]);
-                setSearchTotal(0);
-              }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-            >
-              <RiCloseLine className="text-lg" />
-            </button>
-          )}
-        </div>
-        <p className="text-xs text-slate-500 mt-2">
-          Search across all songs by title, artist name, album name, or year (e.g., "2024")
-        </p>
-      </div>
+          {/* Search Input */}
+          <div className="relative">
+            <div className="relative">
+              <RiSearchLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg" />
+              <input
+                type="text"
+                placeholder="Search by song, artist, album, or year..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-[#161616] text-white placeholder-slate-400 pl-10 pr-10 py-3 rounded-lg border border-slate-700 focus:border-blue-500 focus:outline-none transition-colors"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSearchResults([]);
+                    setSearchTotal(0);
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
+                  <RiCloseLine className="text-lg" />
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              Search across all songs by title, artist name, album name, or year (e.g., "2024")
+            </p>
+          </div>
 
-      {!queue || queue.length === 0 ? (
-        <div className="bg-[#161616] border border-dashed border-slate-700 rounded-xl p-6 md:p-10 text-center">
-          <p className="text-lg md:text-xl font-semibold mb-2">Your queue is empty</p>
-          <p className="text-sm md:text-base text-slate-400">
-            Start playing any song, album, or playlist and we will keep the music going for you.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6 md:space-y-8">
-          {searchTerm ? (
-            /* Search Results */
-            <section className="space-y-3 md:space-y-4">
-              <h2 className="text-lg md:text-xl font-semibold">
-                Search Results {searchLoading ? '(Searching...)' : `(${searchTotal})`}
-              </h2>
-              <div className="space-y-2 md:space-y-3">
-                {searchLoading ? (
-                  <div className="flex justify-center items-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <span className="ml-3 text-slate-400">Searching all songs...</span>
-                  </div>
-                ) : searchResults.length > 0 ? (
-                  searchResults.map((song, index) => {
-                    const originalQueueIndex = queue.findIndex(q => q._id === song._id);
-                    const isCurrentlyPlaying = originalQueueIndex !== -1 && originalQueueIndex === queueIndex;
-                    return renderSongRow(song, index + 1, isCurrentlyPlaying, true);
-                  })
-                ) : (
-                  <div className="bg-[#161616] border border-dashed border-slate-700 rounded-xl p-6 md:p-10 text-center">
-                    <RiSearchLine className="mx-auto text-4xl mb-3 text-slate-500" />
-                    <p className="text-lg font-semibold mb-2">No songs found</p>
-                    <p className="text-sm text-slate-400">No songs match "{searchTerm}"</p>
-                  </div>
-                )}
-              </div>
-            </section>
+          {!queue || queue.length === 0 ? (
+            <div className="bg-[#161616] border border-dashed border-slate-700 rounded-xl p-6 md:p-10 text-center">
+              <p className="text-lg md:text-xl font-semibold mb-2">Your queue is empty</p>
+              <p className="text-sm md:text-base text-slate-400">
+                Start playing any song, album, or playlist and we will keep the music going for you.
+              </p>
+            </div>
           ) : (
-            /* Default Queue View */
-            <>
-              {nowPlaying && (
+            <div className="space-y-6 md:space-y-8">
+              {searchTerm ? (
+                /* Search Results */
                 <section className="space-y-3 md:space-y-4">
-                  <h2 className="text-lg md:text-xl font-semibold">Now Playing</h2>
-                  {renderSongRow(nowPlaying, queueIndex + 1, true)}
-                </section>
-              )}
-
-              {upcoming.length > 0 && (
-                <section className="space-y-3 md:space-y-4">
-                  <h2 className="text-lg md:text-xl font-semibold">Up Next</h2>
+                  <h2 className="text-lg md:text-xl font-semibold">
+                    Search Results {searchLoading ? '(Searching...)' : `(${searchTotal})`}
+                  </h2>
                   <div className="space-y-2 md:space-y-3">
-                    {upcoming.map((song, idx) => renderSongRow(song, queueIndex + idx + 2))}
-                  </div>
-                </section>
-              )}
-
-              {previouslyPlayed.length > 0 && (
-                <section className="space-y-3 md:space-y-4">
-                  <h2 className="text-lg md:text-xl font-semibold text-slate-300">Played Earlier</h2>
-                  <div className="space-y-2 md:space-y-3">
-                    {previouslyPlayed.map((song, idx) =>
-                      renderSongRow(song, queueIndex - idx)
+                    {searchLoading ? (
+                      <div className="flex justify-center items-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        <span className="ml-3 text-slate-400">Searching all songs...</span>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map((song, index) => {
+                        const originalQueueIndex = queue.findIndex(q => q._id === song._id);
+                        const isCurrentlyPlaying = originalQueueIndex !== -1 && originalQueueIndex === queueIndex;
+                        return renderSongRow(song, index + 1, isCurrentlyPlaying, true);
+                      })
+                    ) : (
+                      <div className="bg-[#161616] border border-dashed border-slate-700 rounded-xl p-6 md:p-10 text-center">
+                        <RiSearchLine className="mx-auto text-4xl mb-3 text-slate-500" />
+                        <p className="text-lg font-semibold mb-2">No songs found</p>
+                        <p className="text-sm text-slate-400">No songs match "{searchTerm}"</p>
+                      </div>
                     )}
                   </div>
                 </section>
+              ) : (
+                /* Default Queue View */
+                <>
+                  {nowPlaying && (
+                    <section className="space-y-3 md:space-y-4">
+                      <h2 className="text-lg md:text-xl font-semibold">Now Playing</h2>
+                      {renderSongRow(nowPlaying, queueIndex + 1, true)}
+                    </section>
+                  )}
+
+                  {visibleUpcomingSongs.length > 0 && (
+                    <section className="space-y-3 md:space-y-4">
+                      <h2 className="text-lg md:text-xl font-semibold">Up Next</h2>
+                      <div className="space-y-2 md:space-y-3">
+                        {visibleUpcomingSongs.map((song, idx) => renderSongRow(song, queueIndex + idx + 2))}
+                      </div>
+
+                      {visibleUpcoming < fullUpcoming.length && (
+                        <button
+                          onClick={handleLoadMore}
+                          className="w-full py-3 text-sm font-medium text-slate-400 hover:text-white bg-[#1b1b1b] hover:bg-[#252525] rounded transition-colors"
+                        >
+                          Load More ({fullUpcoming.length - visibleUpcoming} remaining)
+                        </button>
+                      )}
+                    </section>
+                  )}
+
+                  {visibleHistorySongs.length > 0 && (
+                    <section className="space-y-3 md:space-y-4">
+                      <h2 className="text-lg md:text-xl font-semibold text-slate-300">Played Earlier</h2>
+                      <div className="space-y-2 md:space-y-3">
+                        {visibleHistorySongs.map((song, idx) =>
+                          renderSongRow(song, queueIndex - idx)
+                        )}
+                      </div>
+                      {fullHistory.length > visibleHistory && (
+                        <p className="text-center text-xs text-slate-500 py-2">
+                          Only showing last {visibleHistory} songs.
+                        </p>
+                      )}
+                    </section>
+                  )}
+                </>
               )}
-            </>
+            </div>
           )}
 
-          {/* TODO: Reintroduce paginated queue controls if needed */}
-        </div>
-      )}
-      
-      {/* Context Menu */}
-      {contextMenu && (
-        <div
-          className="fixed z-50 bg-[#282828] border border-slate-700 rounded-lg shadow-lg py-2 min-w-[160px]"
-          style={{
-            left: Math.min(contextMenu.x || 0, window.innerWidth - 180),
-            top: Math.min(contextMenu.y || 0, window.innerHeight - 140),
-            transform: 'translate(0, 10px)'
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={handlePlayNow}
-            className="w-full px-4 py-2 text-left text-white hover:bg-[#3e3e3e] transition-colors flex items-center gap-3"
-          >
-            <RiPulseLine className="text-green-500" />
-            Play Now
-          </button>
-          <button
-            onClick={handlePlayNext}
-            className="w-full px-4 py-2 text-left text-white hover:bg-[#3e3e3e] transition-colors flex items-center gap-3"
-          >
-            <RiPulseLine className="text-blue-500" />
-            Play Next
-          </button>
-          <button
-            onClick={handleAddToQueue}
-            className="w-full px-4 py-2 text-left text-white hover:bg-[#3e3e3e] transition-colors flex items-center gap-3"
-          >
-            <RiPulseLine className="text-slate-400" />
-            Add to Queue
-          </button>
-        </div>
-      )}
-      </>
+          {/* Context Menu */}
+          {contextMenu && (
+            <div
+              className="fixed z-50 bg-[#282828] border border-slate-700 rounded-lg shadow-lg py-2 min-w-[160px]"
+              style={{
+                left: Math.min(contextMenu.x || 0, window.innerWidth - 180),
+                top: Math.min(contextMenu.y || 0, window.innerHeight - 140),
+                transform: 'translate(0, 10px)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={handlePlayNow}
+                className="w-full px-4 py-2 text-left text-white hover:bg-[#3e3e3e] transition-colors flex items-center gap-3"
+              >
+                <RiPulseLine className="text-green-500" />
+                Play Now
+              </button>
+              <button
+                onClick={handlePlayNext}
+                className="w-full px-4 py-2 text-left text-white hover:bg-[#3e3e3e] transition-colors flex items-center gap-3"
+              >
+                <RiPulseLine className="text-blue-500" />
+                Play Next
+              </button>
+              <button
+                onClick={handleAddToQueue}
+                className="w-full px-4 py-2 text-left text-white hover:bg-[#3e3e3e] transition-colors flex items-center gap-3"
+              >
+                <RiPulseLine className="text-slate-400" />
+                Add to Queue
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

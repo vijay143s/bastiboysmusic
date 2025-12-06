@@ -235,14 +235,14 @@ const getQueueByYear = TryCatch(async (req, res) => {
 
 const searchSongs = TryCatch(async (req, res) => {
   const { q: query, limit = 50, offset = 0, year, language } = req.query;
-  
+
   if (!query || query.trim().length === 0) {
     return res.json({ songs: [], albums: [], artists: [], total: 0 });
   }
 
   const yearFilter = year ? parseInt(year) : null;
   const songsResult = await searchSongsRepo(query.trim(), parseInt(limit), parseInt(offset), yearFilter, language);
-  
+
   // Search albums
   const { pool } = require('../database/db.js');
   let albumQuery = `
@@ -252,23 +252,23 @@ const searchSongs = TryCatch(async (req, res) => {
     FROM albums a
     WHERE (a.title LIKE ? OR a.description LIKE ? OR a.director LIKE ? OR a.music_director LIKE ?)
   `;
-  
+
   const albumParams = [`%${query.trim()}%`, `%${query.trim()}%`, `%${query.trim()}%`, `%${query.trim()}%`];
-  
+
   if (yearFilter) {
     albumQuery += ' AND a.year = ?';
     albumParams.push(yearFilter);
   }
-  
+
   if (language) {
     albumQuery += ' AND a.language = ?';
     albumParams.push(language);
   }
-  
+
   albumQuery += ' ORDER BY a.year DESC LIMIT 50';
-  
+
   const [albumRows] = await pool.execute(albumQuery, albumParams);
-  
+
   const albums = albumRows.map(row => ({
     _id: String(row._id),
     title: row.title,
@@ -278,7 +278,7 @@ const searchSongs = TryCatch(async (req, res) => {
     director: row.director,
     musicDirector: row.musicDirector
   }));
-  
+
   // Search artists
   const artistQuery = `
     SELECT DISTINCT ar.artist_name as artistName, ar.artist_id as artistId,
@@ -289,15 +289,15 @@ const searchSongs = TryCatch(async (req, res) => {
     ORDER BY albumCount DESC
     LIMIT 20
   `;
-  
+
   const [artistRows] = await pool.execute(artistQuery, [`%${query.trim()}%`]);
-  
+
   const artists = artistRows.map(row => ({
     artistId: row.artistId,
     artistName: row.artistName,
     albumCount: row.albumCount
   }));
-  
+
   // Search singers - optimized with single query
   const singerQuery = `
     SELECT si.singer_name as singerName, si.singer_id as singerId,
@@ -310,15 +310,15 @@ const searchSongs = TryCatch(async (req, res) => {
     ORDER BY songCount DESC
     LIMIT 20
   `;
-  
+
   const [singerRows] = await pool.execute(singerQuery, [`%${query.trim()}%`]);
-  
+
   const singers = singerRows.map(row => ({
     singerId: row.singerId,
     singerName: row.singerName,
     songCount: row.songCount
   }));
-  
+
   res.json({
     songs: songsResult.songs,
     albums,
@@ -348,8 +348,8 @@ const getAllSongsByAlbum = TryCatch(async (req, res) => {
 
   const songs = await getSongsByAlbum(albumId);
 
-  res.json({ 
-    album: formatAlbum(album), 
+  res.json({
+    album: formatAlbum(album),
     songs: songs.map(formatSong),
   });
 });
@@ -489,6 +489,7 @@ module.exports = {
     const offset = parseInt(req.query.offset) || 0;
     const shuffle = req.query.shuffle === 'true';
     const language = req.query.language || null;
+    console.log(`[DEBUG] getTopPlayedSongs - Language: ${language}, Limit: ${limit}`);
 
     let result = await getTopPlayedSongsRepo(limit, offset, language);
 
@@ -526,13 +527,13 @@ module.exports = {
   // Get playlist songs by user ID from auth token
   getPlaylistSongs: TryCatch(async (req, res) => {
     const userId = req.user.id;
-    
+
     // Get user with playlist
     const { getUserWithPlaylist } = require("../repositories/userRepository.js");
     const { getPlaylistSongs: fetchPlaylistSongs } = require("../repositories/songRepository.js");
-    
+
     const user = await getUserWithPlaylist(userId);
-    
+
     if (!user || !user.playlist || user.playlist.length === 0) {
       return res.json({ songs: [] });
     }
