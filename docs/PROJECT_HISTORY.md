@@ -1374,6 +1374,9 @@ npm run dev
 ```bash
 cd backend/python-scripts
 python pagalworld_incremental_scraper.py --mode full --language hindi --pages 1 --execute-sql
+
+cd backend/python-scripts
+python pagalworld_incremental_scraper.py --mode full --language hindi --all-pages --execute-sql
 ```
 
 ### Step 4: Test

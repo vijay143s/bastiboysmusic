@@ -1,0 +1,51 @@
+{
+    "expo": {
+        "name": "BastiBoys Music",
+        "slug": "bastiboysmusic",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "dark",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#000000"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.bastiboys.music",
+            "infoPlist": {
+                "UIBackgroundModes": [
+                    "audio"
+                ]
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#000000"
+            },
+            "package": "com.bastiboys.music",
+            "permissions": [
+                "INTERNET",
+                "READ_EXTERNAL_STORAGE",
+                "WRITE_EXTERNAL_STORAGE",
+                "WAKE_LOCK"
+            ]
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        },
+        "plugins": [
+            [
+                "expo-av",
+                {
+                    "microphonePermission": "Allow BastiBoys Music to access your microphone."
+                }
+            ]
+        ]
+    }
+}

@@ -14,6 +14,9 @@ const generateToken = (id, res) => {
     sameSite: isProduction ? "none" : "lax",
     secure: isProduction,
   });
+
+  // Return token for mobile apps (they can't access HTTP-only cookies)
+  return token;
 };
 
 module.exports = generateToken;

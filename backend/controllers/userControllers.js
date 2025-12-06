@@ -31,11 +31,12 @@ const sanitizeUser = (userDoc) => {
 };
 
 const sendAuthSuccess = (res, user, message, statusCode = 200) => {
-  generateToken(user.id, res);
+  const token = generateToken(user.id, res);
 
   return res.status(statusCode).json({
     success: true,
     message,
+    token, // Include token in response for mobile apps
     user: sanitizeUser(user),
   });
 };
@@ -144,7 +145,7 @@ const saveToPlaylist = TryCatch(async (req, res) => {
 
   if (alreadySaved) {
     await removeSongFromPlaylist(req.user.id, songId);
-    
+
     // Get updated user data
     const updatedUser = await getUserWithPlaylist(req.user.id);
 
@@ -156,7 +157,7 @@ const saveToPlaylist = TryCatch(async (req, res) => {
   }
 
   await addSongToPlaylist(req.user.id, songId);
-  
+
   // Get updated user data
   const updatedUser = await getUserWithPlaylist(req.user.id);
 
