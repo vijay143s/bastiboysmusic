@@ -1,9 +1,9 @@
 name: Deploy to cPanel (FTP Only)
 
 on:
-  push:
-    branches:
-      - 'antigravity-*'
+  # push:
+  #   branches:
+  #     - 'antigravity-*'
   workflow_dispatch:
 
 jobs:
