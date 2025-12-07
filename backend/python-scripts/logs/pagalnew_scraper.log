@@ -1,0 +1,152 @@
+2025-12-07 01:07:18,019 - __main__ - INFO - Scraping category: https://pagalnew.com/category/bollywood-tracks
+2025-12-07 01:07:18,669 - __main__ - INFO - Found 12 unique albums
+2025-12-07 01:07:18,669 - __main__ - INFO - Processing 12 albums...
+2025-12-07 01:07:18,945 - __main__ - INFO - Parsed: Dhurandhar 2025 (0 songs)
+2025-12-07 01:07:19,214 - __main__ - INFO - Parsed: Non Violence 2025 (0 songs)
+2025-12-07 01:07:19,227 - __main__ - INFO - Parsed: The Rajasaab 2025 (0 songs)
+2025-12-07 01:07:19,255 - __main__ - INFO - Parsed: Tu Meri Main Tera Main Tera Tu Meri 2025 (0 songs)
+2025-12-07 01:07:19,271 - __main__ - INFO - Parsed: King 2025 (0 songs)
+2025-12-07 01:07:19,300 - __main__ - INFO - Parsed: Kis Kisko Pyaar Karoon 2 2025 (0 songs)
+2025-12-07 01:07:19,498 - __main__ - INFO - Parsed: Peddi 2025 (0 songs)
+2025-12-07 01:07:19,517 - __main__ - INFO - Parsed: De De Pyaar De 2 2025 (0 songs)
+2025-12-07 01:07:19,543 - __main__ - INFO - Parsed: Haq 2025 (0 songs)
+2025-12-07 01:07:19,551 - __main__ - INFO - Parsed: Tere Ishk Mein 2025 (0 songs)
+2025-12-07 01:07:19,577 - __main__ - INFO - Parsed: Mastiii 4 2025 (0 songs)
+2025-12-07 01:07:19,762 - __main__ - INFO - Parsed: Soulmates 2025 (0 songs)
+2025-12-07 01:07:19,763 - __main__ - INFO - Generated SQL files in sql_pagalnew
+2025-12-07 01:07:19,763 - __main__ - INFO -   Albums: 12
+2025-12-07 01:07:19,763 - __main__ - INFO -   Songs: 0
+2025-12-07 01:07:19,763 - __main__ - INFO - Executing SQL...
+2025-12-07 01:07:22,410 - db_utils - INFO - Database connection established
+2025-12-07 01:07:22,410 - db_utils - INFO - Processing: sql_pagalnew/metadata.sql
+2025-12-07 01:07:23,076 - db_utils - INFO - Successfully executed sql_pagalnew/metadata.sql
+2025-12-07 01:07:23,076 - db_utils - INFO - Processing: sql_pagalnew/albums.sql
+2025-12-07 01:07:26,168 - db_utils - INFO - Successfully executed sql_pagalnew/albums.sql
+2025-12-07 01:07:26,169 - db_utils - INFO - Processing: sql_pagalnew/songs.sql
+2025-12-07 01:07:26,732 - db_utils - INFO - Successfully executed sql_pagalnew/songs.sql
+2025-12-07 01:07:26,952 - db_utils - INFO - Database connection closed
+2025-12-07 01:07:26,953 - __main__ - INFO - DB Update Result: {'success': 3, 'failed': 0, 'errors': []}
+2025-12-07 01:09:19,740 - __main__ - INFO - Scraping category: https://pagalnew.com/category/bollywood-tracks
+2025-12-07 01:09:20,284 - __main__ - INFO - Found 12 unique albums
+2025-12-07 01:09:20,284 - __main__ - INFO - Processing 12 albums...
+2025-12-07 01:09:20,550 - __main__ - INFO -   Album 'Tu Meri Main Tera Main Tera Tu Meri 2025' has 1 songs. Fetching...
+2025-12-07 01:09:20,831 - __main__ - INFO -   Parsed Tu Meri Main Tera Main Tera Tu Meri 2025 complete.
+2025-12-07 01:09:20,840 - __main__ - INFO -   Album 'The Rajasaab 2025' has 1 songs. Fetching...
+2025-12-07 01:09:21,123 - __main__ - INFO -   Parsed The Rajasaab 2025 complete.
+2025-12-07 01:09:21,129 - __main__ - INFO -   Album 'King 2025' has 1 songs. Fetching...
+2025-12-07 01:09:21,413 - __main__ - INFO -   Parsed King 2025 complete.
+2025-12-07 01:09:21,413 - __main__ - INFO -   Album 'Kis Kisko Pyaar Karoon 2 2025' has 1 songs. Fetching...
+2025-12-07 01:09:21,770 - __main__ - INFO -   Parsed Kis Kisko Pyaar Karoon 2 2025 complete.
+2025-12-07 01:09:21,770 - __main__ - INFO -   Album 'Dhurandhar 2025' has 6 songs. Fetching...
+2025-12-07 01:09:23,560 - __main__ - INFO -   Parsed Dhurandhar 2025 complete.
+2025-12-07 01:09:23,560 - __main__ - INFO -   Album 'Non Violence 2025' has 1 songs. Fetching...
+2025-12-07 01:09:23,862 - __main__ - INFO -   Parsed Non Violence 2025 complete.
+2025-12-07 01:09:23,862 - __main__ - INFO -   Album 'Haq 2025' has 6 songs. Fetching...
+2025-12-07 01:09:26,098 - __main__ - INFO -   Parsed Haq 2025 complete.
+2025-12-07 01:09:26,098 - __main__ - INFO -   Album 'Peddi 2025' has 1 songs. Fetching...
+2025-12-07 01:09:26,396 - __main__ - INFO -   Parsed Peddi 2025 complete.
+2025-12-07 01:09:26,396 - __main__ - INFO -   Album 'De De Pyaar De 2 2025' has 5 songs. Fetching...
+2025-12-07 01:09:28,114 - __main__ - INFO -   Parsed De De Pyaar De 2 2025 complete.
+2025-12-07 01:09:28,114 - __main__ - INFO -   Album 'Tere Ishk Mein 2025' has 9 songs. Fetching...
+2025-12-07 01:09:30,973 - __main__ - INFO -   Parsed Tere Ishk Mein 2025 complete.
+2025-12-07 01:09:30,974 - __main__ - INFO -   Album 'Soulmates 2025' has 1 songs. Fetching...
+2025-12-07 01:09:31,240 - __main__ - INFO -   Parsed Soulmates 2025 complete.
+2025-12-07 01:09:31,241 - __main__ - INFO -   Album 'Mastiii 4 2025' has 3 songs. Fetching...
+2025-12-07 01:09:32,351 - __main__ - INFO -   Parsed Mastiii 4 2025 complete.
+2025-12-07 01:09:32,353 - __main__ - INFO - Generated SQL files in sql_pagalnew
+2025-12-07 01:09:32,353 - __main__ - INFO -   Albums: 12
+2025-12-07 01:09:32,353 - __main__ - INFO -   Songs: 36
+2025-12-07 01:09:32,353 - __main__ - INFO - Executing SQL...
+2025-12-07 01:09:34,433 - db_utils - INFO - Database connection established
+2025-12-07 01:09:34,434 - db_utils - INFO - Processing: sql_pagalnew/metadata.sql
+2025-12-07 01:09:35,024 - db_utils - INFO - Successfully executed sql_pagalnew/metadata.sql
+2025-12-07 01:09:35,024 - db_utils - INFO - Processing: sql_pagalnew/albums.sql
+2025-12-07 01:09:40,577 - db_utils - INFO - Successfully executed sql_pagalnew/albums.sql
+2025-12-07 01:09:40,578 - db_utils - INFO - Processing: sql_pagalnew/songs.sql
+2025-12-07 01:09:49,712 - db_utils - INFO - Successfully executed sql_pagalnew/songs.sql
+2025-12-07 01:09:49,912 - db_utils - INFO - Database connection closed
+2025-12-07 01:09:49,913 - __main__ - INFO - DB Update Result: {'success': 3, 'failed': 0, 'errors': []}
+2025-12-07 01:26:50,038 - __main__ - INFO - Processing 1 albums...
+2025-12-07 01:26:50,956 - __main__ - INFO -   Album 'Dhurandhar' has 6 songs. Fetching...
+2025-12-07 01:26:52,406 - __main__ - INFO -   Parsed Dhurandhar complete.
+2025-12-07 01:26:52,407 - __main__ - INFO - Generated SQL files in sql_pagalnew_updated
+2025-12-07 01:26:52,407 - __main__ - INFO -   Albums: 1
+2025-12-07 01:26:52,407 - __main__ - INFO -   Songs: 6
+2025-12-07 01:26:52,407 - __main__ - INFO - Executing SQL...
+2025-12-07 01:26:54,305 - db_utils - INFO - Database connection established
+2025-12-07 01:26:54,305 - db_utils - INFO - Processing: sql_pagalnew_updated/metadata.sql
+2025-12-07 01:26:55,066 - db_utils - INFO - Successfully executed sql_pagalnew_updated/metadata.sql
+2025-12-07 01:26:55,066 - db_utils - INFO - Processing: sql_pagalnew_updated/albums.sql
+2025-12-07 01:26:55,832 - db_utils - INFO - Successfully executed sql_pagalnew_updated/albums.sql
+2025-12-07 01:26:55,833 - db_utils - INFO - Processing: sql_pagalnew_updated/songs.sql
+2025-12-07 01:26:57,362 - db_utils - INFO - Successfully executed sql_pagalnew_updated/songs.sql
+2025-12-07 01:26:57,563 - db_utils - INFO - Database connection closed
+2025-12-07 01:26:57,564 - __main__ - INFO - DB Update Result: {'success': 3, 'failed': 0, 'errors': []}
+2025-12-07 01:31:04,150 - __main__ - INFO - Scraping category page 1: https://pagalnew.com/category/bollywood-tracks
+2025-12-07 01:31:04,668 - __main__ - INFO -   Found 12 albums on page 1
+2025-12-07 01:31:04,669 - __main__ - INFO - Scraping category page 2: https://pagalnew.com/category/bollywood-mp3-songs/2
+2025-12-07 01:31:04,971 - __main__ - INFO -   Found 12 albums on page 2
+2025-12-07 01:31:04,971 - __main__ - INFO - Reached max pages (2). Stopping.
+2025-12-07 01:31:04,971 - __main__ - INFO - Total unique albums found across 2 pages: 24
+2025-12-07 01:31:04,971 - __main__ - INFO - Processing 24 albums...
+2025-12-07 01:31:05,248 - __main__ - INFO -   Album 'The Rajasaab' has 1 songs. Fetching...
+2025-12-07 01:31:05,533 - __main__ - INFO -   Parsed The Rajasaab complete.
+2025-12-07 01:31:05,533 - __main__ - INFO -   Album 'Kis Kisko Pyaar Karoon 2' has 1 songs. Fetching...
+2025-12-07 01:31:05,825 - __main__ - INFO -   Parsed Kis Kisko Pyaar Karoon 2 complete.
+2025-12-07 01:31:05,825 - __main__ - INFO -   Album 'Tu Meri Main Tera Main Tera Tu Meri' has 1 songs. Fetching...
+2025-12-07 01:31:06,116 - __main__ - INFO -   Parsed Tu Meri Main Tera Main Tera Tu Meri complete.
+2025-12-07 01:31:06,116 - __main__ - INFO -   Album 'King' has 1 songs. Fetching...
+2025-12-07 01:31:06,408 - __main__ - INFO -   Parsed King complete.
+2025-12-07 01:31:06,413 - __main__ - INFO -   Album 'Dhurandhar' has 6 songs. Fetching...
+2025-12-07 01:31:08,124 - __main__ - INFO -   Parsed Dhurandhar complete.
+2025-12-07 01:31:08,124 - __main__ - INFO -   Album 'Non Violence' has 1 songs. Fetching...
+2025-12-07 01:31:08,450 - __main__ - INFO -   Parsed Non Violence complete.
+2025-12-07 01:31:08,450 - __main__ - INFO -   Album 'De De Pyaar De 2' has 5 songs. Fetching...
+2025-12-07 01:31:09,793 - __main__ - INFO -   Parsed De De Pyaar De 2 complete.
+2025-12-07 01:31:09,793 - __main__ - INFO -   Album 'Peddi' has 1 songs. Fetching...
+2025-12-07 01:31:10,093 - __main__ - INFO -   Parsed Peddi complete.
+2025-12-07 01:31:10,093 - __main__ - INFO -   Album 'Tere Ishk Mein' has 9 songs. Fetching...
+2025-12-07 01:31:12,730 - __main__ - INFO -   Parsed Tere Ishk Mein complete.
+2025-12-07 01:31:12,731 - __main__ - INFO -   Album 'Haq' has 6 songs. Fetching...
+2025-12-07 01:31:14,370 - __main__ - INFO -   Parsed Haq complete.
+2025-12-07 01:31:14,370 - __main__ - INFO -   Album 'Mastiii 4' has 3 songs. Fetching...
+2025-12-07 01:31:15,196 - __main__ - INFO -   Parsed Mastiii 4 complete.
+2025-12-07 01:31:15,197 - __main__ - INFO -   Album 'Soulmates' has 1 songs. Fetching...
+2025-12-07 01:31:15,454 - __main__ - INFO -   Parsed Soulmates complete.
+2025-12-07 01:31:15,454 - __main__ - INFO -   Album '120 Bahadur' has 4 songs. Fetching...
+2025-12-07 01:31:16,581 - __main__ - INFO -   Parsed 120 Bahadur complete.
+2025-12-07 01:31:16,581 - __main__ - INFO -   Album 'Kantara A Legend Chapter 1 (Hindi)' has 6 songs. Fetching...
+2025-12-07 01:31:18,634 - __main__ - INFO -   Parsed Kantara A Legend Chapter 1 (Hindi) complete.
+2025-12-07 01:31:18,634 - __main__ - INFO -   Album 'Thamma' has 4 songs. Fetching...
+2025-12-07 01:31:19,744 - __main__ - INFO -   Parsed Thamma complete.
+2025-12-07 01:31:19,744 - __main__ - INFO -   Album 'Sunny Sanskari Ki Tulsi Kumari' has 7 songs. Fetching...
+2025-12-07 01:31:21,699 - __main__ - INFO -   Parsed Sunny Sanskari Ki Tulsi Kumari complete.
+2025-12-07 01:31:21,699 - __main__ - INFO -   Album 'Ek Chatur Naar' has 2 songs. Fetching...
+2025-12-07 01:31:22,281 - __main__ - INFO -   Parsed Ek Chatur Naar complete.
+2025-12-07 01:31:22,281 - __main__ - INFO -   Album 'Gustaakh Ishq' has 3 songs. Fetching...
+2025-12-07 01:31:23,124 - __main__ - INFO -   Parsed Gustaakh Ishq complete.
+2025-12-07 01:31:23,124 - __main__ - INFO -   Album 'The Bads Of Bollywood' has 12 songs. Fetching...
+2025-12-07 01:31:28,098 - __main__ - INFO -   Parsed The Bads Of Bollywood complete.
+2025-12-07 01:31:28,099 - __main__ - INFO -   Album 'Ek Deewane Ki Deewaniyat' has 7 songs. Fetching...
+2025-12-07 01:31:30,141 - __main__ - INFO -   Parsed Ek Deewane Ki Deewaniyat complete.
+2025-12-07 01:31:30,141 - __main__ - INFO -   Album 'Nishaanchi' has 12 songs. Fetching...
+2025-12-07 01:31:35,266 - __main__ - INFO -   Parsed Nishaanchi complete.
+2025-12-07 01:31:35,267 - __main__ - INFO -   Album 'Jolly LLB 3' has 4 songs. Fetching...
+2025-12-07 01:31:37,185 - __main__ - INFO -   Parsed Jolly LLB 3 complete.
+2025-12-07 01:31:37,186 - __main__ - INFO -   Album 'Param Sundari' has 6 songs. Fetching...
+2025-12-07 01:31:39,045 - __main__ - INFO -   Parsed Param Sundari complete.
+2025-12-07 01:31:39,046 - __main__ - INFO -   Album 'Baaghi 4' has 9 songs. Fetching...
+2025-12-07 01:31:41,811 - __main__ - INFO -   Parsed Baaghi 4 complete.
+2025-12-07 01:31:41,813 - __main__ - INFO - Generated SQL files in sql_pagalnew_paged
+2025-12-07 01:31:41,813 - __main__ - INFO -   Albums: 24
+2025-12-07 01:31:41,813 - __main__ - INFO -   Songs: 112
+2025-12-07 01:31:41,813 - __main__ - INFO - Executing SQL...
+2025-12-07 01:31:43,832 - db_utils - INFO - Database connection established
+2025-12-07 01:31:43,832 - db_utils - INFO - Processing: sql_pagalnew_paged/metadata.sql
+2025-12-07 01:31:53,441 - db_utils - INFO - Successfully executed sql_pagalnew_paged/metadata.sql
+2025-12-07 01:31:53,442 - db_utils - INFO - Processing: sql_pagalnew_paged/albums.sql
+2025-12-07 01:32:03,031 - db_utils - INFO - Successfully executed sql_pagalnew_paged/albums.sql
+2025-12-07 01:32:03,031 - db_utils - INFO - Processing: sql_pagalnew_paged/songs.sql
+2025-12-07 01:32:25,759 - db_utils - INFO - Successfully executed sql_pagalnew_paged/songs.sql
+2025-12-07 01:32:25,952 - db_utils - INFO - Database connection closed
+2025-12-07 01:32:25,952 - __main__ - INFO - DB Update Result: {'success': 3, 'failed': 0, 'errors': []}

@@ -35,9 +35,13 @@ router.get("/stream", async (req, res) => {
 
     // Validate URL is from Pagal World only
     const urlObj = new URL(decodedUrl);
-    if (!urlObj.hostname.includes("pagalworldmusic.com")) {
+    // Allow Pagal World and Google Drive
+    const allowedDomains = ["pagalworldmusic.com", "drive.google.com", "drive.usercontent.google.com"];
+    const isAllowed = allowedDomains.some(domain => urlObj.hostname.includes(domain));
+
+    if (!isAllowed) {
       return res.status(403).json({
-        message: "Only Pagal World music streams are allowed. Use direct URLs for other sources.",
+        message: "This audio source is not allowed via proxy.",
       });
     }
 
@@ -49,14 +53,18 @@ router.get("/stream", async (req, res) => {
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     // Add user agent to avoid being blocked
-    const requestOptions = {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        Referer: "https://pagalworldmusic.com/",
-        Range: req.headers.range || undefined,
-      },
+    // Add user agent to avoid being blocked
+    const headers = {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      Range: req.headers.range || undefined,
     };
+
+    // Only add Referer for Pagal World
+    if (urlObj.hostname.includes("pagalworldmusic.com")) {
+      headers["Referer"] = "https://pagalworldmusic.com/";
+    }
+
+    const requestOptions = { headers };
 
     // Remove undefined Range header
     if (!requestOptions.headers.Range) {

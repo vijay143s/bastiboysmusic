@@ -6,6 +6,7 @@ import { FaPause, FaPlay } from "react-icons/fa";
 import { FaShuffle } from "react-icons/fa6";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import axios from "axios";
+import { getPlayableAudioUrl } from "../utils/audioUtils";
 
 const Player = () => {
   const {
@@ -20,9 +21,9 @@ const Player = () => {
     queue,
     loadDefaultQueue,
   } = SongData();
-  
+
   const { user, addToPlaylist } = UserData();
-  
+
   const albumTitle = useMemo(() => {
     if (!song) return "Single";
     // Use albumName from song data if available
@@ -31,7 +32,7 @@ const Player = () => {
     const album = albums.find((albumItem) => albumItem._id === song.album);
     return album ? album.title : "Single";
   }, [song, albums]);
-  
+
   const albumThumbnail = useMemo(() => {
     if (!song) return null;
     // Use albumThumbnail from song data if available
@@ -45,7 +46,7 @@ const Player = () => {
   const [audioRetryCount, setAudioRetryCount] = useState(0);
   const maxRetries = 2;
   const playCountThreshold = 0.3; // 30% of song duration
-  
+
   const isInPlaylist = useMemo(() => {
     if (!user || !user.playlist || !song || !song._id) return false;
     return user.playlist.includes(String(song._id));
@@ -80,7 +81,7 @@ const Player = () => {
     if (previousSong && previousSong !== selectedSong && audioRef.current) {
       const listenDuration = audioRef.current.currentTime || 0;
       const totalDuration = audioRef.current.duration || 0;
-      
+
       if (listenDuration > 5 && totalDuration > 0) { // Only track if listened for more than 5 seconds
         axios.post(`/api/interaction/track/completion/${previousSong}`, {
           listenDuration,
@@ -93,12 +94,12 @@ const Player = () => {
         });
       }
     }
-    
+
     // Fetch song (will use cache if available for instant playback, or API as fallback)
     fetchSingleSong();
     setPlayCountUpdated(false); // Reset when song changes
     setAudioRetryCount(0); // Reset retry counter when song changes
-    
+
     // Store current song ID for tracking
     if (audioRef.current && selectedSong) {
       audioRef.current.setAttribute('data-song-id', selectedSong);
@@ -109,7 +110,7 @@ const Player = () => {
 
   const handlePlayPause = () => {
     if (!audioRef.current) return;
-    
+
     // Check if song has valid audio source
     if (!song || !song.audio || !song.audio.url) {
       if (process.env.NODE_ENV === 'development') {
@@ -117,7 +118,7 @@ const Player = () => {
       }
       return; // Don't auto-skip, just return
     }
-    
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -204,7 +205,7 @@ const Player = () => {
         }
         return; // Don't auto-advance if song didn't actually play
       }
-      
+
       // Track completion
       if (selectedSong && audio && audio.duration) {
         axios.post(`/api/interaction/track/completion/${selectedSong}`, {
@@ -237,7 +238,7 @@ const Player = () => {
     const newTime = (e.target.value / 100) * duration;
     audioRef.current.currentTime = newTime;
     setProgress(newTime);
-    
+
     // Track listening session if significant time has passed
     if (selectedSong && oldTime > 30 && duration > 0) {
       const completionPercentage = (oldTime / duration) * 100;
@@ -253,7 +254,7 @@ const Player = () => {
     }
   };
   const progressPercent = duration ? (progress / duration) * 100 : 0;
-  
+
   const formatTime = (time) => {
     if (!time) return "0:00";
     const minutes = Math.floor(time / 60);
@@ -269,9 +270,9 @@ const Player = () => {
           {song && song.audio && song.audio.url && (
             <>
               {isPlaying ? (
-                <audio 
-                  ref={audioRef} 
-                  src={song.audio.url} 
+                <audio
+                  ref={audioRef}
+                  src={getPlayableAudioUrl(song.audio.url)}
                   preload="metadata"
                   autoPlay
                   onError={(e) => {
@@ -283,7 +284,7 @@ const Player = () => {
                       if (error) {
                         console.error("Error code:", error.code);
                         console.error("Error message:", error.message);
-                        switch(error.code) {
+                        switch (error.code) {
                           case 1: console.error("MEDIA_ERR_ABORTED: Audio load was aborted"); break;
                           case 2: console.error("MEDIA_ERR_NETWORK: Network error"); break;
                           case 3: console.error("MEDIA_ERR_DECODE: Audio decode error"); break;
@@ -292,7 +293,7 @@ const Player = () => {
                       }
                     }
                     setIsPlaying(false);
-                    
+
                     // Try to reload audio if we haven't exceeded max retries
                     if (audioRetryCount < maxRetries) {
                       setTimeout(() => {
@@ -310,9 +311,9 @@ const Player = () => {
                   }}
                 />
               ) : (
-                <audio 
-                  ref={audioRef} 
-                  src={song.audio.url}
+                <audio
+                  ref={audioRef}
+                  src={getPlayableAudioUrl(song.audio.url)}
                   preload="metadata"
                   onError={(e) => {
                     if (process.env.NODE_ENV === 'development') {
@@ -323,7 +324,7 @@ const Player = () => {
                       if (error) {
                         console.error("Error code:", error.code);
                         console.error("Error message:", error.message);
-                        switch(error.code) {
+                        switch (error.code) {
                           case 1: console.error("MEDIA_ERR_ABORTED: Audio load was aborted"); break;
                           case 2: console.error("MEDIA_ERR_NETWORK: Network error"); break;
                           case 3: console.error("MEDIA_ERR_DECODE: Audio decode error"); break;
@@ -336,7 +337,7 @@ const Player = () => {
               )}
             </>
           )}
-          
+
           {/* Show message if no valid audio source */}
           {song && (!song.audio || !song.audio.url) && (
             <div className="text-center text-red-400 text-sm p-2">

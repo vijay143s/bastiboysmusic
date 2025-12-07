@@ -28,7 +28,7 @@ const server = http.createServer(app);
 
 // CORS configuration for cPanel and local development
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
+  origin: process.env.NODE_ENV === 'production'
     ? (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'])
     : '*',
   credentials: true,
@@ -50,7 +50,7 @@ app.use(cookieParser());
 initSocketManager(io);
 
 // Port configuration: Use 8080 for cPanel, 5000 for local development
-const port = Number(process.env.PORT) || (process.env.NODE_ENV === 'production' ? 8080 : 5000);
+const port = Number(process.env.PORT) || (process.env.NODE_ENV === 'production' ? 8080 : 5001);
 
 //importing existing routes
 const userRoutes = require("./routes/userRoutes.js");

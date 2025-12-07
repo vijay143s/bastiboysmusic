@@ -1,0 +1,107 @@
+2025-12-07 03:17:36,769 - INFO - Starting duplicate removal process for all tables...
+2025-12-07 03:17:36,769 - INFO - 
+================================================================================
+2025-12-07 03:17:36,769 - INFO - FINDING DUPLICATES IN ALL TABLES
+2025-12-07 03:17:36,769 - INFO - ================================================================================
+2025-12-07 03:17:36,769 - INFO - 
+1. Finding duplicate albums...
+2025-12-07 03:17:38,957 - INFO - Database connection established
+2025-12-07 03:17:43,242 - INFO - Database connection closed
+2025-12-07 03:17:43,245 - INFO -    Found 0 duplicate albums to remove
+2025-12-07 03:17:43,245 - INFO - 
+2. Finding duplicate songs...
+2025-12-07 03:17:45,342 - INFO - Database connection established
+2025-12-07 03:17:57,586 - INFO - Database connection closed
+2025-12-07 03:17:57,589 - INFO -    Found 610 duplicate songs to remove
+2025-12-07 03:17:57,589 - INFO - 
+3. Finding duplicate artists...
+2025-12-07 03:17:59,860 - INFO - Database connection established
+2025-12-07 03:18:03,152 - INFO - Database connection closed
+2025-12-07 03:18:03,154 - INFO -    Found 5385 duplicate artists to remove
+2025-12-07 03:18:03,154 - INFO - 
+4. Finding duplicate singers...
+2025-12-07 03:18:05,142 - INFO - Database connection established
+2025-12-07 03:18:06,498 - INFO - Database connection closed
+2025-12-07 03:18:06,498 - INFO -    Found 0 duplicate singers to remove
+2025-12-07 03:18:06,498 - INFO - 
+5. Finding duplicate music directors...
+2025-12-07 03:18:08,420 - INFO - Database connection established
+2025-12-07 03:18:10,374 - INFO - Database connection closed
+2025-12-07 03:18:10,376 - INFO -    Found 2498 duplicate music directors to remove
+2025-12-07 03:18:10,376 - INFO - 
+================================================================================
+2025-12-07 03:18:10,376 - INFO - REMOVAL SUMMARY
+2025-12-07 03:18:10,376 - INFO - ================================================================================
+2025-12-07 03:18:10,376 - INFO - Albums:          0 duplicates
+2025-12-07 03:18:10,376 - INFO - Songs:           610 duplicates
+2025-12-07 03:18:10,376 - INFO - Artists:         5385 duplicates
+2025-12-07 03:18:10,376 - INFO - Singers:         0 duplicates
+2025-12-07 03:18:10,376 - INFO - Music Directors: 2498 duplicates
+2025-12-07 03:18:10,376 - INFO - ================================================================================
+2025-12-07 03:18:10,376 - INFO - TOTAL:           8493 duplicates across all tables
+2025-12-07 03:18:10,376 - INFO - Strategy: Keep oldest entry (lowest ID), remove newer duplicates
+2025-12-07 03:18:10,376 - INFO - 
+================================================================================
+2025-12-07 03:18:10,377 - INFO - DRY RUN - Preview of what will be removed
+2025-12-07 03:18:10,377 - INFO - ================================================================================
+2025-12-07 03:18:10,377 - INFO - 
+Songs to remove (610):
+2025-12-07 03:18:10,377 - INFO - DRY RUN: Would remove 610 duplicate songs
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'id': 41665, 'song_title': '3 Shaukk', 'audio_url': 'https://pagalworldmusic.com/download.php?title=3+Shaukk-320kbps&path=downloads%2Fhigh%2FHTozBCsAfwY%2FHTozBCsAfwY.mp3', 'singer': 'Avvy Sra', 'album_title': 'India Lockdown', 'created_at': datetime.datetime(2025, 12, 7, 0, 46, 4), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'id': 41725, 'song_title': '3 Shaukk', 'audio_url': 'https://pagalworldmusic.com/download.php?title=3+Shaukk-320kbps&path=downloads%2Fhigh%2FHTozBCsAfwY%2FHTozBCsAfwY.mp3', 'singer': 'Avvy Sra', 'album_title': 'Sasanasabha Hindi', 'created_at': datetime.datetime(2025, 12, 7, 0, 46, 4), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'id': 43539, 'song_title': '3 Shaukk', 'audio_url': 'https://pagalworldmusic.com/download.php?title=3+Shaukk-320kbps&path=downloads%2Fhigh%2FHTozBCsAfwY%2FHTozBCsAfwY.mp3', 'singer': 'Avvy Sra', 'album_title': 'Vasantha Mullai', 'created_at': datetime.datetime(2025, 12, 7, 1, 3, 46), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'id': 43637, 'song_title': '3 Shaukk', 'audio_url': 'https://pagalworldmusic.com/download.php?title=3+Shaukk-320kbps&path=downloads%2Fhigh%2FHTozBCsAfwY%2FHTozBCsAfwY.mp3', 'singer': 'Avvy Sra', 'album_title': 'Dada', 'created_at': datetime.datetime(2025, 12, 7, 1, 4, 31), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'id': 51011, 'song_title': '3 Shaukk  Song  - De De Pyaar De 2', 'audio_url': 'https://pagalnew.com/320-download/52571', 'singer': '', 'album_title': 'De De Pyaar De 2', 'created_at': datetime.datetime(2025, 12, 7, 1, 32, 6), 'duplicate_count': 5, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   ... and 605 more
+2025-12-07 03:18:10,377 - INFO - 
+Artists to remove (5385):
+2025-12-07 03:18:10,377 - INFO - DRY RUN: Would remove 5385 duplicate artists
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'artist_id': 9817, 'artist_name': 'A.Ravi Teja', 'album_id': 105, 'album_name': 'Aavu Puli Madhyalo Prabahas Pelli', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'artist_id': 10473, 'artist_name': 'Aadarsh', 'album_id': 1253, 'album_name': 'Geeta Sakshigaa', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'artist_id': 10210, 'artist_name': 'Aadhi', 'album_id': 811, 'album_name': 'Chelagatam', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,377 - INFO -   Would remove: {'artist_id': 10993, 'artist_name': 'Aadhi', 'album_id': 2093, 'album_name': 'Malupu', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   Would remove: {'artist_id': 11029, 'artist_name': 'Aadhi', 'album_id': 2176, 'album_name': 'Marakatha Mani', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   ... and 5380 more
+2025-12-07 03:18:10,378 - INFO - 
+Music Directors to remove (2498):
+2025-12-07 03:18:10,378 - INFO - DRY RUN: Would remove 2498 duplicate music_directors
+2025-12-07 03:18:10,378 - INFO -   Would remove: {'director_id': 6156, 'director_name': 'A', 'album_id': 2927, 'album_name': 'Premaalayam', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   Would remove: {'director_id': 5946, 'director_name': 'A R Rahaman', 'album_id': 2569, 'album_name': 'OK Bangaram', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   Would remove: {'director_id': 4494, 'director_name': 'A R Rahman', 'album_id': 149, 'album_name': 'Adirindhi', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   Would remove: {'director_id': 4753, 'director_name': 'A R Rahman', 'album_id': 626, 'album_name': 'Bharateeyudu', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   Would remove: {'director_id': 4782, 'director_name': 'A R Rahman', 'album_id': 677, 'album_name': 'Bobbili Paparayudu', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 03:18:10,378 - INFO -   ... and 2493 more
+2025-12-07 03:18:10,378 - INFO - 
+================================================================================
+2025-12-07 03:18:15,586 - INFO - 
+Proceeding with duplicate removal...
+2025-12-07 03:18:15,586 - INFO - ================================================================================
+2025-12-07 03:18:15,586 - INFO - 
+Removing duplicate songs...
+2025-12-07 03:18:17,764 - INFO - Database connection established
+2025-12-07 03:18:19,192 - INFO - Removed batch 1: 610 songs deleted
+2025-12-07 03:18:19,193 - INFO - Successfully removed 610 duplicate songs
+2025-12-07 03:18:19,405 - INFO - Database connection closed
+2025-12-07 03:18:19,406 - INFO - 
+Removing duplicate artists...
+2025-12-07 03:18:21,610 - INFO - Database connection established
+2025-12-07 03:18:22,366 - INFO - Removed batch 1: 1000 artists deleted
+2025-12-07 03:18:22,789 - INFO - Removed batch 2: 1000 artists deleted
+2025-12-07 03:18:23,259 - INFO - Removed batch 3: 1000 artists deleted
+2025-12-07 03:18:23,778 - INFO - Removed batch 4: 1000 artists deleted
+2025-12-07 03:18:24,228 - INFO - Removed batch 5: 1000 artists deleted
+2025-12-07 03:18:24,715 - INFO - Removed batch 6: 385 artists deleted
+2025-12-07 03:18:24,716 - INFO - Successfully removed 5385 duplicate artists
+2025-12-07 03:18:24,943 - INFO - Database connection closed
+2025-12-07 03:18:24,943 - INFO - 
+Removing duplicate music directors...
+2025-12-07 03:18:27,072 - INFO - Database connection established
+2025-12-07 03:18:27,904 - INFO - Removed batch 1: 1000 music_directors deleted
+2025-12-07 03:18:28,417 - INFO - Removed batch 2: 1000 music_directors deleted
+2025-12-07 03:18:28,877 - INFO - Removed batch 3: 498 music_directors deleted
+2025-12-07 03:18:28,878 - INFO - Successfully removed 2498 duplicate music_directors
+2025-12-07 03:18:29,116 - INFO - Database connection closed
+2025-12-07 03:18:29,116 - INFO - 
+================================================================================
+2025-12-07 03:18:29,116 - INFO - ✓ Successfully removed 8493 duplicate records!
+2025-12-07 03:18:29,116 - INFO - ================================================================================

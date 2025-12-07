@@ -1,17 +1,17 @@
 -- DELETE statements for language-specific full reload
--- Deleting all HINDI language data
+-- Deleting all TAMIL language data
 
 START TRANSACTION;
 
 -- Delete songs from this language's albums
 DELETE FROM songs
 WHERE album_id IN (
-  SELECT id FROM albums WHERE language = 'hindi'
+  SELECT id FROM albums WHERE language = 'tamil'
 );
 
--- Delete albums with language = hindi
+-- Delete albums with language = tamil
 DELETE FROM albums
-WHERE language = 'hindi';
+WHERE language = 'tamil';
 
 COMMIT;
 
