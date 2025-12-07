@@ -1,0 +1,316 @@
+2025-12-07 09:04:55,766 - __main__ - INFO - ======================================================================
+2025-12-07 09:04:55,766 - __main__ - INFO - STARTING FULL LOAD
+2025-12-07 09:04:55,766 - __main__ - INFO - ======================================================================
+2025-12-07 09:04:55,766 - __main__ - INFO - Scraping 1 tags...
+2025-12-07 09:04:55,766 - __main__ - INFO - Scraping 1 tags with 1 parallel workers...
+2025-12-07 09:04:55,766 - __main__ - INFO - Scraping tag 'telugu-1' page 1...
+2025-12-07 09:04:56,373 - __main__ - INFO - Scraping tag 'telugu-1' page 2...
+2025-12-07 09:04:56,680 - __main__ - INFO - [OK] (1/1) Completed tag 'telugu-1': 24 articles
+2025-12-07 09:04:56,680 - __main__ - INFO - Found 24 articles to scrape
+2025-12-07 09:04:56,680 - __main__ - INFO - Processing in 1 batches of ~50 articles each
+2025-12-07 09:04:56,680 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:04:56,680 - __main__ - INFO - Processing batch 1/1 (24 articles)
+2025-12-07 09:04:56,680 - __main__ - INFO - ======================================================================
+2025-12-07 09:04:56,680 - __main__ - INFO - Scraping 24 articles with 15 parallel workers...
+2025-12-07 09:04:57,415 - __main__ - INFO - [OK] Progress: 10/24 articles processed (10 successful)
+2025-12-07 09:04:57,779 - __main__ - INFO - [OK] Progress: 20/24 articles processed (20 successful)
+2025-12-07 09:04:58,302 - __main__ - INFO - [OK] Progress: 24/24 articles processed (24 successful)
+2025-12-07 09:04:58,303 - __main__ - INFO - [OK] Completed: 24/24 articles scraped successfully
+2025-12-07 09:04:58,326 - __main__ - INFO - Batch 1 complete: 24 articles scraped
+2025-12-07 09:04:58,327 - __main__ - INFO - Generating SQL files...
+2025-12-07 09:04:58,328 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:04:58,328 - __main__ - INFO - ✓ SQL FILES GENERATED
+2025-12-07 09:04:58,328 - __main__ - INFO - ======================================================================
+2025-12-07 09:04:58,328 - __main__ - INFO -   Albums: 24
+2025-12-07 09:04:58,328 - __main__ - INFO -   Songs: 123
+2025-12-07 09:04:58,328 - __main__ - INFO -   Artists: 50
+2025-12-07 09:04:58,328 - __main__ - INFO -   Singers: 9
+2025-12-07 09:04:58,328 - __main__ - INFO -   Music Directors: 23
+2025-12-07 09:04:58,328 - __main__ - INFO -   Output Directory: /Users/vijayramireddy/Documents/bastiboysmusic/backend/python-scripts/sql_output
+2025-12-07 09:04:58,328 - __main__ - INFO - ======================================================================
+
+2025-12-07 09:04:58,328 - __main__ - INFO - ======================================================================
+2025-12-07 09:04:58,328 - __main__ - INFO - FULL LOAD COMPLETED
+2025-12-07 09:04:58,328 - __main__ - INFO - ======================================================================
+2025-12-07 09:11:43,570 - ingestion - INFO - Dynamic Normalization: 'nup Rubens' -> 'Anup Rubens'
+2025-12-07 09:11:43,570 - ingestion - INFO - Dynamic Normalization: 'Devi Sri Prasa' -> 'Devi Sri Prasad'
+2025-12-07 09:12:12,900 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:12,900 - __main__ - INFO - STARTING FULL LOAD
+2025-12-07 09:12:12,900 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:12,900 - __main__ - INFO - Scraping 1 tags...
+2025-12-07 09:12:12,900 - __main__ - INFO - Scraping 1 tags with 1 parallel workers...
+2025-12-07 09:12:12,901 - __main__ - INFO - Scraping tag 'telugu-1' page 1...
+2025-12-07 09:12:13,502 - __main__ - INFO - Scraping tag 'telugu-1' page 2...
+2025-12-07 09:12:13,789 - __main__ - INFO - [OK] (1/1) Completed tag 'telugu-1': 24 articles
+2025-12-07 09:12:13,789 - __main__ - INFO - Found 24 articles to scrape
+2025-12-07 09:12:13,789 - __main__ - INFO - Processing in 1 batches of ~50 articles each
+2025-12-07 09:12:13,789 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:12:13,789 - __main__ - INFO - Processing batch 1/1 (24 articles)
+2025-12-07 09:12:13,789 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:13,790 - __main__ - INFO - Scraping 24 articles with 15 parallel workers...
+2025-12-07 09:12:14,509 - __main__ - INFO - [OK] Progress: 10/24 articles processed (10 successful)
+2025-12-07 09:12:14,878 - __main__ - INFO - [OK] Progress: 20/24 articles processed (20 successful)
+2025-12-07 09:12:15,039 - __main__ - INFO - [OK] Progress: 24/24 articles processed (24 successful)
+2025-12-07 09:12:15,040 - __main__ - INFO - [OK] Completed: 24/24 articles scraped successfully
+2025-12-07 09:12:15,059 - __main__ - INFO - Batch 1 complete: 24 articles scraped
+2025-12-07 09:12:15,059 - __main__ - INFO - Generating SQL files...
+2025-12-07 09:12:17,011 - db_utils - INFO - Database connection established
+2025-12-07 09:12:18,460 - __main__ - INFO - Loaded 6727 unique names from database for dynamic normalization.
+2025-12-07 09:12:18,643 - db_utils - INFO - Database connection closed
+2025-12-07 09:12:18,708 - __main__ - INFO - Dynamic Normalization: 'Allari naresh' -> 'Allari Naresh'
+2025-12-07 09:12:18,750 - __main__ - INFO - Dynamic Normalization: 'Sithara Krishnakumar' -> 'Sithara KrishnaKumar'
+2025-12-07 09:12:18,852 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:12:18,852 - __main__ - INFO - ✓ SQL FILES GENERATED
+2025-12-07 09:12:18,852 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:18,852 - __main__ - INFO -   Albums: 24
+2025-12-07 09:12:18,852 - __main__ - INFO -   Songs: 123
+2025-12-07 09:12:18,852 - __main__ - INFO -   Artists: 50
+2025-12-07 09:12:18,852 - __main__ - INFO -   Singers: 9
+2025-12-07 09:12:18,852 - __main__ - INFO -   Music Directors: 23
+2025-12-07 09:12:18,852 - __main__ - INFO -   Output Directory: /Users/vijayramireddy/Documents/bastiboysmusic/backend/python-scripts/sql_output
+2025-12-07 09:12:18,852 - __main__ - INFO - ======================================================================
+
+2025-12-07 09:12:18,852 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:18,852 - __main__ - INFO - FULL LOAD COMPLETED
+2025-12-07 09:12:18,852 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:53,360 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:53,360 - __main__ - INFO - STARTING FULL LOAD
+2025-12-07 09:12:53,360 - __main__ - INFO - ======================================================================
+2025-12-07 09:12:53,361 - __main__ - INFO - Scraping 1 tags...
+2025-12-07 09:12:53,361 - __main__ - INFO - Scraping 1 tags with 1 parallel workers...
+2025-12-07 09:12:53,361 - __main__ - INFO - Scraping tag 'telugu-a' page 1...
+2025-12-07 09:12:53,940 - __main__ - INFO - Scraping tag 'telugu-a' page 2...
+2025-12-07 09:12:54,231 - __main__ - INFO - Scraping tag 'telugu-a' page 3...
+2025-12-07 09:12:54,551 - __main__ - INFO - Scraping tag 'telugu-a' page 4...
+2025-12-07 09:12:54,842 - __main__ - INFO - Scraping tag 'telugu-a' page 5...
+2025-12-07 09:12:55,147 - __main__ - INFO - Scraping tag 'telugu-a' page 6...
+2025-12-07 09:12:55,459 - __main__ - INFO - Scraping tag 'telugu-a' page 7...
+2025-12-07 09:12:55,757 - __main__ - INFO - Scraping tag 'telugu-a' page 8...
+2025-12-07 09:12:56,068 - __main__ - INFO - Scraping tag 'telugu-a' page 9...
+2025-12-07 09:12:56,375 - __main__ - INFO - Scraping tag 'telugu-a' page 10...
+2025-12-07 09:12:56,688 - __main__ - INFO - Scraping tag 'telugu-a' page 11...
+2025-12-07 09:12:56,975 - __main__ - INFO - Scraping tag 'telugu-a' page 12...
+2025-12-07 09:12:57,261 - __main__ - INFO - Scraping tag 'telugu-a' page 13...
+2025-12-07 09:12:57,575 - __main__ - INFO - Scraping tag 'telugu-a' page 14...
+2025-12-07 09:12:57,855 - __main__ - INFO - Scraping tag 'telugu-a' page 15...
+2025-12-07 09:12:58,289 - __main__ - INFO - Scraping tag 'telugu-a' page 16...
+2025-12-07 09:12:58,611 - __main__ - INFO - Scraping tag 'telugu-a' page 17...
+2025-12-07 09:12:58,951 - __main__ - INFO - Scraping tag 'telugu-a' page 18...
+2025-12-07 09:12:59,272 - __main__ - INFO - Scraping tag 'telugu-a' page 19...
+2025-12-07 09:12:59,611 - __main__ - INFO - Scraping tag 'telugu-a' page 20...
+2025-12-07 09:12:59,934 - __main__ - INFO - Scraping tag 'telugu-a' page 21...
+2025-12-07 09:13:00,257 - __main__ - INFO - Scraping tag 'telugu-a' page 22...
+2025-12-07 09:13:00,576 - __main__ - INFO - Scraping tag 'telugu-a' page 23...
+2025-12-07 09:13:00,863 - __main__ - INFO - Scraping tag 'telugu-a' page 24...
+2025-12-07 09:13:01,160 - __main__ - INFO - Scraping tag 'telugu-a' page 25...
+2025-12-07 09:13:01,449 - __main__ - INFO - Scraping tag 'telugu-a' page 26...
+2025-12-07 09:13:01,753 - __main__ - INFO - Scraping tag 'telugu-a' page 27...
+2025-12-07 09:13:02,033 - __main__ - INFO - Scraping tag 'telugu-a' page 28...
+2025-12-07 09:13:02,330 - __main__ - INFO - [OK] (1/1) Completed tag 'telugu-a': 432 articles
+2025-12-07 09:13:02,331 - __main__ - INFO - Found 432 articles to scrape
+2025-12-07 09:13:02,331 - __main__ - INFO - Processing in 9 batches of ~50 articles each
+2025-12-07 09:13:02,331 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:02,331 - __main__ - INFO - Processing batch 1/9 (50 articles)
+2025-12-07 09:13:02,331 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:02,331 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:02,970 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:03,291 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:03,489 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:03,682 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:03,868 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:03,869 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:03,882 - __main__ - INFO - Batch 1 complete: 50 articles scraped
+2025-12-07 09:13:03,882 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:03,882 - __main__ - INFO - Processing batch 2/9 (50 articles)
+2025-12-07 09:13:03,882 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:03,883 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:04,494 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:04,790 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:05,068 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:05,255 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:05,617 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:05,617 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:05,642 - __main__ - INFO - Batch 2 complete: 50 articles scraped
+2025-12-07 09:13:05,642 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:05,642 - __main__ - INFO - Processing batch 3/9 (50 articles)
+2025-12-07 09:13:05,642 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:05,642 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:06,349 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:06,699 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:06,893 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:07,118 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:07,325 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:07,326 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:07,342 - __main__ - INFO - Batch 3 complete: 50 articles scraped
+2025-12-07 09:13:07,342 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:07,342 - __main__ - INFO - Processing batch 4/9 (50 articles)
+2025-12-07 09:13:07,342 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:07,342 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:07,917 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:08,205 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:08,494 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:08,771 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:08,909 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:08,909 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:08,925 - __main__ - INFO - Batch 4 complete: 50 articles scraped
+2025-12-07 09:13:08,925 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:08,926 - __main__ - INFO - Processing batch 5/9 (50 articles)
+2025-12-07 09:13:08,926 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:08,926 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:09,647 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:10,013 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:10,274 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:10,388 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:10,656 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:10,656 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:10,672 - __main__ - INFO - Batch 5 complete: 50 articles scraped
+2025-12-07 09:13:10,672 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:10,672 - __main__ - INFO - Processing batch 6/9 (50 articles)
+2025-12-07 09:13:10,672 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:10,672 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:11,245 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:11,524 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:11,746 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:12,080 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:12,142 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:12,143 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:12,156 - __main__ - INFO - Batch 6 complete: 50 articles scraped
+2025-12-07 09:13:12,156 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:12,156 - __main__ - INFO - Processing batch 7/9 (50 articles)
+2025-12-07 09:13:12,156 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:12,157 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:12,755 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:13,043 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:13,278 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:13,395 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:13,595 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:13,595 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:13,607 - __main__ - INFO - Batch 7 complete: 50 articles scraped
+2025-12-07 09:13:13,607 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:13,607 - __main__ - INFO - Processing batch 8/9 (50 articles)
+2025-12-07 09:13:13,607 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:13,607 - __main__ - INFO - Scraping 50 articles with 15 parallel workers...
+2025-12-07 09:13:14,278 - __main__ - INFO - [OK] Progress: 10/50 articles processed (10 successful)
+2025-12-07 09:13:14,559 - __main__ - INFO - [OK] Progress: 20/50 articles processed (20 successful)
+2025-12-07 09:13:14,748 - __main__ - INFO - [OK] Progress: 30/50 articles processed (30 successful)
+2025-12-07 09:13:14,972 - __main__ - INFO - [OK] Progress: 40/50 articles processed (40 successful)
+2025-12-07 09:13:15,119 - __main__ - INFO - [OK] Progress: 50/50 articles processed (50 successful)
+2025-12-07 09:13:15,119 - __main__ - INFO - [OK] Completed: 50/50 articles scraped successfully
+2025-12-07 09:13:15,134 - __main__ - INFO - Batch 8 complete: 50 articles scraped
+2025-12-07 09:13:15,134 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:15,135 - __main__ - INFO - Processing batch 9/9 (32 articles)
+2025-12-07 09:13:15,135 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:15,135 - __main__ - INFO - Scraping 32 articles with 15 parallel workers...
+2025-12-07 09:13:15,758 - __main__ - INFO - [OK] Progress: 10/32 articles processed (10 successful)
+2025-12-07 09:13:16,066 - __main__ - INFO - [OK] Progress: 20/32 articles processed (20 successful)
+2025-12-07 09:13:16,357 - __main__ - INFO - [OK] Progress: 30/32 articles processed (30 successful)
+2025-12-07 09:13:16,370 - __main__ - INFO - [OK] Progress: 32/32 articles processed (32 successful)
+2025-12-07 09:13:16,371 - __main__ - INFO - [OK] Completed: 32/32 articles scraped successfully
+2025-12-07 09:13:16,385 - __main__ - INFO - Batch 9 complete: 32 articles scraped
+2025-12-07 09:13:16,385 - __main__ - INFO - Generating SQL files...
+2025-12-07 09:13:18,380 - db_utils - INFO - Database connection established
+2025-12-07 09:13:19,805 - __main__ - INFO - Loaded 6727 unique names from database for dynamic normalization.
+2025-12-07 09:13:20,007 - db_utils - INFO - Database connection closed
+2025-12-07 09:13:20,069 - __main__ - INFO - Dynamic Normalization: 'Srikanth N. Reddy' -> 'Srikanth Reddy'
+2025-12-07 09:13:20,149 - __main__ - INFO - Dynamic Normalization: 'Shakthisree Gopalan' -> 'ShakthiSree Gopalan'
+2025-12-07 09:13:20,193 - __main__ - INFO - Dynamic Normalization: 'Bellamkonda Sai Srinivas' -> 'BellamKonda Sai Srinivas'
+2025-12-07 09:13:20,228 - __main__ - INFO - Dynamic Normalization: 'Gv Prakash Kumar' -> 'GV Prakash Kumar'
+2025-12-07 09:13:20,364 - __main__ - INFO - Dynamic Normalization: 'Ramya behra' -> 'Ramya Mehra'
+2025-12-07 09:13:20,373 - __main__ - INFO - Dynamic Normalization: 'Anurag kulkarni' -> 'Anurag Kulkarni'
+2025-12-07 09:13:20,429 - __main__ - INFO - Dynamic Normalization: 'Mark k Robin' -> 'Mark K Robin'
+2025-12-07 09:13:20,436 - __main__ - INFO - Dynamic Normalization: 'Mark k Robin' -> 'Mark K Robin'
+2025-12-07 09:13:20,571 - __main__ - INFO - Dynamic Normalization: 'Sekhar chandra' -> 'Sekhar Chandra'
+2025-12-07 09:13:20,581 - __main__ - INFO - Dynamic Normalization: 'Sekhar chandra' -> 'Sekhar Chandra'
+2025-12-07 09:13:20,690 - __main__ - INFO - Dynamic Normalization: 'G K Venkatesh' -> 'G. K. Venkatesh'
+2025-12-07 09:13:20,700 - __main__ - INFO - Dynamic Normalization: 'G K Venkatesh' -> 'G. K. Venkatesh'
+2025-12-07 09:13:20,723 - __main__ - INFO - Dynamic Normalization: 'Bharathi' -> 'Bharath'
+2025-12-07 09:13:20,792 - __main__ - INFO - Dynamic Normalization: 'BS Narayan' -> 'S. Narayan'
+2025-12-07 09:13:21,035 - __main__ - INFO - Dynamic Normalization: 'V Kumar' -> 'V. Kumar'
+2025-12-07 09:13:21,045 - __main__ - INFO - Dynamic Normalization: 'V Kumar' -> 'V. Kumar'
+2025-12-07 09:13:21,070 - __main__ - INFO - Dynamic Normalization: 'Siva Kumar' -> 'Shiva Kumar'
+2025-12-07 09:13:21,118 - __main__ - INFO - Dynamic Normalization: 'Bharathi' -> 'Bharath'
+2025-12-07 09:13:21,156 - __main__ - INFO - Dynamic Normalization: 'P Adinarayana Rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:21,166 - __main__ - INFO - Dynamic Normalization: 'P Adinarayana Rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:21,246 - __main__ - INFO - Dynamic Normalization: 'Prabha' -> 'Prabhas'
+2025-12-07 09:13:21,263 - __main__ - INFO - Dynamic Normalization: 'G K Venkatesh' -> 'G. K. Venkatesh'
+2025-12-07 09:13:21,280 - __main__ - INFO - Dynamic Normalization: 'G K Venkatesh' -> 'G. K. Venkatesh'
+2025-12-07 09:13:21,317 - __main__ - INFO - Dynamic Normalization: 'Sri Ranjani' -> 'Sri Ranjini'
+2025-12-07 09:13:21,375 - __main__ - INFO - Dynamic Normalization: 'Ramakrishna' -> 'Ramyakrishna'
+2025-12-07 09:13:21,471 - __main__ - INFO - Dynamic Normalization: 'K Srinivasa Reddy' -> 'Srinivas Reddy'
+2025-12-07 09:13:21,510 - __main__ - INFO - Dynamic Normalization: 'J Rajasekhar' -> 'Rajasekhar'
+2025-12-07 09:13:21,539 - __main__ - INFO - Dynamic Normalization: 'Ramakrishna' -> 'Ramyakrishna'
+2025-12-07 09:13:21,617 - __main__ - INFO - Dynamic Normalization: 'P Adinarayana Rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:21,626 - __main__ - INFO - Dynamic Normalization: 'P Adinarayana Rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:21,665 - __main__ - INFO - Dynamic Normalization: 'K Bhagyaraja' -> 'K.Bhagyaraja'
+2025-12-07 09:13:21,683 - __main__ - INFO - Dynamic Normalization: 'Sri Ranjani' -> 'Sri Ranjini'
+2025-12-07 09:13:21,785 - __main__ - INFO - Dynamic Normalization: 'Jayalalitha' -> 'Jayalalithaa'
+2025-12-07 09:13:21,813 - __main__ - INFO - Dynamic Normalization: 'Saagar' -> 'Sagar'
+2025-12-07 09:13:22,002 - __main__ - INFO - Dynamic Normalization: 'BS Narayan' -> 'S. Narayan'
+2025-12-07 09:13:22,010 - __main__ - INFO - Dynamic Normalization: 'Jayalalitha' -> 'Jayalalithaa'
+2025-12-07 09:13:22,113 - __main__ - INFO - Dynamic Normalization: 'T.Chalapathi Rao' -> 'T Chalapathi Rao'
+2025-12-07 09:13:22,128 - __main__ - INFO - Dynamic Normalization: 'T.Chalapathi Rao' -> 'T Chalapathi Rao'
+2025-12-07 09:13:22,175 - __main__ - INFO - Dynamic Normalization: 'Akkineni Nageshwara Rao' -> 'Akkineni Nageswara Rao'
+2025-12-07 09:13:22,180 - __main__ - INFO - Dynamic Normalization: 'Jayalalitha' -> 'Jayalalithaa'
+2025-12-07 09:13:22,196 - __main__ - INFO - Dynamic Normalization: 'R. Narayana Murthy' -> 'R.Narayana Murthy'
+2025-12-07 09:13:22,233 - __main__ - INFO - Dynamic Normalization: 'N.T. Rama Rao' -> 'NT Rama Rao'
+2025-12-07 09:13:22,271 - __main__ - INFO - Dynamic Normalization: 'M.S.Viswanathan' -> 'M. S. Viswanathan'
+2025-12-07 09:13:22,278 - __main__ - INFO - Dynamic Normalization: 'Jayaprada' -> 'Jayapradha'
+2025-12-07 09:13:22,284 - __main__ - INFO - Dynamic Normalization: 'M.S.Viswanathan' -> 'M. S. Viswanathan'
+2025-12-07 09:13:22,310 - __main__ - INFO - Dynamic Normalization: 'Jayaprada' -> 'Jayapradha'
+2025-12-07 09:13:22,395 - __main__ - INFO - Dynamic Normalization: 'P.Adinarayana Rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:22,404 - __main__ - INFO - Dynamic Normalization: 'P.Adinarayana Rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:22,472 - __main__ - INFO - Dynamic Normalization: 'Vaasu Rao' -> 'Vasu Rao'
+2025-12-07 09:13:22,481 - __main__ - INFO - Dynamic Normalization: 'P. Adinarayana rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:22,490 - __main__ - INFO - Dynamic Normalization: 'P. Adinarayana rao' -> 'P. Adinarayana Rao'
+2025-12-07 09:13:22,521 - __main__ - INFO - Dynamic Normalization: 'S.Rajeswara Rao' -> 'S. Rajeswara Rao'
+2025-12-07 09:13:22,535 - __main__ - INFO - Dynamic Normalization: 'S.Rajeswara Rao' -> 'S. Rajeswara Rao'
+2025-12-07 09:13:22,574 - __main__ - INFO - Dynamic Normalization: 'Jayaprada' -> 'Jayapradha'
+2025-12-07 09:13:22,587 - __main__ - INFO - Dynamic Normalization: 'Jayalalitha' -> 'Jayalalithaa'
+2025-12-07 09:13:22,599 - __main__ - INFO - Dynamic Normalization: 'Deepa' -> 'Deepak'
+2025-12-07 09:13:22,681 - __main__ - INFO - Dynamic Normalization: 'T.Chalapathi Rao' -> 'T Chalapathi Rao'
+2025-12-07 09:13:22,695 - __main__ - INFO - Dynamic Normalization: 'T.Chalapathi Rao' -> 'T Chalapathi Rao'
+2025-12-07 09:13:22,717 - __main__ - INFO - Dynamic Normalization: 'T.Prabhakar' -> 'Prabhakar'
+2025-12-07 09:13:22,749 - __main__ - INFO - Dynamic Normalization: 'Jayaprada' -> 'Jayapradha'
+2025-12-07 09:13:22,802 - __main__ - INFO - Dynamic Normalization: 'Jayaprada' -> 'Jayapradha'
+2025-12-07 09:13:22,876 - __main__ - INFO - Dynamic Normalization: 'Akkineni Nageshwara Rao' -> 'Akkineni Nageswara Rao'
+2025-12-07 09:13:22,913 - __main__ - INFO - Dynamic Normalization: 'Savitri' -> 'Savithri'
+2025-12-07 09:13:22,945 - __main__ - INFO - Dynamic Normalization: 'Saluri Rajeshwara Rao' -> 'Saluri Rajeswara Rao'
+2025-12-07 09:13:22,952 - __main__ - INFO - Dynamic Normalization: 'Akkineni Nageshwara Rao' -> 'Akkineni Nageswara Rao'
+2025-12-07 09:13:22,956 - __main__ - INFO - Dynamic Normalization: 'Saluri Rajeshwara Rao' -> 'Saluri Rajeswara Rao'
+2025-12-07 09:13:23,024 - __main__ - INFO - Dynamic Normalization: 'M.S.Vishwanathan' -> 'M. S. Viswanathan'
+2025-12-07 09:13:23,033 - __main__ - INFO - Dynamic Normalization: 'M.S.Vishwanathan' -> 'M. S. Viswanathan'
+2025-12-07 09:13:23,037 - __main__ - INFO - Dynamic Normalization: 'T.Chalapathi Rao' -> 'T Chalapathi Rao'
+2025-12-07 09:13:23,417 - __main__ - INFO - Dynamic Normalization: 'K.Venkateshwara Rao' -> 'J. Venkateshwara Rao'
+2025-12-07 09:13:23,609 - __main__ - INFO - Dynamic Normalization: 'Srinivasa Reddy' -> 'Srinivas Reddy'
+2025-12-07 09:13:23,622 - __main__ - INFO - Dynamic Normalization: 'Mahesh babu' -> 'Mahesh Babu'
+2025-12-07 09:13:23,957 - __main__ - INFO - Dynamic Normalization: 'S P Balasubramanyam' -> 'S P Balasubrahmanyam'
+2025-12-07 09:13:23,962 - __main__ - INFO - Dynamic Normalization: 'S P Balasubramanyam' -> 'S P Balasubrahmanyam'
+2025-12-07 09:13:23,966 - __main__ - INFO - Dynamic Normalization: 'S P Balasubramanyam' -> 'S P Balasubrahmanyam'
+2025-12-07 09:13:24,045 - __main__ - INFO - 
+======================================================================
+2025-12-07 09:13:24,046 - __main__ - INFO - ✓ SQL FILES GENERATED
+2025-12-07 09:13:24,046 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:24,046 - __main__ - INFO -   Albums: 411
+2025-12-07 09:13:24,046 - __main__ - INFO -   Songs: 1826
+2025-12-07 09:13:24,046 - __main__ - INFO -   Artists: 929
+2025-12-07 09:13:24,046 - __main__ - INFO -   Singers: 195
+2025-12-07 09:13:24,046 - __main__ - INFO -   Music Directors: 430
+2025-12-07 09:13:24,046 - __main__ - INFO -   Output Directory: /Users/vijayramireddy/Documents/bastiboysmusic/backend/python-scripts/sql_output
+2025-12-07 09:13:24,046 - __main__ - INFO - ======================================================================
+
+2025-12-07 09:13:24,046 - __main__ - INFO - ======================================================================
+2025-12-07 09:13:24,046 - __main__ - INFO - FULL LOAD COMPLETED
+2025-12-07 09:13:24,046 - __main__ - INFO - ======================================================================

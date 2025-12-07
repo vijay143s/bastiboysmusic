@@ -105,3 +105,110 @@ Removing duplicate music directors...
 ================================================================================
 2025-12-07 03:18:29,116 - INFO - ✓ Successfully removed 8493 duplicate records!
 2025-12-07 03:18:29,116 - INFO - ================================================================================
+2025-12-07 11:29:59,235 - INFO - Starting duplicate removal process for all tables...
+2025-12-07 11:29:59,235 - INFO - 
+================================================================================
+2025-12-07 11:29:59,235 - INFO - FINDING DUPLICATES IN ALL TABLES
+2025-12-07 11:29:59,235 - INFO - ================================================================================
+2025-12-07 11:29:59,235 - INFO - 
+1. Finding duplicate albums...
+2025-12-07 11:30:01,201 - INFO - Database connection established
+2025-12-07 11:30:03,152 - INFO - Database connection closed
+2025-12-07 11:30:03,153 - INFO -    Found 0 duplicate albums to remove
+2025-12-07 11:30:03,153 - INFO - 
+2. Finding duplicate songs...
+2025-12-07 11:30:05,249 - INFO - Database connection established
+2025-12-07 11:30:09,445 - INFO - Database connection closed
+2025-12-07 11:30:09,449 - INFO -    Found 90 duplicate songs to remove
+2025-12-07 11:30:09,450 - INFO - 
+3. Finding duplicate artists...
+2025-12-07 11:30:11,533 - INFO - Database connection established
+2025-12-07 11:30:13,645 - INFO - Database connection closed
+2025-12-07 11:30:13,647 - INFO -    Found 5385 duplicate artists to remove
+2025-12-07 11:30:13,647 - INFO - 
+4. Finding duplicate singers...
+2025-12-07 11:30:15,722 - INFO - Database connection established
+2025-12-07 11:30:16,573 - INFO - Database connection closed
+2025-12-07 11:30:16,574 - INFO -    Found 0 duplicate singers to remove
+2025-12-07 11:30:16,574 - INFO - 
+5. Finding duplicate music directors...
+2025-12-07 11:30:18,811 - INFO - Database connection established
+2025-12-07 11:30:20,479 - INFO - Database connection closed
+2025-12-07 11:30:20,481 - INFO -    Found 2498 duplicate music directors to remove
+2025-12-07 11:30:20,481 - INFO - 
+================================================================================
+2025-12-07 11:30:20,482 - INFO - REMOVAL SUMMARY
+2025-12-07 11:30:20,482 - INFO - ================================================================================
+2025-12-07 11:30:20,482 - INFO - Albums:          0 duplicates
+2025-12-07 11:30:20,482 - INFO - Songs:           90 duplicates
+2025-12-07 11:30:20,482 - INFO - Artists:         5385 duplicates
+2025-12-07 11:30:20,482 - INFO - Singers:         0 duplicates
+2025-12-07 11:30:20,482 - INFO - Music Directors: 2498 duplicates
+2025-12-07 11:30:20,482 - INFO - ================================================================================
+2025-12-07 11:30:20,482 - INFO - TOTAL:           7973 duplicates across all tables
+2025-12-07 11:30:20,483 - INFO - Strategy: Keep oldest entry (lowest ID), remove newer duplicates
+2025-12-07 11:30:20,483 - INFO - 
+================================================================================
+2025-12-07 11:30:20,483 - INFO - DRY RUN - Preview of what will be removed
+2025-12-07 11:30:20,483 - INFO - ================================================================================
+2025-12-07 11:30:20,483 - INFO - 
+Songs to remove (90):
+2025-12-07 11:30:20,483 - INFO - DRY RUN: Would remove 90 duplicate songs
+2025-12-07 11:30:20,483 - INFO -   Would remove: {'id': 19156, 'song_title': 'Akhanda Haindhavam', 'audio_url': 'https://mp3teluguwap.net/mp3/2025/Akhanda%202%20(2025)/Akhanda%202%20(2025)%20-%20HQ/Akhanda%20Haindhavam.mp3', 'singer': 'Sarvepalli Sisters', 'album_title': 'Akhanda 2', 'created_at': datetime.datetime(2025, 12, 4, 11, 56, 39), 'duplicate_count': 11, 'row_num': 2}
+2025-12-07 11:30:20,483 - INFO -   Would remove: {'id': 19165, 'song_title': 'Akhanda Haindhavam', 'audio_url': 'https://mp3teluguwap.net/mp3/2025/Akhanda%202%20(2025)/Akhanda%202%20(2025)%20-%20HQ/Akhanda%20Haindhavam.mp3', 'singer': 'Sarvepalli Sisters', 'album_title': 'Akhanda 2', 'created_at': datetime.datetime(2025, 12, 4, 11, 58, 42), 'duplicate_count': 11, 'row_num': 3}
+2025-12-07 11:30:20,483 - INFO -   Would remove: {'id': 19174, 'song_title': 'Akhanda Haindhavam', 'audio_url': 'https://mp3teluguwap.net/mp3/2025/Akhanda%202%20(2025)/Akhanda%202%20(2025)%20-%20HQ/Akhanda%20Haindhavam.mp3', 'singer': 'Sarvepalli Sisters', 'album_title': 'Akhanda 2', 'created_at': datetime.datetime(2025, 12, 4, 12, 1, 18), 'duplicate_count': 11, 'row_num': 4}
+2025-12-07 11:30:20,483 - INFO -   Would remove: {'id': 19183, 'song_title': 'Akhanda Haindhavam', 'audio_url': 'https://mp3teluguwap.net/mp3/2025/Akhanda%202%20(2025)/Akhanda%202%20(2025)%20-%20HQ/Akhanda%20Haindhavam.mp3', 'singer': 'Sarvepalli Sisters', 'album_title': 'Akhanda 2', 'created_at': datetime.datetime(2025, 12, 4, 12, 4, 29), 'duplicate_count': 11, 'row_num': 5}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'id': 19192, 'song_title': 'Akhanda Haindhavam', 'audio_url': 'https://mp3teluguwap.net/mp3/2025/Akhanda%202%20(2025)/Akhanda%202%20(2025)%20-%20HQ/Akhanda%20Haindhavam.mp3', 'singer': 'Sarvepalli Sisters', 'album_title': 'Akhanda 2', 'created_at': datetime.datetime(2025, 12, 4, 12, 6, 8), 'duplicate_count': 11, 'row_num': 6}
+2025-12-07 11:30:20,484 - INFO -   ... and 85 more
+2025-12-07 11:30:20,484 - INFO - 
+Artists to remove (5385):
+2025-12-07 11:30:20,484 - INFO - DRY RUN: Would remove 5385 duplicate artists
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'artist_id': 9817, 'artist_name': 'A.Ravi Teja', 'album_id': 105, 'album_name': 'Aavu Puli Madhyalo Prabahas Pelli', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'artist_id': 10473, 'artist_name': 'Aadarsh', 'album_id': 1253, 'album_name': 'Geeta Sakshigaa', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'artist_id': 10210, 'artist_name': 'Aadhi', 'album_id': 811, 'album_name': 'Chelagatam', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'artist_id': 10993, 'artist_name': 'Aadhi', 'album_id': 2093, 'album_name': 'Malupu', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'artist_id': 11029, 'artist_name': 'Aadhi', 'album_id': 2176, 'album_name': 'Marakatha Mani', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 18), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   ... and 5380 more
+2025-12-07 11:30:20,484 - INFO - 
+Music Directors to remove (2498):
+2025-12-07 11:30:20,484 - INFO - DRY RUN: Would remove 2498 duplicate music_directors
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'director_id': 6156, 'director_name': 'A', 'album_id': 2927, 'album_name': 'Premaalayam', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'director_id': 5946, 'director_name': 'A R Rahaman', 'album_id': 2569, 'album_name': 'OK Bangaram', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'director_id': 4494, 'director_name': 'A R Rahman', 'album_id': 149, 'album_name': 'Adirindhi', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'director_id': 4753, 'director_name': 'A R Rahman', 'album_id': 626, 'album_name': 'Bharateeyudu', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   Would remove: {'director_id': 4782, 'director_name': 'A R Rahman', 'album_id': 677, 'album_name': 'Bobbili Paparayudu', 'created_at': datetime.datetime(2025, 12, 3, 22, 50, 38), 'duplicate_count': 2, 'row_num': 2}
+2025-12-07 11:30:20,484 - INFO -   ... and 2493 more
+2025-12-07 11:30:20,485 - INFO - 
+================================================================================
+2025-12-07 11:30:30,662 - INFO - 
+Proceeding with duplicate removal...
+2025-12-07 11:30:30,662 - INFO - ================================================================================
+2025-12-07 11:30:30,662 - INFO - 
+Removing duplicate songs...
+2025-12-07 11:30:32,697 - INFO - Database connection established
+2025-12-07 11:30:33,336 - INFO - Removed batch 1: 90 songs deleted
+2025-12-07 11:30:33,337 - INFO - Successfully removed 90 duplicate songs
+2025-12-07 11:30:33,532 - INFO - Database connection closed
+2025-12-07 11:30:33,533 - INFO - 
+Removing duplicate artists...
+2025-12-07 11:30:36,158 - INFO - Database connection established
+2025-12-07 11:30:37,018 - INFO - Removed batch 1: 1000 artists deleted
+2025-12-07 11:30:37,441 - INFO - Removed batch 2: 1000 artists deleted
+2025-12-07 11:30:37,852 - INFO - Removed batch 3: 1000 artists deleted
+2025-12-07 11:30:38,252 - INFO - Removed batch 4: 1000 artists deleted
+2025-12-07 11:30:38,703 - INFO - Removed batch 5: 1000 artists deleted
+2025-12-07 11:30:39,117 - INFO - Removed batch 6: 385 artists deleted
+2025-12-07 11:30:39,118 - INFO - Successfully removed 5385 duplicate artists
+2025-12-07 11:30:39,314 - INFO - Database connection closed
+2025-12-07 11:30:39,315 - INFO - 
+Removing duplicate music directors...
+2025-12-07 11:30:41,361 - INFO - Database connection established
+2025-12-07 11:30:42,041 - INFO - Removed batch 1: 1000 music_directors deleted
+2025-12-07 11:30:42,573 - INFO - Removed batch 2: 1000 music_directors deleted
+2025-12-07 11:30:42,979 - INFO - Removed batch 3: 498 music_directors deleted
+2025-12-07 11:30:42,980 - INFO - Successfully removed 2498 duplicate music_directors
+2025-12-07 11:30:43,167 - INFO - Database connection closed
+2025-12-07 11:30:43,168 - INFO - 
+================================================================================
+2025-12-07 11:30:43,168 - INFO - ✓ Successfully removed 7973 duplicate records!
+2025-12-07 11:30:43,168 - INFO - ================================================================================

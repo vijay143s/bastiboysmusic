@@ -1,0 +1,4 @@
+oci
+mysql-connector-python
+python-dotenv
+requests
