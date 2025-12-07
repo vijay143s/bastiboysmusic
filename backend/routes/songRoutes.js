@@ -26,6 +26,13 @@ const {
   getDistinctLanguages,
 } = require("../controllers/songControllers.js");
 
+const {
+  getDownloadUrl,
+  markDownloaded,
+  getUserDownloads,
+  removeDownload
+} = require("../controllers/downloadController.js");
+
 const router = express.Router();
 
 // Album routes
@@ -55,5 +62,11 @@ router.delete("/:id", isAuth, deleteSong);
 // Years routes
 router.get("/years/top", getTopYears); // Get top 10 years
 router.get("/years/:year/albums", getAlbumsByYear); // Get albums by year with songs
+
+// Download routes
+router.get("/:id/download-url", isAuth, getDownloadUrl); // Get signed download URL
+router.post("/:id/mark-downloaded", isAuth, markDownloaded); // Mark song as downloaded
+router.get("/downloads", isAuth, getUserDownloads); // Get user's downloads
+router.delete("/:id/download", isAuth, removeDownload); // Remove download record
 
 module.exports = router;

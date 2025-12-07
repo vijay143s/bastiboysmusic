@@ -23,6 +23,10 @@
   "author": "BastiBoys Music Team",
   "license": "MIT",
   "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.4.0",
     "compression": "^1.8.1",

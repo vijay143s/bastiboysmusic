@@ -1,0 +1,16 @@
+{
+  "appId": "com.bastiboys.music",
+  "appName": "BastiBoys Music",
+  "webDir": "frontend/dist",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#000000",
+      "showSpinner": false
+    }
+  }
+}

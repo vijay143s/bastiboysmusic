@@ -1,8 +1,11 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserData } from "./context/User";
 import Loading from "./components/Loading";
 import Layout from "./components/Layout";
+import { Capacitor } from '@capacitor/core';
+import SmartAudioCache from './services/SmartAudioCache';
+import StoragePermissions from './utils/storagePermissions';
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -25,6 +28,27 @@ const DatabaseQueryPage = lazy(() => import("./pages/DatabaseQueryPage"));
 
 const App = () => {
   const { loading, isAuth } = UserData();
+
+  // Initialize Capacitor plugins and caching on mount
+  useEffect(() => {
+    const initializeApp = async () => {
+      const platform = Capacitor.getPlatform();
+      console.log(`🚀 Running on platform: ${platform}`);
+
+      // Initialize smart audio cache
+      await SmartAudioCache.init();
+
+      // Request persistent storage (prevents auto-eviction)
+      await StoragePermissions.requestPersistentStorage();
+
+      // Check storage quota
+      const quota = await StoragePermissions.checkQuota();
+      console.log(`📊 Storage: ${quota.used} / ${quota.available} (${quota.percentUsed})`);
+    };
+
+    initializeApp();
+  }, []);
+
   return (
     <>
       {loading ? (
